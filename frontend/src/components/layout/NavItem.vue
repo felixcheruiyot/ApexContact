@@ -14,7 +14,9 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
-const props = defineProps<{ to: string; icon: string; label: string }>()
+const props = defineProps<{ to: string; icon: string; label: string; exact?: boolean }>()
 const route = useRoute()
-const isActive = computed(() => route.path === props.to)
+const isActive = computed(() =>
+  props.exact ? route.path === props.to : route.path.startsWith(props.to),
+)
 </script>

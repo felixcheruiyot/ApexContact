@@ -72,6 +72,20 @@ func (h *AdminHandler) LockUser(c *fiber.Ctx) error {
 	return c.JSON(domain.Response{Data: "user account locked"})
 }
 
+func (h *AdminHandler) UnlockUser(c *fiber.Ctx) error {
+	userID := c.Params("id")
+
+	_, err := h.db.Exec(context.Background(),
+		`UPDATE users SET is_locked=false, updated_at=NOW() WHERE id=$1`, userID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to unlock user")
+	}
+
+	h.rdb.Del(context.Background(), "blocklist:"+userID)
+
+	return c.JSON(domain.Response{Data: "user account unlocked"})
+}
+
 func (h *AdminHandler) PlatformAnalytics(c *fiber.Ctx) error {
 	var stats struct {
 		TotalUsers      int     `json:"total_users"`

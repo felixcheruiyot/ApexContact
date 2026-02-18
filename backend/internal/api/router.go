@@ -99,6 +99,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	admin.Get("/users", adminHandler.ListUsers)
 	admin.Get("/fraud", adminHandler.ListFraudFlags)
 	admin.Post("/users/:id/lock", adminHandler.LockUser)
+	admin.Post("/users/:id/unlock", adminHandler.UnlockUser)
 	admin.Get("/analytics", adminHandler.PlatformAnalytics)
 }
 

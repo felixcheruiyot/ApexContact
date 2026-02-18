@@ -39,7 +39,7 @@ type stkPushResponse struct {
 		InvoiceID    string `json:"invoice_id"`
 		State        string `json:"state"`
 		Provider     string `json:"provider"`
-		Value        string `json:"value"`
+		Value        json.Number `json:"value"`
 		Account      string `json:"account"`
 		APIRef       string `json:"api_ref"`
 		FailedReason any    `json:"failed_reason"`
