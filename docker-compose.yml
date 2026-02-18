@@ -40,12 +40,14 @@ services:
     build:
       context: ./media-server
     restart: unless-stopped
+    environment:
+      MEDIA_SERVER_KEY: ${MEDIA_SERVER_KEY:-change-me-media-server-secret}
     ports:
       - "1935:1935"   # RTMP (broadcasters push here)
       - "8888:8888"   # HLS (internal; exposed via nginx)
     volumes:
       - hls_data:/tmp/hls
-    depends_on:  
+    depends_on:
       backend:
         condition: service_started
 

@@ -43,6 +43,18 @@ func RequireAuth(cfg *config.Config) fiber.Handler {
 	}
 }
 
+// RequireMediaServerKey validates requests from the Nginx-RTMP media server.
+// nginx-rtmp cannot send Authorization headers, so we use a shared secret
+// passed as the ?key= query parameter.
+func RequireMediaServerKey(cfg *config.Config) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		if cfg.MediaServerKey == "" || c.Query("key") != cfg.MediaServerKey {
+			return fiber.NewError(fiber.StatusUnauthorized, "invalid media server key")
+		}
+		return c.Next()
+	}
+}
+
 // RequireRole checks that the authenticated user has one of the allowed roles.
 func RequireRole(roles ...string) fiber.Handler {
 	allowed := make(map[string]bool, len(roles))

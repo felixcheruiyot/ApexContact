@@ -78,7 +78,10 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	stream := v1.Group("/stream", middleware.RequireAuth(cfg))
 	stream.Post("/:eventId/subscribe", streamHandler.Subscribe)
 	stream.Get("/:eventId/token", middleware.AntiPiracy(rdb), streamHandler.GetToken)
-	stream.Post("/ingest/callback", streamHandler.IngestCallback) // called by media server
+
+	// Media server callback — no JWT (nginx-rtmp can't send auth headers);
+	// verified by shared MediaServerKey query param instead.
+	v1.Post("/stream/ingest/callback", middleware.RequireMediaServerKey(cfg), streamHandler.IngestCallback)
 
 	// ── Payments ───────────────────────────────────────────────────────────────
 	payments := v1.Group("/payments")

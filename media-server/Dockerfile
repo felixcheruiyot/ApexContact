@@ -25,13 +25,15 @@ RUN cd nginx-${NGINX_VERSION} && \
 # Runtime
 FROM alpine:3.20
 
-RUN apk add --no-cache pcre openssl
+RUN apk add --no-cache pcre openssl gettext
 
 COPY --from=builder /usr/local/nginx /usr/local/nginx
-COPY nginx.conf /usr/local/nginx/conf/nginx.conf
+# Store the template; entrypoint substitutes ${MEDIA_SERVER_KEY} at startup
+COPY nginx.conf /usr/local/nginx/conf/nginx.conf.template
 
 RUN mkdir -p /tmp/hls
 
 EXPOSE 1935 8888
 
-CMD ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
+# envsubst replaces ${MEDIA_SERVER_KEY} from the environment before nginx starts
+CMD ["sh", "-c", "envsubst '${MEDIA_SERVER_KEY}' < /usr/local/nginx/conf/nginx.conf.template > /usr/local/nginx/conf/nginx.conf && /usr/local/nginx/sbin/nginx -g 'daemon off;'"]
