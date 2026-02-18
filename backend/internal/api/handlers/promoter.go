@@ -18,6 +18,30 @@ func NewPromoterHandler(cfg *config.Config, db *pgxpool.Pool) *PromoterHandler {
 	return &PromoterHandler{cfg: cfg, db: db}
 }
 
+// StreamKey returns the RTMP stream key for a specific event owned by the promoter.
+// This is sensitive — only the promoter of that event can retrieve it.
+func (h *PromoterHandler) StreamKey(c *fiber.Ctx) error {
+	eventID := c.Params("eventId")
+	promoterID := c.Locals("user_id").(string)
+
+	var streamKey string
+	err := h.db.QueryRow(context.Background(),
+		`SELECT stream_key FROM events WHERE id=$1 AND promoter_id=$2`,
+		eventID, promoterID,
+	).Scan(&streamKey)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "event not found or access denied")
+	}
+
+	return c.JSON(domain.Response{
+		Data: fiber.Map{
+			"stream_key": streamKey,
+			"rtmp_url":   "rtmp://<your-host>:1935/live",
+			"push_to":    "rtmp://<your-host>:1935/live/" + streamKey,
+		},
+	})
+}
+
 func (h *PromoterHandler) MyEvents(c *fiber.Ctx) error {
 	promoterID := c.Locals("user_id").(string)
 

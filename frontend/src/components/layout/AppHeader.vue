@@ -13,10 +13,14 @@
           active-class="text-white">
           Home
         </RouterLink>
-        <RouterLink to="/?sport=boxing" class="text-text-muted hover:text-white transition-colors text-sm font-medium">
+        <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }"
+          class="text-text-muted hover:text-white transition-colors text-sm font-medium"
+          :class="{ 'text-white': route.query.sport === 'boxing' }">
           Boxing
         </RouterLink>
-        <RouterLink to="/?sport=racing" class="text-text-muted hover:text-white transition-colors text-sm font-medium">
+        <RouterLink :to="{ name: 'home', query: { sport: 'racing' } }"
+          class="text-text-muted hover:text-white transition-colors text-sm font-medium"
+          :class="{ 'text-white': route.query.sport === 'racing' }">
           Racing
         </RouterLink>
       </nav>
@@ -61,11 +65,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const initials = computed(() => {
   const name = auth.user?.full_name ?? ''

@@ -60,14 +60,61 @@
                 </span>
               </td>
               <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                <button @click="showStreamKey(event.id)"
+                  class="text-accent-orange text-sm hover:underline">
+                  Stream Key
+                </button>
                 <RouterLink :to="`/dashboard/analytics/${event.id}`"
                   class="text-accent-red text-sm hover:underline">
                   Analytics
                 </RouterLink>
+              </div>
               </td>
             </tr>
           </tbody>
         </table>
+    <!-- Stream Key Modal -->
+    <Teleport to="body">
+      <div v-if="streamKeyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="streamKeyModal = null" />
+        <div class="relative bg-bg-elevated border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+          <h3 class="text-white font-bold text-lg mb-1">OBS / Streaming Setup</h3>
+          <p class="text-text-muted text-sm mb-5">Configure these in OBS → Settings → Stream</p>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">RTMP Server URL</label>
+              <div class="flex items-center gap-2">
+                <code class="flex-1 bg-bg-surface text-accent-orange text-sm px-4 py-3 rounded-lg font-mono truncate">
+                  rtmp://{{ hostname }}:1935/live
+                </code>
+              </div>
+            </div>
+            <div>
+              <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">Stream Key</label>
+              <div class="flex items-center gap-2">
+                <code class="flex-1 bg-bg-surface text-white text-sm px-4 py-3 rounded-lg font-mono truncate">
+                  {{ streamKeyModal.streamKey }}
+                </code>
+                <button @click="copyToClipboard(streamKeyModal!.streamKey)"
+                  class="btn-ghost text-xs py-2 px-3 shrink-0">Copy</button>
+              </div>
+              <p class="text-status-error text-xs mt-2">Keep this secret — do not share it.</p>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-white/5 text-text-muted text-xs space-y-1">
+            <p>1. Open OBS → Settings → Stream → Custom</p>
+            <p>2. Paste the Server URL and Stream Key above</p>
+            <p>3. Click "Start Streaming" — your event will go <span class="text-accent-red font-bold">LIVE</span> automatically</p>
+          </div>
+
+          <button @click="streamKeyModal = null" class="btn-primary w-full mt-5 text-sm">Done</button>
+        </div>
+      </div>
+    </Teleport>
+
         <div v-if="!events.length" class="text-center py-16">
           <p class="text-text-muted text-sm">No events yet.</p>
           <RouterLink to="/dashboard/create" class="btn-primary mt-4 inline-block text-sm py-2 px-4">
@@ -84,12 +131,24 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { format } from 'date-fns'
 import { eventsApi } from '@/api/events'
+import client from '@/api/client'
 import type { Event } from '@/types'
 
 const events = ref<Event[]>([])
+const streamKeyModal = ref<{ pushTo: string; streamKey: string } | null>(null)
+const hostname = window.location.hostname
 
 onMounted(async () => {
   const res = await eventsApi.myEvents()
   events.value = res.data.data ?? []
 })
+
+async function showStreamKey(eventId: string) {
+  const res = await client.get(`/promoter/stream-key/${eventId}`)
+  streamKeyModal.value = res.data.data
+}
+
+function copyToClipboard(text: string) {
+  window.navigator.clipboard.writeText(text)
+}
 </script>

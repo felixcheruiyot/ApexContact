@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/apexcontact/backend/internal/config"
@@ -32,12 +33,13 @@ type createEventRequest struct {
 
 func (h *EventHandler) List(c *fiber.Ctx) error {
 	sport := c.Query("sport")
-	status := c.Query("status", "scheduled,live")
+	// Split comma-separated statuses into a []string so pgx encodes it as a proper text[]
+	statusList := strings.Split(c.Query("status", "scheduled,live"), ",")
 
 	query := `SELECT id, promoter_id, title, description, sport_type, scheduled_at,
 	           status, price, currency, thumbnail_url, created_at, updated_at
 	          FROM events WHERE status = ANY($1::text[])`
-	args := []interface{}{status}
+	args := []interface{}{statusList}
 
 	if sport != "" {
 		query += " AND sport_type = $2"

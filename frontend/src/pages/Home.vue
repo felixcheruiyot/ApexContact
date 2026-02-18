@@ -30,7 +30,9 @@
 
       <!-- Upcoming -->
       <section v-if="upcomingEvents.length">
-        <h2 class="section-heading mb-6">Upcoming Events</h2>
+        <h2 class="section-heading mb-6">
+          {{ currentSport ? `Upcoming ${currentSport.charAt(0).toUpperCase() + currentSport.slice(1)}` : 'Upcoming Events' }}
+        </h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <EventCard v-for="event in upcomingEvents" :key="event.id" :event="event" />
         </div>
@@ -54,10 +56,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
 import EventHero from '@/components/events/EventHero.vue'
 import EventCard from '@/components/events/EventCard.vue'
 import MpesaModal from '@/components/payment/MpesaModal.vue'
@@ -65,12 +67,21 @@ import type { Event } from '@/types'
 
 const eventsStore = useEventsStore()
 const auth = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 
 const showPaymentModal = ref(false)
 const selectedEvent = ref<Event | null>(null)
 
-onMounted(() => eventsStore.fetchEvents())
+function load() {
+  const sport = route.query.sport as string | undefined
+  eventsStore.fetchEvents(sport ? { sport } : undefined)
+}
+
+onMounted(load)
+
+// Re-fetch when the ?sport= query param changes (e.g. clicking Boxing / Racing nav)
+watch(() => route.query.sport, load)
 
 const liveEvents = computed(() => eventsStore.events.filter((e) => e.status === 'live'))
 const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status === 'scheduled'))
@@ -78,6 +89,8 @@ const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status 
 const featuredEvent = computed<Event | undefined>(() =>
   liveEvents.value[0] ?? upcomingEvents.value[0]
 )
+
+const currentSport = computed(() => route.query.sport as string | undefined)
 
 function openPayment(event: Event) {
   if (!auth.isAuthenticated) {

@@ -89,6 +89,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	// ── Promoter dashboard ─────────────────────────────────────────────────────
 	promoter := v1.Group("/promoter", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"))
 	promoter.Get("/events", promoterHandler.MyEvents)
+	promoter.Get("/stream-key/:eventId", promoterHandler.StreamKey)
 	promoter.Get("/analytics/:eventId", promoterHandler.Analytics)
 	promoter.Get("/revenue", promoterHandler.Revenue)
 

@@ -120,8 +120,8 @@ func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "stream not yet available — event may not have started")
 	}
 
-	// Construct the HLS URL. In production this would be signed.
-	hlsURL := fmt.Sprintf("%s/hls/%s/index.m3u8?token=%s", h.cfg.MediaServerURL, streamKey, token)
+	// Use the public frontend URL so the browser can reach the HLS stream via nginx.
+	hlsURL := fmt.Sprintf("%s/hls/%s/index.m3u8?token=%s", h.cfg.FrontendURL, streamKey, token)
 
 	return c.JSON(domain.Response{
 		Data: fiber.Map{"hls_url": hlsURL},
@@ -129,26 +129,27 @@ func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
 }
 
 // IngestCallback is called by the Nginx-RTMP media server on stream start/stop.
+// Nginx-RTMP sends application/x-www-form-urlencoded with fields: call, name, app, addr
 func (h *StreamHandler) IngestCallback(c *fiber.Ctx) error {
-	var body struct {
-		Name   string `json:"name"`   // stream key
-		Action string `json:"action"` // "publish" or "publish_done"
-	}
-	if err := c.BodyParser(&body); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "invalid callback body")
+	// "call" = "publish" on start, "publish_done" on stop
+	call := c.FormValue("call")
+	name := c.FormValue("name") // stream key
+
+	if name == "" {
+		return c.SendStatus(fiber.StatusOK) // ignore malformed calls
 	}
 
-	switch body.Action {
+	switch call {
 	case "publish":
-		hlsPath := fmt.Sprintf("/tmp/hls/%s", body.Name)
+		hlsPath := fmt.Sprintf("/tmp/hls/%s", name)
 		h.db.Exec(context.Background(),
 			`UPDATE events SET status='live', hls_path=$1, updated_at=NOW() WHERE stream_key=$2`,
-			hlsPath, body.Name,
+			hlsPath, name,
 		)
 	case "publish_done":
 		h.db.Exec(context.Background(),
 			`UPDATE events SET status='completed', updated_at=NOW() WHERE stream_key=$1`,
-			body.Name,
+			name,
 		)
 	}
 
