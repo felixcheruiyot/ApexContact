@@ -1,0 +1,90 @@
+<template>
+  <div>
+    <!-- Hero: featured live or next scheduled event -->
+    <EventHero v-if="featuredEvent" :event="featuredEvent" @buy-ticket="openPayment(featuredEvent!)" />
+
+    <!-- Skeleton hero if loading -->
+    <div v-else-if="eventsStore.loading"
+      class="min-h-[60vh] bg-bg-surface animate-pulse flex items-end p-12">
+      <div class="max-w-lg space-y-4">
+        <div class="h-4 bg-bg-elevated rounded w-24" />
+        <div class="h-16 bg-bg-elevated rounded w-96" />
+        <div class="h-4 bg-bg-elevated rounded w-64" />
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
+      <!-- Live Now -->
+      <section v-if="liveEvents.length">
+        <h2 class="section-heading mb-6 flex items-center gap-3">
+          Live Now
+          <span class="badge-live text-xs">
+            <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+            {{ liveEvents.length }}
+          </span>
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <EventCard v-for="event in liveEvents" :key="event.id" :event="event" />
+        </div>
+      </section>
+
+      <!-- Upcoming -->
+      <section v-if="upcomingEvents.length">
+        <h2 class="section-heading mb-6">Upcoming Events</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <EventCard v-for="event in upcomingEvents" :key="event.id" :event="event" />
+        </div>
+      </section>
+
+      <!-- Empty state -->
+      <div v-if="!eventsStore.loading && !eventsStore.events.length" class="text-center py-24">
+        <p class="text-5xl mb-4">🎬</p>
+        <h3 class="text-white font-semibold text-xl mb-2">No events scheduled yet</h3>
+        <p class="text-text-muted">Check back soon for upcoming boxing and racing events.</p>
+      </div>
+    </div>
+
+    <!-- Payment modal -->
+    <MpesaModal
+      v-if="selectedEvent && showPaymentModal"
+      :event="selectedEvent"
+      @close="showPaymentModal = false"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useEventsStore } from '@/stores/events'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import EventHero from '@/components/events/EventHero.vue'
+import EventCard from '@/components/events/EventCard.vue'
+import MpesaModal from '@/components/payment/MpesaModal.vue'
+import type { Event } from '@/types'
+
+const eventsStore = useEventsStore()
+const auth = useAuthStore()
+const router = useRouter()
+
+const showPaymentModal = ref(false)
+const selectedEvent = ref<Event | null>(null)
+
+onMounted(() => eventsStore.fetchEvents())
+
+const liveEvents = computed(() => eventsStore.events.filter((e) => e.status === 'live'))
+const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status === 'scheduled'))
+
+const featuredEvent = computed<Event | undefined>(() =>
+  liveEvents.value[0] ?? upcomingEvents.value[0]
+)
+
+function openPayment(event: Event) {
+  if (!auth.isAuthenticated) {
+    router.push({ name: 'login', query: { redirect: `/events/${event.id}` } })
+    return
+  }
+  selectedEvent.value = event
+  showPaymentModal.value = true
+}
+</script>

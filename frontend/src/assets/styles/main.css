@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #0A0A0F;
+    color: #FFFFFF;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #141418;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #E8002D;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C0001F;
+  }
+}
+
+@layer components {
+  /* Primary button */
+  .btn-primary {
+    @apply bg-accent-red hover:bg-accent-red-hover text-white font-semibold px-6 py-3 rounded-lg
+           transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2
+           focus:ring-accent-red focus:ring-offset-2 focus:ring-offset-bg;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply border border-white/20 hover:border-white/50 text-white font-semibold px-6 py-3 rounded-lg
+           transition-all duration-200 active:scale-95 bg-transparent hover:bg-white/5;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-bg-surface rounded-xl overflow-hidden transition-transform duration-200 hover:-translate-y-1;
+  }
+
+  /* Live badge */
+  .badge-live {
+    @apply inline-flex items-center gap-1.5 bg-accent-red text-white text-xs font-bold
+           uppercase tracking-wider px-2.5 py-1 rounded-full;
+  }
+
+  /* Upcoming badge */
+  .badge-upcoming {
+    @apply inline-flex items-center gap-1.5 bg-bg-elevated border border-white/10 text-text-muted
+           text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full;
+  }
+
+  /* Input field */
+  .input {
+    @apply w-full bg-bg-elevated border border-white/10 text-white placeholder-text-muted
+           rounded-lg px-4 py-3 focus:outline-none focus:border-accent-red transition-colors;
+  }
+
+  /* Section heading */
+  .section-heading {
+    @apply font-display text-2xl md:text-3xl uppercase tracking-wide text-white;
+  }
+}
+
+/* Video.js dark theme overrides */
+.video-js {
+  background-color: #000 !important;
+}
+.video-js .vjs-control-bar {
+  background: linear-gradient(transparent, rgba(0,0,0,0.8)) !important;
+}
+.video-js .vjs-play-progress,
+.video-js .vjs-volume-level {
+  background-color: #E8002D !important;
+}

@@ -1,0 +1,32 @@
+# Production overrides — use with:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+name: apexcontact
+
+services:
+  postgres:
+    ports: []   # do not expose DB port in production
+
+  redis:
+    ports: []   # do not expose Redis port in production
+
+  media-server:
+    ports:
+      - "1935:1935"  # keep RTMP open for broadcasters
+      # remove 8888 — serve HLS only through nginx
+
+  backend:
+    ports: []   # behind nginx only
+    environment:
+      APP_ENV: production
+
+  frontend:
+    ports: []   # behind nginx only
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro  # SSL certificates

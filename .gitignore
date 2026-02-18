@@ -1,0 +1,35 @@
+# ── Environment / Secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+backend/vendor/
+backend/bin/
+backend/apexcontact
+*.exe
+*.test
+*.out
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+nginx/certs/
+
+# ── HLS / Media ───────────────────────────────────────────────────────────────
+/tmp/hls/
+*.ts
+*.m3u8
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

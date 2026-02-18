@@ -1,0 +1,107 @@
+package handlers
+
+import (
+	"context"
+
+	"github.com/apexcontact/backend/internal/config"
+	"github.com/apexcontact/backend/internal/domain"
+	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type PromoterHandler struct {
+	cfg *config.Config
+	db  *pgxpool.Pool
+}
+
+func NewPromoterHandler(cfg *config.Config, db *pgxpool.Pool) *PromoterHandler {
+	return &PromoterHandler{cfg: cfg, db: db}
+}
+
+func (h *PromoterHandler) MyEvents(c *fiber.Ctx) error {
+	promoterID := c.Locals("user_id").(string)
+
+	rows, err := h.db.Query(context.Background(),
+		`SELECT id, title, description, sport_type, scheduled_at, status, price, currency, thumbnail_url, created_at
+		 FROM events WHERE promoter_id=$1 ORDER BY scheduled_at DESC`, promoterID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch events")
+	}
+	defer rows.Close()
+
+	var events []domain.Event
+	for rows.Next() {
+		var e domain.Event
+		rows.Scan(&e.ID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
+			&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.CreatedAt)
+		events = append(events, e)
+	}
+
+	return c.JSON(domain.Response{Data: events})
+}
+
+func (h *PromoterHandler) Analytics(c *fiber.Ctx) error {
+	eventID := c.Params("eventId")
+	promoterID := c.Locals("user_id").(string)
+
+	// Verify ownership
+	var count int
+	h.db.QueryRow(context.Background(),
+		`SELECT COUNT(*) FROM events WHERE id=$1 AND promoter_id=$2`, eventID, promoterID,
+	).Scan(&count)
+	if count == 0 {
+		return fiber.NewError(fiber.StatusForbidden, "event not found or access denied")
+	}
+
+	var stats struct {
+		EventID      string  `json:"event_id"`
+		TotalTickets int     `json:"total_tickets"`
+		TotalRevenue float64 `json:"total_revenue"`
+		PeakViewers  int     `json:"peak_viewers"`
+	}
+	stats.EventID = eventID
+
+	h.db.QueryRow(context.Background(),
+		`SELECT COUNT(*), COALESCE(SUM(p.amount),0)
+		 FROM subscriptions s JOIN payments p ON s.payment_id=p.id
+		 WHERE s.event_id=$1 AND p.status='success'`, eventID,
+	).Scan(&stats.TotalTickets, &stats.TotalRevenue)
+
+	h.db.QueryRow(context.Background(),
+		`SELECT COALESCE(MAX(peak_viewers),0) FROM stream_analytics WHERE event_id=$1`, eventID,
+	).Scan(&stats.PeakViewers)
+
+	return c.JSON(domain.Response{Data: stats})
+}
+
+func (h *PromoterHandler) Revenue(c *fiber.Ctx) error {
+	promoterID := c.Locals("user_id").(string)
+
+	rows, err := h.db.Query(context.Background(),
+		`SELECT e.id, e.title, COUNT(s.id) as tickets, COALESCE(SUM(p.amount),0) as revenue
+		 FROM events e
+		 LEFT JOIN subscriptions s ON e.id=s.event_id
+		 LEFT JOIN payments p ON s.payment_id=p.id AND p.status='success'
+		 WHERE e.promoter_id=$1
+		 GROUP BY e.id, e.title
+		 ORDER BY e.scheduled_at DESC`, promoterID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch revenue data")
+	}
+	defer rows.Close()
+
+	type eventRevenue struct {
+		EventID string  `json:"event_id"`
+		Title   string  `json:"title"`
+		Tickets int     `json:"tickets"`
+		Revenue float64 `json:"revenue"`
+	}
+	var results []eventRevenue
+	for rows.Next() {
+		var er eventRevenue
+		rows.Scan(&er.EventID, &er.Title, &er.Tickets, &er.Revenue)
+		results = append(results, er)
+	}
+
+	return c.JSON(domain.Response{Data: results})
+}
