@@ -28,7 +28,7 @@
                 <p class="text-text-muted text-xs mb-1">Total Amount</p>
                 <p class="text-white font-bold text-2xl">{{ event.currency }} {{ event.price.toLocaleString() }}</p>
               </div>
-              <img src="/mpesa-logo.png" alt="M-Pesa" class="h-8 opacity-80" onerror="this.style.display='none'" />
+              <span class="font-bold text-sm tracking-widest px-2 py-1 rounded bg-[#00A651]/20 text-[#00A651]">M-PESA</span>
             </div>
 
             <div class="mb-5">
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePaymentStore } from '@/stores/payment'
 import type { Event } from '@/types'
@@ -113,7 +113,6 @@ const router = useRouter()
 const phoneNumber = ref('')
 
 async function handlePay() {
-  const fingerprint = await generateFingerprint()
   await payment.initiate(props.event.id, phoneNumber.value)
 }
 

@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useEventsStore } from '@/stores/events'
 import { paymentsApi } from '@/api/payments'
@@ -80,9 +80,7 @@ const eventsStore = useEventsStore()
 const loading = ref(true)
 const error = ref<string | null>(null)
 const hlsUrl = ref<string | null>(null)
-const event = computed => eventsStore.currentEvent
-
-import { computed } from 'vue'
+const event = computed(() => eventsStore.currentEvent)
 
 onMounted(async () => {
   const eventId = route.params.eventId as string

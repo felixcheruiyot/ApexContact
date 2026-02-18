@@ -67,12 +67,21 @@
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { eventsApi } from '@/api/events'
+import type { SportType } from '@/types'
 
 const router = useRouter()
 const errorMsg = ref('')
 const loading = ref(false)
 
-const form = ref({
+const form = ref<{
+  title: string
+  description: string
+  sport_type: SportType | ''
+  scheduled_at: string
+  price: number
+  currency: string
+  thumbnail_url: string
+}>({
   title: '',
   description: '',
   sport_type: '',
@@ -83,11 +92,13 @@ const form = ref({
 })
 
 async function handleSubmit() {
+  if (!form.value.sport_type) return
   errorMsg.value = ''
   loading.value = true
   try {
     await eventsApi.create({
       ...form.value,
+      sport_type: form.value.sport_type as SportType,
       scheduled_at: new Date(form.value.scheduled_at).toISOString(),
     })
     router.push('/dashboard')
