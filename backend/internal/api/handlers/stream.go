@@ -116,7 +116,7 @@ func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusNotFound, "stream not yet available — event may not have started")
 		}
 
-		hlsURL := fmt.Sprintf("%s/hls/%s/index.m3u8", h.cfg.FrontendURL, streamKey)
+		hlsURL := fmt.Sprintf("%s/hls/%s.m3u8", h.cfg.FrontendURL, streamKey)
 		return c.JSON(domain.Response{Data: fiber.Map{"hls_url": hlsURL}})
 	}
 
@@ -139,7 +139,7 @@ func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
 	}
 
 	// Use the public frontend URL so the browser can reach the HLS stream via nginx.
-	hlsURL := fmt.Sprintf("%s/hls/%s/index.m3u8?token=%s", h.cfg.FrontendURL, streamKey, token)
+	hlsURL := fmt.Sprintf("%s/hls/%s.m3u8?token=%s", h.cfg.FrontendURL, streamKey, token)
 
 	return c.JSON(domain.Response{
 		Data: fiber.Map{"hls_url": hlsURL},
@@ -159,7 +159,7 @@ func (h *StreamHandler) IngestCallback(c *fiber.Ctx) error {
 
 	switch call {
 	case "publish":
-		hlsPath := fmt.Sprintf("/tmp/hls/%s", name)
+		hlsPath := fmt.Sprintf("/tmp/hls/%s.m3u8", name)
 		h.db.Exec(context.Background(),
 			`UPDATE events SET status='live', hls_path=$1, updated_at=NOW() WHERE stream_key=$2`,
 			hlsPath, name,
