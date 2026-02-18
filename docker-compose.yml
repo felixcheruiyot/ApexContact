@@ -45,9 +45,8 @@ services:
       - "8888:8888"   # HLS (internal; exposed via nginx)
     volumes:
       - hls_data:/tmp/hls
-    depends_on:
-      backend:
-        condition: service_healthy
+    backend:
+        condition: service_started
 
   # ── Go API backend ────────────────────────────────────────────────────────────
   backend:
@@ -68,12 +67,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8000/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
   # ── Vue 3 Frontend ────────────────────────────────────────────────────────────
   frontend:
