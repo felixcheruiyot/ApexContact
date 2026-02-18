@@ -74,14 +74,12 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	events.Post("/", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"), eventHandler.Create)
 	events.Put("/:id", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"), eventHandler.Update)
 
-	// ── Streaming (requires auth + valid subscription) ─────────────────────────
-	stream := v1.Group("/stream", middleware.RequireAuth(cfg))
-	stream.Post("/:eventId/subscribe", streamHandler.Subscribe)
-	stream.Get("/:eventId/token", middleware.AntiPiracy(rdb), streamHandler.GetToken)
-
-	// Media server callback — no JWT (nginx-rtmp can't send auth headers);
-	// verified by shared MediaServerKey query param instead.
-	v1.Post("/stream/ingest/callback", middleware.RequireMediaServerKey(cfg), streamHandler.IngestCallback)
+	// ── Streaming ──────────────────────────────────────────────────────────────
+	// Ingest callback first — no JWT (nginx-rtmp can't send auth headers).
+	stream := v1.Group("/stream")
+	stream.Post("/ingest/callback", middleware.RequireMediaServerKey(cfg), streamHandler.IngestCallback)
+	stream.Post("/:eventId/subscribe", middleware.RequireAuth(cfg), streamHandler.Subscribe)
+	stream.Get("/:eventId/token", middleware.RequireAuth(cfg), middleware.AntiPiracy(rdb), streamHandler.GetToken)
 
 	// ── Payments ───────────────────────────────────────────────────────────────
 	payments := v1.Group("/payments")
