@@ -17,9 +17,10 @@ export const paymentsApi = {
     return client.post<ApiResponse<{ stream_token: string }>>(`/stream/${eventId}/subscribe`, data)
   },
 
-  getStreamToken(eventId: string, token: string) {
+  // token is optional — admins can omit it (backend detects admin role from JWT)
+  getStreamToken(eventId: string, token?: string) {
     return client.get<ApiResponse<{ hls_url: string }>>(`/stream/${eventId}/token`, {
-      params: { token },
+      params: token ? { token } : undefined,
     })
   },
 }

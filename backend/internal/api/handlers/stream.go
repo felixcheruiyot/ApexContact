@@ -100,9 +100,27 @@ func (h *StreamHandler) Subscribe(c *fiber.Ctx) error {
 }
 
 // GetToken validates the stream token and returns the signed HLS playlist URL.
+// Admins bypass the subscription check and get free access to any live event.
 func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
-	token := c.Locals("stream_token").(string) // set by AntiPiracy middleware
 	eventID := c.Params("eventId")
+	role, _ := c.Locals("role").(domain.UserRole)
+
+	if role == domain.RoleAdmin {
+		// Admins watch for free — skip token validation entirely.
+		var hlsPath, streamKey string
+		h.db.QueryRow(context.Background(),
+			`SELECT hls_path, stream_key FROM events WHERE id=$1 AND status='live'`, eventID,
+		).Scan(&hlsPath, &streamKey)
+
+		if hlsPath == "" {
+			return fiber.NewError(fiber.StatusNotFound, "stream not yet available — event may not have started")
+		}
+
+		hlsURL := fmt.Sprintf("%s/hls/%s/index.m3u8", h.cfg.FrontendURL, streamKey)
+		return c.JSON(domain.Response{Data: fiber.Map{"hls_url": hlsURL}})
+	}
+
+	token := c.Locals("stream_token").(string) // set by AntiPiracy middleware
 
 	// Verify token is for this event
 	cachedEventID, err := h.rdb.Get(context.Background(), fmt.Sprintf("token:%s", token)).Result()

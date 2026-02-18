@@ -5,7 +5,7 @@
     </div>
 
     <template v-else-if="event">
-      <EventHero :event="event" @buy-ticket="handleBuyTicket" />
+      <EventHero :event="event" @buy-ticket="handleCta" />
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -35,15 +35,21 @@
                     <span v-else class="badge-upcoming text-xs capitalize">{{ event.status }}</span>
                   </dd>
                 </div>
-                <div>
+                <div v-if="!auth.isAdmin">
                   <dt class="text-text-muted text-xs uppercase tracking-wider mb-1">Ticket Price</dt>
                   <dd class="text-accent-red font-bold text-xl">
                     {{ event.currency }} {{ event.price.toLocaleString() }}
                   </dd>
                 </div>
+                <div v-else>
+                  <dt class="text-text-muted text-xs uppercase tracking-wider mb-1">Access</dt>
+                  <dd class="text-status-success font-semibold text-sm">Admin — Free</dd>
+                </div>
               </dl>
-              <button @click="handleBuyTicket" class="btn-primary w-full mt-6">
-                {{ event.status === 'live' ? 'Watch Live' : 'Buy Ticket' }}
+
+              <!-- CTA button — changes based on access state -->
+              <button @click="handleCta" class="btn-primary w-full mt-6">
+                {{ ctaLabel }}
               </button>
             </div>
 
@@ -71,6 +77,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { format } from 'date-fns'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
+import { usePaymentStore } from '@/stores/payment'
 import EventHero from '@/components/events/EventHero.vue'
 import CountdownTimer from '@/components/events/CountdownTimer.vue'
 import MpesaModal from '@/components/payment/MpesaModal.vue'
@@ -79,6 +86,7 @@ const route = useRoute()
 const router = useRouter()
 const eventsStore = useEventsStore()
 const auth = useAuthStore()
+const payment = usePaymentStore()
 const showPaymentModal = ref(false)
 
 const event = computed(() => eventsStore.currentEvent)
@@ -86,13 +94,42 @@ const formattedDate = computed(() =>
   event.value ? format(new Date(event.value.scheduled_at), 'EEEE, MMMM d, yyyy · h:mm a') : ''
 )
 
+// Does the authenticated viewer already own a ticket for this event?
+const existingToken = computed(() =>
+  event.value ? payment.getStoredToken(event.value.id) : null
+)
+
+const ctaLabel = computed(() => {
+  if (auth.isAdmin) return event.value?.status === 'live' ? 'Watch Free (Admin)' : 'Event Details (Admin)'
+  if (existingToken.value) return 'Watch Now'
+  return event.value?.status === 'live' ? 'Watch Live' : 'Buy Ticket'
+})
+
 onMounted(() => eventsStore.fetchEvent(route.params.id as string))
 
-function handleBuyTicket() {
+function handleCta() {
   if (!auth.isAuthenticated) {
     router.push({ name: 'login', query: { redirect: route.fullPath } })
     return
   }
+
+  // Admins go straight to Watch — no token needed
+  if (auth.isAdmin) {
+    router.push({ name: 'watch', params: { eventId: event.value!.id } })
+    return
+  }
+
+  // Viewer with existing subscription — go straight to Watch with their token
+  if (existingToken.value) {
+    router.push({
+      name: 'watch',
+      params: { eventId: event.value!.id },
+      query: { token: existingToken.value },
+    })
+    return
+  }
+
+  // New purchase
   showPaymentModal.value = true
 }
 </script>

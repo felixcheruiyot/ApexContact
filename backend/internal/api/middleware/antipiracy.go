@@ -5,14 +5,21 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/livestreamify/backend/internal/domain"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
 
 // AntiPiracy enforces single-session streaming per token.
 // If a token is already active on another session, the old session is invalidated.
+// Admins bypass this check entirely — they can watch any live stream for free.
 func AntiPiracy(rdb *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// Admins are exempt from anti-piracy and subscription checks.
+		if role, _ := c.Locals("role").(domain.UserRole); role == domain.RoleAdmin {
+			return c.Next()
+		}
+
 		token := c.Query("token")
 		if token == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "stream token required")

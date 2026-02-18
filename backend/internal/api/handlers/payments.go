@@ -7,25 +7,33 @@ import (
 
 	"github.com/livestreamify/backend/internal/config"
 	"github.com/livestreamify/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/integrations/intasend"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
 type PaymentHandler struct {
-	cfg *config.Config
-	db  *pgxpool.Pool
-	rdb *redis.Client
+	cfg      *config.Config
+	db       *pgxpool.Pool
+	rdb      *redis.Client
+	intasend *intasend.Client
 }
 
 func NewPaymentHandler(cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client) *PaymentHandler {
-	return &PaymentHandler{cfg: cfg, db: db, rdb: rdb}
+	return &PaymentHandler{
+		cfg:      cfg,
+		db:       db,
+		rdb:      rdb,
+		intasend: intasend.New(cfg.IntaSendPrivateKey, cfg.IntaSendBaseURL),
+	}
 }
 
 type initiatePaymentRequest struct {
 	EventID     string `json:"event_id"`
-	PhoneNumber string `json:"phone_number"` // E.164 format e.g. +254712345678
+	PhoneNumber string `json:"phone_number"` // E.164 format e.g. 254712345678
 }
 
 // Initiate triggers the IntaSend M-Pesa STK Push.
@@ -35,6 +43,9 @@ func (h *PaymentHandler) Initiate(c *fiber.Ctx) error {
 	var req initiatePaymentRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+	if req.PhoneNumber == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "phone_number is required")
 	}
 
 	// Fetch event price
@@ -69,15 +80,21 @@ func (h *PaymentHandler) Initiate(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to create payment record")
 	}
 
-	// TODO: Call IntaSend API to initiate STK Push
-	// intasendRef, err := h.intasendClient.StkPush(req.PhoneNumber, event.Price, event.Currency, payment.ID.String())
-	// For now, store placeholder ref
-	intasendRef := fmt.Sprintf("PENDING-%s", payment.ID.String()[:8])
+	// Initiate IntaSend STK Push — payment.ID is used as api_ref so the
+	// webhook callback can look up and update the right payment record.
+	invoiceID, err := h.intasend.StkPush(req.PhoneNumber, payment.Amount, payment.Currency, payment.ID.String())
+	if err != nil {
+		log.Error().Err(err).Str("payment_id", payment.ID.String()).Msg("intasend stk push failed")
+		// Roll back the pending payment so the user can retry.
+		h.db.Exec(context.Background(), `DELETE FROM payments WHERE id=$1`, payment.ID)
+		return fiber.NewError(fiber.StatusBadGateway, "failed to initiate M-Pesa payment — please try again")
+	}
+
 	h.db.Exec(context.Background(),
-		`UPDATE payments SET intasend_ref=$1 WHERE id=$2`, intasendRef, payment.ID,
+		`UPDATE payments SET intasend_ref=$1 WHERE id=$2`, invoiceID, payment.ID,
 	)
 
-	// Cache payment status in Redis for fast polling
+	// Cache payment status in Redis for fast polling (30-min TTL matches STK timeout).
 	h.rdb.Set(context.Background(),
 		fmt.Sprintf("payment:%s", payment.ID.String()),
 		"pending",
@@ -96,16 +113,24 @@ func (h *PaymentHandler) Initiate(c *fiber.Ctx) error {
 }
 
 // Callback is the IntaSend webhook handler — called when payment status changes.
+// IntaSend posts: invoice_id, state (COMPLETE|FAILED|CANCELLED), value, account, api_ref
 func (h *PaymentHandler) Callback(c *fiber.Ctx) error {
 	var body struct {
 		InvoiceID string `json:"invoice_id"`
-		State     string `json:"state"` // "COMPLETE" | "FAILED" | "CANCELLED"
+		State     string `json:"state"`
 		Value     string `json:"value"`
 		Account   string `json:"account"`
 		APIRef    string `json:"api_ref"` // our payment UUID
+		Currency  string `json:"currency"`
+		NetAmount string `json:"net_amount"`
 	}
 	if err := c.BodyParser(&body); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid callback body")
+	}
+
+	if body.APIRef == "" || body.InvoiceID == "" {
+		// Not a payment callback we recognise — acknowledge to stop retries.
+		return c.SendStatus(fiber.StatusOK)
 	}
 
 	var status domain.PaymentStatus
@@ -117,7 +142,7 @@ func (h *PaymentHandler) Callback(c *fiber.Ctx) error {
 	case "CANCELLED":
 		status = domain.PaymentCancelled
 	default:
-		return c.SendStatus(fiber.StatusOK) // ignore unknown states
+		return c.SendStatus(fiber.StatusOK) // pending/processing states — ignore
 	}
 
 	h.db.Exec(context.Background(),
@@ -130,6 +155,12 @@ func (h *PaymentHandler) Callback(c *fiber.Ctx) error {
 		string(status),
 		10*time.Minute,
 	)
+
+	log.Info().
+		Str("payment_id", body.APIRef).
+		Str("invoice_id", body.InvoiceID).
+		Str("state", body.State).
+		Msg("payment webhook received")
 
 	return c.SendStatus(fiber.StatusOK)
 }
