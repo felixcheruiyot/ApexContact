@@ -7,7 +7,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o apexcontact ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o livestreamify ./cmd/api
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
 FROM alpine:3.20
@@ -16,9 +16,9 @@ RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /app
 
-COPY --from=builder /app/apexcontact .
+COPY --from=builder /app/livestreamify .
 COPY migrations/ ./migrations/
 
 EXPOSE 8000
 
-CMD ["./apexcontact"]
+CMD ["./livestreamify"]

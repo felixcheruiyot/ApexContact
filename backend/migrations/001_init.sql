@@ -1,4 +1,4 @@
--- ApexContact initial schema
+-- Live Streamify initial schema
 -- Run with: psql $DATABASE_URL -f migrations/001_init.sql
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

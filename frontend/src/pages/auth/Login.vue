@@ -1,7 +1,7 @@
 <template>
   <div class="card p-8">
     <h2 class="text-white font-bold text-2xl mb-2">Sign in</h2>
-    <p class="text-text-muted text-sm mb-8">Welcome back to ApexContact</p>
+    <p class="text-text-muted text-sm mb-8">Welcome back to Live Streamify</p>
 
     <form @submit.prevent="handleLogin" class="space-y-5">
       <div>

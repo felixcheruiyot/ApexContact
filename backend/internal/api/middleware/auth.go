@@ -3,8 +3,8 @@ package middleware
 import (
 	"strings"
 
-	"github.com/apexcontact/backend/internal/config"
-	"github.com/apexcontact/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/config"
+	"github.com/livestreamify/backend/internal/domain"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gofiber/fiber/v2"
 )

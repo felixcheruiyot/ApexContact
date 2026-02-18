@@ -1,7 +1,7 @@
 <template>
   <div class="card p-8">
     <h2 class="text-white font-bold text-2xl mb-2">Create account</h2>
-    <p class="text-text-muted text-sm mb-8">Join ApexContact and watch live events</p>
+    <p class="text-text-muted text-sm mb-8">Join Live Streamify and watch live events</p>
 
     <form @submit.prevent="handleRegister" class="space-y-5">
       <div>

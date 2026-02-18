@@ -16,7 +16,7 @@
             Worldwide
           </h1>
           <p class="text-text-muted text-lg leading-relaxed mb-8 max-w-lg">
-            ApexContact gives boxing and car racing promoters a complete platform to schedule,
+            Live Streamify gives boxing and car racing promoters a complete platform to schedule,
             sell tickets, and stream live events — with zero technical setup and real-time
             revenue in your account.
           </p>
@@ -24,7 +24,7 @@
             <RouterLink to="/register" class="btn-primary text-base px-8 py-4">
               Get Started Free
             </RouterLink>
-            <a href="mailto:promoters@apexcontact.com" class="btn-ghost text-base px-8 py-4">
+            <a href="mailto:promoters@livestreamify.com" class="btn-ghost text-base px-8 py-4">
               Talk to Us
             </a>
           </div>
@@ -80,7 +80,7 @@
               You Keep<br /><span class="text-accent-red">70%</span> of Every Ticket
             </h2>
             <p class="text-text-muted leading-relaxed mb-6">
-              No hidden fees, no monthly subscriptions. ApexContact takes a
+              No hidden fees, no monthly subscriptions. Live Streamify takes a
               <strong class="text-white">30% platform fee</strong> per ticket sold to cover streaming
               infrastructure, payment processing (M-Pesa), fraud protection, and customer support.
             </p>
@@ -211,7 +211,7 @@
                                             hover:bg-white/90 transition-colors text-base">
             Create Promoter Account
           </RouterLink>
-          <a href="mailto:promoters@apexcontact.com"
+          <a href="mailto:promoters@livestreamify.com"
             class="border-2 border-white/50 text-white font-bold px-8 py-4 rounded-lg
                    hover:border-white transition-colors text-base">
             Contact Sales

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/apexcontact/backend/internal/api/handlers"
-	"github.com/apexcontact/backend/internal/api/middleware"
-	"github.com/apexcontact/backend/internal/config"
+	"github.com/livestreamify/backend/internal/api/handlers"
+	"github.com/livestreamify/backend/internal/api/middleware"
+	"github.com/livestreamify/backend/internal/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -22,7 +22,7 @@ func NewApp(cfg *config.Config) (*fiber.App, func(), error) {
 	}
 
 	app := fiber.New(fiber.Config{
-		AppName:      "ApexContact API v1",
+		AppName:      "Live Streamify API v1",
 		ErrorHandler: errorHandler,
 	})
 

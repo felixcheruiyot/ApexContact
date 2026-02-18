@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/apexcontact/backend/internal/config"
-	"github.com/apexcontact/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/config"
+	"github.com/livestreamify/backend/internal/domain"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"

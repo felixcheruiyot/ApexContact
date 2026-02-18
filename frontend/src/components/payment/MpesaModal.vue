@@ -132,7 +132,7 @@ async function generateFingerprint(): Promise<string> {
   if (ctx) {
     ctx.textBaseline = 'top'
     ctx.font = '14px Arial'
-    ctx.fillText('ApexContact', 2, 2)
+    ctx.fillText('LiveStreamify', 2, 2)
   }
   const canvasData = canvas.toDataURL()
   const screenData = `${screen.width}x${screen.height}x${screen.colorDepth}`

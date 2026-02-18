@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/apexcontact/backend/internal/api/middleware"
-	"github.com/apexcontact/backend/internal/config"
-	"github.com/apexcontact/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/api/middleware"
+	"github.com/livestreamify/backend/internal/config"
+	"github.com/livestreamify/backend/internal/domain"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"

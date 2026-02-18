@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/apexcontact/backend/internal/api"
-	"github.com/apexcontact/backend/internal/config"
+	"github.com/livestreamify/backend/internal/api"
+	"github.com/livestreamify/backend/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -32,7 +32,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Info().Str("addr", ":"+cfg.Port).Msg("ApexContact API starting")
+		log.Info().Str("addr", ":"+cfg.Port).Msg("Live Streamify API starting")
 		if err := app.Listen(":" + cfg.Port); err != nil {
 			log.Fatal().Err(err).Msg("server error")
 		}

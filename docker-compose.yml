@@ -1,4 +1,4 @@
-name: apexcontact
+name: livestreamify
 
 services:
   # ── Database ─────────────────────────────────────────────────────────────────
@@ -6,7 +6,7 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: apexcontact
+      POSTGRES_DB: livestreamify
       POSTGRES_USER: apex
       POSTGRES_PASSWORD: ${DB_PASSWORD:-devpassword}
     volumes:
@@ -15,7 +15,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U apex -d apexcontact"]
+      test: ["CMD-SHELL", "pg_isready -U apex -d livestreamify"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -54,7 +54,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgres://apex:${DB_PASSWORD:-devpassword}@postgres:5432/apexcontact?sslmode=disable
+      DATABASE_URL: postgres://apex:${DB_PASSWORD:-devpassword}@postgres:5432/livestreamify?sslmode=disable
       REDIS_ADDR: redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
       MEDIA_SERVER_URL: http://media-server:8888

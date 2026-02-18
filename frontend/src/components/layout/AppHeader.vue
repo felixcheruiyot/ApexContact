@@ -2,9 +2,15 @@
   <header class="sticky top-0 z-50 bg-bg/80 backdrop-blur-md border-b border-white/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-0.5">
-        <span class="font-display text-2xl text-accent-red tracking-widest">APEX</span>
-        <span class="font-display text-2xl text-white tracking-widest">CONTACT</span>
+      <RouterLink to="/" class="flex items-center gap-2">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="14" fill="#E8002D"/>
+          <polygon points="11,8 22,14 11,20" fill="white"/>
+          <rect x="5" y="11" width="2.5" height="6" rx="1" fill="white"/>
+          <rect x="8.5" y="9" width="2.5" height="10" rx="1" fill="white"/>
+        </svg>
+        <span class="font-display text-2xl text-accent-red tracking-widest">LIVE</span>
+        <span class="font-display text-2xl text-white tracking-widest">STREAMIFY</span>
       </RouterLink>
 
       <!-- Nav links -->

@@ -12,9 +12,9 @@
       <section>
         <h2>1. Who We Are</h2>
         <p>
-          ApexContact operates a live sports streaming platform for boxing and car racing events.
+          Live Streamify operates a live sports streaming platform for boxing and car racing events.
           We are the data controller for all personal information collected through our website
-          and services. By using ApexContact, you agree to the practices described in this policy.
+          and services. By using Live Streamify, you agree to the practices described in this policy.
         </p>
       </section>
 
@@ -89,7 +89,7 @@
       <section>
         <h2>4. Anti-Piracy Measures</h2>
         <p>
-          ApexContact uses technical measures to protect the intellectual property of event promoters and rights holders.
+          Live Streamify uses technical measures to protect the intellectual property of event promoters and rights holders.
           These include but are not limited to:
         </p>
         <ul>
@@ -140,7 +140,7 @@
         </ul>
         <p>
           To exercise any of these rights, contact us at
-          <a href="mailto:privacy@apexcontact.com" class="text-accent-red hover:underline">privacy@apexcontact.com</a>.
+          <a href="mailto:privacy@livestreamify.com" class="text-accent-red hover:underline">privacy@livestreamify.com</a>.
           We will respond within 30 days.
         </p>
       </section>
@@ -162,7 +162,7 @@
       <section>
         <h2>10. Children's Privacy</h2>
         <p>
-          ApexContact is intended for users aged 18 and above. We do not knowingly collect personal information
+          Live Streamify is intended for users aged 18 and above. We do not knowingly collect personal information
           from minors. If you believe a child has registered, contact us immediately and we will delete the account.
         </p>
       </section>
@@ -171,7 +171,7 @@
         <h2>11. Changes to This Policy</h2>
         <p>
           We may update this policy from time to time. When we make material changes, we will notify you via
-          email or a prominent notice on the platform. Your continued use of ApexContact after the effective
+          email or a prominent notice on the platform. Your continued use of Live Streamify after the effective
           date constitutes acceptance of the updated policy.
         </p>
       </section>
@@ -181,8 +181,8 @@
         <p>For any privacy-related questions or requests:</p>
         <div class="card p-6 not-prose">
           <dl class="space-y-2 text-sm">
-            <div class="flex gap-3"><dt class="text-text-muted w-24 shrink-0">Email</dt><dd class="text-white"><a href="mailto:privacy@apexcontact.com" class="text-accent-red hover:underline">privacy@apexcontact.com</a></dd></div>
-            <div class="flex gap-3"><dt class="text-text-muted w-24 shrink-0">Platform</dt><dd class="text-white">ApexContact</dd></div>
+            <div class="flex gap-3"><dt class="text-text-muted w-24 shrink-0">Email</dt><dd class="text-white"><a href="mailto:privacy@livestreamify.com" class="text-accent-red hover:underline">privacy@livestreamify.com</a></dd></div>
+            <div class="flex gap-3"><dt class="text-text-muted w-24 shrink-0">Platform</dt><dd class="text-white">Live Streamify</dd></div>
           </dl>
         </div>
       </section>

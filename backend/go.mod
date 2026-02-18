@@ -1,4 +1,4 @@
-module github.com/apexcontact/backend
+module github.com/livestreamify/backend
 
 go 1.22
 

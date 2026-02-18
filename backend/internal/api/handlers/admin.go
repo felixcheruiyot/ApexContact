@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/apexcontact/backend/internal/config"
-	"github.com/apexcontact/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/config"
+	"github.com/livestreamify/backend/internal/domain"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
