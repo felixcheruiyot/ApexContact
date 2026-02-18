@@ -45,7 +45,8 @@ services:
       - "8888:8888"   # HLS (internal; exposed via nginx)
     volumes:
       - hls_data:/tmp/hls
-    backend:
+    depends_on:  
+      backend:
         condition: service_started
 
   # ── Go API backend ────────────────────────────────────────────────────────────
