@@ -77,7 +77,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	// ── Streaming ──────────────────────────────────────────────────────────────
 	// Ingest callback first — no JWT (nginx-rtmp can't send auth headers).
 	stream := v1.Group("/stream")
-	stream.Post("/ingest/callback", middleware.RequireMediaServerKey(cfg), streamHandler.IngestCallback)
+	stream.Post("/ingest/:key/callback", middleware.RequireMediaServerKey(cfg), streamHandler.IngestCallback)
 	stream.Post("/:eventId/subscribe", middleware.RequireAuth(cfg), streamHandler.Subscribe)
 	stream.Get("/:eventId/token", middleware.RequireAuth(cfg), middleware.AntiPiracy(rdb), streamHandler.GetToken)
 

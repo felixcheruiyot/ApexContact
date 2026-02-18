@@ -48,7 +48,7 @@ func RequireAuth(cfg *config.Config) fiber.Handler {
 // passed as the ?key= query parameter.
 func RequireMediaServerKey(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if cfg.MediaServerKey == "" || c.Query("key") != cfg.MediaServerKey {
+		if cfg.MediaServerKey == "" || c.Params("key") != cfg.MediaServerKey {
 			return fiber.NewError(fiber.StatusUnauthorized, "invalid media server key")
 		}
 		return c.Next()
