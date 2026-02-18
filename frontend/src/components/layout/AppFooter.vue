@@ -24,9 +24,9 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Platform</h4>
           <ul class="space-y-2">
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">For Promoters</a></li>
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">Help Center</a></li>
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><RouterLink to="/promoters" class="text-text-muted text-sm hover:text-white transition-colors">For Promoters</RouterLink></li>
+            <li><a href="mailto:support@apexcontact.com" class="text-text-muted text-sm hover:text-white transition-colors">Help Center</a></li>
+            <li><RouterLink to="/privacy" class="text-text-muted text-sm hover:text-white transition-colors">Privacy Policy</RouterLink></li>
           </ul>
         </div>
       </div>
@@ -42,3 +42,7 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+</script>

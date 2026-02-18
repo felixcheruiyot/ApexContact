@@ -3,6 +3,7 @@ docker compose exec postgres psql -U apex -d apexcontact -c \
 
 
 
+Streaming instruction
 How it all works end-to-end                                   
                                                                                                           
   Broadcaster (OBS setup)                                 

@@ -13,6 +13,10 @@
           active-class="text-white">
           Home
         </RouterLink>
+        <RouterLink to="/promoters" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
+          active-class="text-white">
+          For Promoters
+        </RouterLink>
         <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }"
           class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           :class="{ 'text-white': route.query.sport === 'boxing' }">

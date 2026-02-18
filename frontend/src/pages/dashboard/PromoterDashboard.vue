@@ -95,9 +95,9 @@
               <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">Stream Key</label>
               <div class="flex items-center gap-2">
                 <code class="flex-1 bg-bg-surface text-white text-sm px-4 py-3 rounded-lg font-mono truncate">
-                  {{ streamKeyModal.streamKey }}
+                  {{ streamKeyModal.stream_key }}
                 </code>
-                <button @click="copyToClipboard(streamKeyModal!.streamKey)"
+                <button @click="copyToClipboard(streamKeyModal!.stream_key)"
                   class="btn-ghost text-xs py-2 px-3 shrink-0">Copy</button>
               </div>
               <p class="text-status-error text-xs mt-2">Keep this secret — do not share it.</p>
@@ -135,7 +135,7 @@ import client from '@/api/client'
 import type { Event } from '@/types'
 
 const events = ref<Event[]>([])
-const streamKeyModal = ref<{ pushTo: string; streamKey: string } | null>(null)
+const streamKeyModal = ref<{ stream_key: string; rtmp_url: string; push_to: string } | null>(null)
 const hostname = window.location.hostname
 
 onMounted(async () => {
