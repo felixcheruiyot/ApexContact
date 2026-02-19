@@ -165,9 +165,13 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "sport_type must be boxing or racing")
 	}
 
+	// JavaScript toISOString() includes milliseconds (RFC3339Nano), try both formats.
 	scheduledAt, err := time.Parse(time.RFC3339, req.ScheduledAt)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "scheduled_at must be RFC3339")
+		scheduledAt, err = time.Parse(time.RFC3339Nano, req.ScheduledAt)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "scheduled_at must be an ISO 8601 date-time string")
+		}
 	}
 
 	promoterID, err := uuid.Parse(userID)
@@ -194,7 +198,7 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt,
 	)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "failed to create lobby")
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to create lobby: "+err.Error())
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(domain.Response{Data: e})
