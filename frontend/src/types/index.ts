@@ -2,6 +2,8 @@ export type UserRole = 'viewer' | 'promoter' | 'broadcaster' | 'admin'
 export type EventStatus = 'draft' | 'pending_review' | 'scheduled' | 'live' | 'completed' | 'cancelled' | 'declined'
 export type SportType = 'boxing' | 'racing'
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled'
+export type EventType = 'video' | 'commentary'
+export type LobbyRole = 'host' | 'speaker' | 'listener'
 
 export interface User {
   id: string
@@ -28,7 +30,41 @@ export interface Event {
   currency: string
   thumbnail_url: string
   review_note?: string
+  event_type: EventType
+  teaser_hook: string
   created_at: string
+}
+
+export interface LobbyParticipant {
+  id: string
+  event_id: string
+  user_id: string
+  nickname: string
+  role: LobbyRole
+  joined_at: string
+}
+
+export interface LobbyMessage {
+  id: string
+  event_id: string
+  user_id: string
+  nickname: string
+  content: string
+  message_type: 'text' | 'meme'
+  created_at: string
+}
+
+export interface ChatEvent {
+  type: 'message' | 'reaction' | 'joined' | 'left' | 'speaker_granted' | 'speaker_revoked'
+  nickname: string
+  content?: string
+  user_id?: string
+  created_at: string
+}
+
+export interface LobbyDetail {
+  event: Event
+  participant_count: number
 }
 
 export interface Payment {

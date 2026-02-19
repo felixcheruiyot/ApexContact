@@ -38,8 +38,19 @@
         </div>
       </section>
 
+      <!-- Commentary Lobbies -->
+      <section v-if="allLobbies.length">
+        <h2 class="section-heading mb-2 flex items-center gap-3">
+          <span class="text-accent-orange">🎙</span> Commentary
+        </h2>
+        <p class="text-text-muted text-sm mb-6">Join live audio discussions from fans worldwide</p>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <LobbyCard v-for="lobby in allLobbies" :key="lobby.id" :lobby="lobby" />
+        </div>
+      </section>
+
       <!-- Empty state -->
-      <div v-if="!eventsStore.loading && !eventsStore.events.length" class="text-center py-24">
+      <div v-if="!eventsStore.loading && !eventsStore.events.length && !allLobbies.length" class="text-center py-24">
         <p class="text-5xl mb-4">🎬</p>
         <h3 class="text-white font-semibold text-xl mb-2">No events scheduled yet</h3>
         <p class="text-text-muted">Check back soon for upcoming boxing and racing events.</p>
@@ -60,12 +71,15 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
+import { useCommentaryStore } from '@/stores/commentary'
 import EventHero from '@/components/events/EventHero.vue'
 import EventCard from '@/components/events/EventCard.vue'
+import LobbyCard from '@/components/commentary/LobbyCard.vue'
 import MpesaModal from '@/components/payment/MpesaModal.vue'
 import type { Event } from '@/types'
 
 const eventsStore = useEventsStore()
+const commentaryStore = useCommentaryStore()
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
@@ -76,6 +90,7 @@ const selectedEvent = ref<Event | null>(null)
 function load() {
   const sport = route.query.sport as string | undefined
   eventsStore.fetchEvents(sport ? { sport } : undefined)
+  commentaryStore.fetchLobbies(sport ? { sport } : undefined)
 }
 
 onMounted(load)
@@ -85,6 +100,9 @@ watch(() => route.query.sport, load)
 
 const liveEvents = computed(() => eventsStore.events.filter((e) => e.status === 'live'))
 const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status === 'scheduled'))
+const liveLobbies = computed(() => commentaryStore.lobbies.filter((l) => l.status === 'live'))
+const upcomingLobbies = computed(() => commentaryStore.lobbies.filter((l) => l.status === 'scheduled'))
+const allLobbies = computed(() => [...liveLobbies.value, ...upcomingLobbies.value])
 
 const featuredEvent = computed<Event | undefined>(() =>
   liveEvents.value[0] ?? upcomingEvents.value[0]

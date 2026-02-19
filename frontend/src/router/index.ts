@@ -12,6 +12,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: () => import('@/pages/Home.vue') },
         { path: 'events/:id', name: 'event-detail', component: () => import('@/pages/EventDetail.vue') },
+        { path: 'commentary/:id', name: 'commentary-detail', component: () => import('@/pages/commentary/CommentaryDetail.vue') },
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
         {
@@ -41,6 +42,14 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
+    // ── Protected: Commentary Room ────────────────────────────────────────────
+    {
+      path: '/commentary/:id/room',
+      name: 'commentary-room',
+      component: () => import('@/pages/commentary/CommentaryRoom.vue'),
+      meta: { requiresAuth: true },
+    },
+
     // ── Protected: Promoter / Broadcaster dashboard ───────────────────────────
     {
       path: '/dashboard',
@@ -52,6 +61,7 @@ const router = createRouter({
         { path: 'edit/:eventId', name: 'edit-event', component: () => import('@/pages/dashboard/EditEvent.vue') },
         { path: 'analytics/:eventId', name: 'analytics', component: () => import('@/pages/dashboard/Analytics.vue') },
         { path: 'revenue', name: 'revenue', component: () => import('@/pages/dashboard/Revenue.vue') },
+        { path: 'commentary/create', name: 'create-commentary', component: () => import('@/pages/dashboard/CreateCommentary.vue') },
       ],
     },
 

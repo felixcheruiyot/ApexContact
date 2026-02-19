@@ -29,6 +29,11 @@ type Config struct {
 	MediaServerURL string
 	MediaServerKey string
 
+	// LiveKit
+	LiveKitURL       string
+	LiveKitAPIKey    string
+	LiveKitAPISecret string
+
 	// App
 	AppEnv      string
 	FrontendURL string
@@ -49,6 +54,9 @@ func Load() (*Config, error) {
 		IntaSendBaseURL:    getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),
 		MediaServerURL:     getEnv("MEDIA_SERVER_URL", "http://media-server:8888"),
 		MediaServerKey:     getEnv("MEDIA_SERVER_KEY", ""),
+		LiveKitURL:         getEnv("LIVEKIT_URL", "ws://livekit:7880"),
+		LiveKitAPIKey:      getEnv("LIVEKIT_API_KEY", "devkey"),
+		LiveKitAPISecret:   getEnv("LIVEKIT_API_SECRET", "devsecret0000000000000000000000"),
 		AppEnv:             getEnv("APP_ENV", "development"),
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 	}

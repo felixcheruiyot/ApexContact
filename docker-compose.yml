@@ -38,6 +38,9 @@ services:
       REDIS_ADDR: redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
       MEDIA_SERVER_URL: http://media-server:8888
+      LIVEKIT_URL: ws://livekit:7880
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-devsecret0000000000000000000000}
     ports:
       - "8000:8000"
     depends_on:
@@ -76,6 +79,19 @@ services:
       - app-network
       - proxy
   
+  livekit:
+    image: livekit/livekit-server:latest
+    restart: unless-stopped
+    ports:
+      - "7880:7880"
+      - "7881:7881/tcp"
+      - "7881:7881/udp"
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}:${LIVEKIT_API_SECRET:-devsecret0000000000000000000000}"
+    command: --dev
+    networks:
+      - app-network
+
   nginx:
     image: nginx:1.27-alpine
     restart: unless-stopped

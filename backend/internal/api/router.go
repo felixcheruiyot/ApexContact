@@ -1,9 +1,7 @@
 package api
 
 import (
-	"github.com/livestreamify/backend/internal/api/handlers"
-	"github.com/livestreamify/backend/internal/api/middleware"
-	"github.com/livestreamify/backend/internal/config"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -11,6 +9,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/livestreamify/backend/internal/api/handlers"
+	"github.com/livestreamify/backend/internal/api/middleware"
+	"github.com/livestreamify/backend/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -114,6 +115,31 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	profile := v1.Group("/profile", middleware.RequireAuth(cfg))
 	profile.Get("/", profileHandler.Get)
 	profile.Put("/", profileHandler.Update)
+
+	// ── Commentary lobbies ─────────────────────────────────────────────────────
+	commentaryHandler := handlers.NewCommentaryHandler(cfg, db, rdb)
+	chatHandler := handlers.NewChatHandler(cfg, db, rdb)
+
+	commentary := v1.Group("/commentary")
+	commentary.Get("/", commentaryHandler.List)
+	commentary.Get("/:id", commentaryHandler.Get)
+	commentary.Post("/", middleware.RequireAuth(cfg), commentaryHandler.Create)
+	commentary.Post("/:id/start", middleware.RequireAuth(cfg), commentaryHandler.Start)
+	commentary.Post("/:id/end", middleware.RequireAuth(cfg), commentaryHandler.End)
+	commentary.Post("/:id/join", middleware.RequireAuth(cfg), commentaryHandler.Join)
+	commentary.Get("/:id/token", middleware.RequireAuth(cfg), commentaryHandler.GetToken)
+	commentary.Patch("/:id/participants/:userId", middleware.RequireAuth(cfg), commentaryHandler.UpdateParticipant)
+	commentary.Get("/:id/messages", commentaryHandler.Messages)
+	commentary.Get("/:id/nicknames/suggest", middleware.RequireAuth(cfg), commentaryHandler.SuggestNicknames)
+
+	// WebSocket upgrade middleware must be applied before the handler
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+	app.Get("/ws/commentary/:id/chat", websocket.New(chatHandler.Handle))
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {

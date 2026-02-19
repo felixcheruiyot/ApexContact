@@ -37,6 +37,23 @@ const (
 	SportRacing  SportType = "racing"
 )
 
+// EventType differentiates video streams from audio commentary lobbies.
+type EventType string
+
+const (
+	EventTypeVideo      EventType = "video"
+	EventTypeCommentary EventType = "commentary"
+)
+
+// LobbyRole defines a participant's speaking permissions in a commentary lobby.
+type LobbyRole string
+
+const (
+	LobbyRoleHost     LobbyRole = "host"
+	LobbyRoleSpeaker  LobbyRole = "speaker"
+	LobbyRoleListener LobbyRole = "listener"
+)
+
 // PaymentStatus tracks the M-Pesa payment lifecycle.
 type PaymentStatus string
 
@@ -80,8 +97,41 @@ type Event struct {
 	StreamKey    string      `json:"-" db:"stream_key"`  // never expose to viewers
 	HLSPath      string      `json:"-" db:"hls_path"`
 	ReviewNote   string      `json:"review_note" db:"review_note"`
+	EventType    EventType   `json:"event_type" db:"event_type"`
+	LiveKitRoom  string      `json:"-" db:"livekit_room"`
+	TeaserHook   string      `json:"teaser_hook" db:"teaser_hook"`
 	CreatedAt    time.Time   `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at" db:"updated_at"`
+}
+
+// ─── Commentary Lobby ──────────────────────────────────────────────────────────
+
+type LobbyParticipant struct {
+	ID       uuid.UUID `json:"id" db:"id"`
+	EventID  uuid.UUID `json:"event_id" db:"event_id"`
+	UserID   uuid.UUID `json:"user_id" db:"user_id"`
+	Nickname string    `json:"nickname" db:"nickname"`
+	Role     LobbyRole `json:"role" db:"role"`
+	JoinedAt time.Time `json:"joined_at" db:"joined_at"`
+}
+
+type LobbyMessage struct {
+	ID          uuid.UUID `json:"id" db:"id"`
+	EventID     uuid.UUID `json:"event_id" db:"event_id"`
+	UserID      uuid.UUID `json:"user_id" db:"user_id"`
+	Nickname    string    `json:"nickname" db:"nickname"`
+	Content     string    `json:"content" db:"content"`
+	MessageType string    `json:"message_type" db:"message_type"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+}
+
+// ChatEvent is the envelope for real-time WebSocket messages.
+type ChatEvent struct {
+	Type      string    `json:"type"`    // "message" | "reaction" | "joined" | "left" | "speaker_granted" | "speaker_revoked"
+	Nickname  string    `json:"nickname"`
+	Content   string    `json:"content,omitempty"`
+	UserID    string    `json:"user_id,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 // ─── Payment ──────────────────────────────────────────────────────────────────
