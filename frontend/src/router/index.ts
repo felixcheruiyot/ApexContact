@@ -56,6 +56,7 @@ const router = createRouter({
         { path: '', name: 'admin', component: () => import('@/pages/admin/AdminDashboard.vue') },
         { path: 'fraud', name: 'fraud', component: () => import('@/pages/admin/FraudMonitor.vue') },
         { path: 'users', name: 'users', component: () => import('@/pages/admin/UserManagement.vue') },
+        { path: 'events', name: 'admin-events', component: () => import('@/pages/admin/EventManagement.vue') },
       ],
     },
 

@@ -34,4 +34,12 @@ export const adminApi = {
   liveEvents() {
     return client.get<ApiResponse<Event[]>>('/events', { params: { status: 'live' } })
   },
+
+  listAllEvents() {
+    return client.get<ApiResponse<Event[]>>('/admin/events')
+  },
+
+  updateEvent(eventId: string, data: Partial<Event> & { status?: string }) {
+    return client.put<ApiResponse<string>>(`/admin/events/${eventId}`, data)
+  },
 }

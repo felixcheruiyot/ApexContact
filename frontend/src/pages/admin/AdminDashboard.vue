@@ -189,9 +189,12 @@
     </div>
 
     <!-- Quick actions -->
-    <div class="flex gap-3 pt-2">
+    <div class="flex gap-3 pt-2 flex-wrap">
       <RouterLink to="/admin/users" class="btn-ghost text-sm py-2 px-4">
         👥 Manage Users
+      </RouterLink>
+      <RouterLink to="/admin/events" class="btn-ghost text-sm py-2 px-4">
+        🎬 Manage Events
       </RouterLink>
       <RouterLink to="/admin/fraud" class="btn-primary text-sm py-2 px-4 flex items-center gap-2">
         🛡️ Fraud Monitor

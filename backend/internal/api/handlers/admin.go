@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"time"
 
 	"github.com/livestreamify/backend/internal/config"
 	"github.com/livestreamify/backend/internal/domain"
@@ -84,6 +85,66 @@ func (h *AdminHandler) UnlockUser(c *fiber.Ctx) error {
 	h.rdb.Del(context.Background(), "blocklist:"+userID)
 
 	return c.JSON(domain.Response{Data: "user account unlocked"})
+}
+
+type adminUpdateEventRequest struct {
+	Title        string             `json:"title"`
+	Description  string             `json:"description"`
+	SportType    domain.SportType   `json:"sport_type"`
+	ScheduledAt  time.Time          `json:"scheduled_at"`
+	Price        float64            `json:"price"`
+	Currency     string             `json:"currency"`
+	ThumbnailURL string             `json:"thumbnail_url"`
+	Status       domain.EventStatus `json:"status"`
+}
+
+func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
+	rows, err := h.db.Query(context.Background(),
+		`SELECT id, promoter_id, title, description, sport_type, scheduled_at,
+		        status, price, currency, thumbnail_url, created_at, updated_at
+		 FROM events ORDER BY scheduled_at DESC`)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch events")
+	}
+	defer rows.Close()
+
+	var events []domain.Event
+	for rows.Next() {
+		var e domain.Event
+		if err := rows.Scan(&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType,
+			&e.ScheduledAt, &e.Status, &e.Price, &e.Currency, &e.ThumbnailURL,
+			&e.CreatedAt, &e.UpdatedAt); err != nil {
+			continue
+		}
+		events = append(events, e)
+	}
+
+	return c.JSON(domain.Response{Data: events})
+}
+
+func (h *AdminHandler) UpdateEvent(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req adminUpdateEventRequest
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE events SET title=$1, description=$2, sport_type=$3, scheduled_at=$4,
+		  price=$5, currency=$6, thumbnail_url=$7, status=$8, updated_at=NOW()
+		 WHERE id=$9`,
+		req.Title, req.Description, req.SportType, req.ScheduledAt,
+		req.Price, req.Currency, req.ThumbnailURL, req.Status, id,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to update event")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusNotFound, "event not found")
+	}
+
+	return c.JSON(domain.Response{Data: "event updated"})
 }
 
 func (h *AdminHandler) PlatformAnalytics(c *fiber.Ctx) error {

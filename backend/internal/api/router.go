@@ -101,6 +101,8 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	admin.Post("/users/:id/lock", adminHandler.LockUser)
 	admin.Post("/users/:id/unlock", adminHandler.UnlockUser)
 	admin.Get("/analytics", adminHandler.PlatformAnalytics)
+	admin.Get("/events", adminHandler.ListEvents)
+	admin.Put("/events/:id", adminHandler.UpdateEvent)
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {
