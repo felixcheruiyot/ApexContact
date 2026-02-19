@@ -86,7 +86,7 @@
             {{ liveEvents.length }} Live
           </span>
         </div>
-        <RouterLink to="/admin/users" class="text-text-muted text-sm hover:text-white transition-colors">
+        <RouterLink to="/admin/events" class="text-text-muted text-sm hover:text-white transition-colors">
           View all events →
         </RouterLink>
       </div>

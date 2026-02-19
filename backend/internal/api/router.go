@@ -52,6 +52,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	paymentHandler := handlers.NewPaymentHandler(cfg, db, rdb)
 	adminHandler := handlers.NewAdminHandler(cfg, db, rdb)
 	promoterHandler := handlers.NewPromoterHandler(cfg, db)
+	profileHandler := handlers.NewProfileHandler(cfg, db)
 
 	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -103,6 +104,12 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	admin.Get("/analytics", adminHandler.PlatformAnalytics)
 	admin.Get("/events", adminHandler.ListEvents)
 	admin.Put("/events/:id", adminHandler.UpdateEvent)
+	admin.Put("/users/:id/role", adminHandler.UpdateUserRole)
+
+	// ── Profile (any authenticated user) ───────────────────────────────────────
+	profile := v1.Group("/profile", middleware.RequireAuth(cfg))
+	profile.Get("/", profileHandler.Get)
+	profile.Put("/", profileHandler.Update)
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {

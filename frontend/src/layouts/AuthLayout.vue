@@ -6,8 +6,8 @@
     <div class="w-full max-w-md relative z-10">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center justify-center mb-8">
-        <span class="font-display text-4xl text-accent-red tracking-widest">APEX</span>
-        <span class="font-display text-4xl text-white tracking-widest">CONTACT</span>
+        <span class="font-display text-4xl text-accent-red tracking-widest">LIVE</span>
+        <span class="font-display text-4xl text-white tracking-widest">STREAMIFY</span>
       </RouterLink>
 
       <RouterView />

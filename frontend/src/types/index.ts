@@ -10,6 +10,9 @@ export interface User {
   phone: string
   role: UserRole
   is_locked: boolean
+  age?: number
+  gender?: string
+  country?: string
   created_at: string
 }
 

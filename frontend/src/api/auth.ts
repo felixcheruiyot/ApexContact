@@ -2,7 +2,7 @@ import client from './client'
 import type { ApiResponse, User } from '@/types'
 
 export const authApi = {
-  register(data: { email: string; password: string; full_name: string; phone: string }) {
+  register(data: { email: string; password: string; full_name: string }) {
     return client.post<ApiResponse<{ token: string; user: User }>>('/auth/register', data)
   },
 

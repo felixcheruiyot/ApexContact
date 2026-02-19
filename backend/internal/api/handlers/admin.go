@@ -87,6 +87,35 @@ func (h *AdminHandler) UnlockUser(c *fiber.Ctx) error {
 	return c.JSON(domain.Response{Data: "user account unlocked"})
 }
 
+func (h *AdminHandler) UpdateUserRole(c *fiber.Ctx) error {
+	userID := c.Params("id")
+
+	var req struct {
+		Role domain.UserRole `json:"role"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+
+	switch req.Role {
+	case domain.RoleViewer, domain.RolePromoter, domain.RoleBroadcaster, domain.RoleAdmin:
+		// valid
+	default:
+		return fiber.NewError(fiber.StatusBadRequest, "invalid role")
+	}
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE users SET role=$1, updated_at=NOW() WHERE id=$2`, req.Role, userID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to update user role")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusNotFound, "user not found")
+	}
+
+	return c.JSON(domain.Response{Data: "role updated"})
+}
+
 type adminUpdateEventRequest struct {
 	Title        string             `json:"title"`
 	Description  string             `json:"description"`

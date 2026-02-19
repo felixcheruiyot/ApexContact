@@ -54,6 +54,9 @@ type User struct {
 	Phone        string    `json:"phone" db:"phone"`
 	Role         UserRole  `json:"role" db:"role"`
 	IsLocked     bool      `json:"is_locked" db:"is_locked"`
+	Age          *int      `json:"age,omitempty" db:"age"`
+	Gender       string    `json:"gender,omitempty" db:"gender"`
+	Country      string    `json:"country,omitempty" db:"country"`
 	CreatedAt    time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }

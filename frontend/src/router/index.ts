@@ -14,6 +14,12 @@ const router = createRouter({
         { path: 'events/:id', name: 'event-detail', component: () => import('@/pages/EventDetail.vue') },
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('@/pages/Profile.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
 
@@ -35,7 +41,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
-    // ── Protected: Promoter dashboard ─────────────────────────────────────────
+    // ── Protected: Promoter / Broadcaster dashboard ───────────────────────────
     {
       path: '/dashboard',
       component: () => import('@/layouts/DashboardLayout.vue'),
@@ -77,6 +83,7 @@ router.beforeEach((to, _from, next) => {
     return next({ name: 'home' })
   }
 
+  // 'promoter' role guard: allows promoters, broadcasters, and admins
   if (to.meta.requiresRole === 'promoter' && !auth.isPromoter) {
     return next({ name: 'home' })
   }

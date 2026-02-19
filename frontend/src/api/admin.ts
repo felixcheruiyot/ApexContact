@@ -1,5 +1,5 @@
 import client from './client'
-import type { ApiResponse, User, FraudFlag, Event } from '@/types'
+import type { ApiResponse, User, FraudFlag, Event, UserRole } from '@/types'
 
 export interface PlatformStats {
   total_users: number
@@ -41,5 +41,9 @@ export const adminApi = {
 
   updateEvent(eventId: string, data: Partial<Event> & { status?: string }) {
     return client.put<ApiResponse<string>>(`/admin/events/${eventId}`, data)
+  },
+
+  updateUserRole(userId: string, role: UserRole) {
+    return client.put<ApiResponse<string>>(`/admin/users/${userId}/role`, { role })
   },
 }

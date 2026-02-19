@@ -122,20 +122,28 @@
 
             <!-- Actions -->
             <td class="px-6 py-4 text-right whitespace-nowrap">
-              <button
-                v-if="!user.is_locked"
-                @click="openConfirm(user, 'lock')"
-                class="text-xs text-status-error hover:bg-status-error/15 px-3 py-1.5 rounded-lg transition-colors font-medium"
-              >
-                Lock
-              </button>
-              <button
-                v-else
-                @click="openConfirm(user, 'unlock')"
-                class="text-xs text-status-success hover:bg-status-success/15 px-3 py-1.5 rounded-lg transition-colors font-medium"
-              >
-                Unlock
-              </button>
+              <div class="flex items-center justify-end gap-2">
+                <button
+                  @click="openRoleEdit(user)"
+                  class="text-xs text-text-muted hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Role
+                </button>
+                <button
+                  v-if="!user.is_locked"
+                  @click="openConfirm(user, 'lock')"
+                  class="text-xs text-status-error hover:bg-status-error/15 px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Lock
+                </button>
+                <button
+                  v-else
+                  @click="openConfirm(user, 'unlock')"
+                  class="text-xs text-status-success hover:bg-status-success/15 px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Unlock
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -148,6 +156,52 @@
       <p class="text-white font-semibold mb-1">No users found</p>
       <p class="text-text-muted text-sm">Try adjusting your search or filter.</p>
     </div>
+
+    <!-- Role edit modal -->
+    <Teleport to="body">
+      <div v-if="roleTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="roleTarget = null" />
+        <div class="relative bg-bg-elevated border border-white/10 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+          <h3 class="text-white font-bold text-lg mb-2">Change Role</h3>
+          <div class="flex items-center gap-3 mb-5 p-3 bg-bg-surface rounded-xl">
+            <div class="w-9 h-9 rounded-full bg-accent-red/20 flex items-center justify-center shrink-0">
+              <span class="text-accent-red text-sm font-bold">{{ initials(roleTarget.full_name) }}</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-white text-sm font-medium">{{ roleTarget.full_name }}</p>
+              <p class="text-text-muted text-xs">{{ roleTarget.email }}</p>
+            </div>
+          </div>
+
+          <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">New Role</label>
+          <select v-model="selectedRole" class="input w-full mb-5">
+            <option value="viewer">Viewer</option>
+            <option value="promoter">Promoter</option>
+            <option value="broadcaster">Broadcaster</option>
+            <option value="admin">Admin</option>
+          </select>
+
+          <div v-if="roleError" class="bg-status-error/10 border border-status-error/20 rounded-lg px-3 py-2 text-status-error text-xs mb-4">
+            {{ roleError }}
+          </div>
+
+          <div class="flex gap-3">
+            <button @click="roleTarget = null" class="btn-ghost flex-1 text-sm py-2.5">Cancel</button>
+            <button
+              @click="executeRoleChange"
+              :disabled="acting"
+              class="btn-primary flex-1 text-sm py-2.5 flex items-center justify-center gap-2"
+            >
+              <svg v-if="acting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              {{ acting ? 'Saving…' : 'Save Role' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <!-- Confirm modal -->
     <Teleport to="body">
@@ -214,6 +268,11 @@ const confirmTarget = ref<User | null>(null)
 const confirmAction = ref<'lock' | 'unlock'>('lock')
 const acting = ref(false)
 
+// Role editing
+const roleTarget = ref<User | null>(null)
+const selectedRole = ref<UserRole>('viewer')
+const roleError = ref<string | null>(null)
+
 const filteredUsers = computed(() => {
   const q = search.value.toLowerCase()
   return users.value.filter((u) => {
@@ -245,6 +304,28 @@ function roleBadgeClass(role: UserRole) {
     broadcaster: 'bg-purple-500/15 text-purple-400',
     admin: 'bg-accent-red/15 text-accent-red',
   }[role]
+}
+
+function openRoleEdit(user: User) {
+  roleTarget.value = user
+  selectedRole.value = user.role
+  roleError.value = null
+}
+
+async function executeRoleChange() {
+  if (!roleTarget.value) return
+  acting.value = true
+  roleError.value = null
+  try {
+    await adminApi.updateUserRole(roleTarget.value.id, selectedRole.value)
+    const u = users.value.find((x) => x.id === roleTarget.value!.id)
+    if (u) u.role = selectedRole.value
+    roleTarget.value = null
+  } catch (e: any) {
+    roleError.value = e.response?.data?.error ?? 'Failed to update role'
+  } finally {
+    acting.value = false
+  }
 }
 
 function openConfirm(user: User, action: 'lock' | 'unlock') {
