@@ -1,7 +1,6 @@
 name: livestreamify
 
 services:
-  # ── Database ─────────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -14,14 +13,7 @@ services:
       - ./backend/migrations:/docker-entrypoint-initdb.d  # auto-run migrations on first start
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U apex -d livestreamify"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  # ── Cache / Sessions ──────────────────────────────────────────────────────────
+  
   redis:
     image: redis:7-alpine
     restart: unless-stopped
@@ -30,14 +22,7 @@ services:
       - redis_data:/data
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD:-devredis}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
-  # ── Go API backend ────────────────────────────────────────────────────────────
+  
   backend:
     build:
       context: ./backend
@@ -52,33 +37,16 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:8000/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-
-  # ── Vue 3 Frontend ────────────────────────────────────────────────────────────
+      - postgres
+      - redis
+  
   frontend:
     build:
       context: ./frontend
     restart: unless-stopped
     depends_on:
       backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-
-  # ── Media server (RTMP ingest → HLS) ─────────────────────────────────────────
+  
   media-server:
     build:
       context: ./media-server
@@ -93,10 +61,8 @@ services:
     volumes:
       - hls_data:/tmp/hls
     depends_on:
-      backend:
-        condition: service_healthy
-
-  # ── Nginx reverse proxy ───────────────────────────────────────────────────────
+      - backend
+  
   nginx:
     image: nginx:1.27-alpine
     restart: unless-stopped
@@ -105,12 +71,9 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      backend:
-        condition: service_healthy
-      frontend:
-        condition: service_healthy
-      # media-server:
-      #   condition: service_started
+      - backend
+      - frontend
+      # media-server
 
 volumes:
   postgres_data:
