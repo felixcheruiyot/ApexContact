@@ -45,7 +45,7 @@ services:
       context: ./frontend
     restart: unless-stopped
     depends_on:
-      backend:
+      - backend
   
   media-server:
     build:
