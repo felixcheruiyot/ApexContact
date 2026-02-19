@@ -38,7 +38,7 @@ func (h *EventHandler) List(c *fiber.Ctx) error {
 
 	query := `SELECT id, promoter_id, title, description, sport_type, scheduled_at,
 	           status, price, currency, thumbnail_url, created_at, updated_at
-	          FROM events WHERE status = ANY($1::text[])`
+	          FROM events WHERE status = ANY($1::text[]) AND event_type = 'video'`
 	args := []interface{}{statusList}
 
 	if sport != "" {

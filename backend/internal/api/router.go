@@ -129,6 +129,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	commentary.Post("/:id/join", middleware.RequireAuth(cfg), commentaryHandler.Join)
 	commentary.Get("/:id/token", middleware.RequireAuth(cfg), commentaryHandler.GetToken)
 	commentary.Patch("/:id/participants/:userId", middleware.RequireAuth(cfg), commentaryHandler.UpdateParticipant)
+	commentary.Get("/:id/me", middleware.RequireAuth(cfg), commentaryHandler.Me)
 	commentary.Get("/:id/messages", commentaryHandler.Messages)
 	commentary.Get("/:id/nicknames/suggest", middleware.RequireAuth(cfg), commentaryHandler.SuggestNicknames)
 

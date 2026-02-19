@@ -95,6 +95,19 @@ export const useCommentaryStore = defineStore('commentary', () => {
     messages.value.push(msg)
   }
 
+  async function checkMe(id: string) {
+    try {
+      const res = await commentaryApi.me(id)
+      const data = res.data.data
+      if (data?.has_joined) {
+        myNickname.value = data.nickname ?? null
+        myRole.value = (data.role as LobbyRole) ?? 'listener'
+        return true
+      }
+    } catch { /* not joined or not authenticated */ }
+    return false
+  }
+
   function reset() {
     current.value = null
     participants.value = []
@@ -112,7 +125,7 @@ export const useCommentaryStore = defineStore('commentary', () => {
     lobbies, current, participantCount, participants, messages,
     myNickname, myRole, livekitToken, livekitUrl, loading, error,
     fetchLobbies, fetchDetail, joinLobby, startRoom, endRoom,
-    fetchToken, fetchMessages, addMessage, reset,
+    fetchToken, fetchMessages, addMessage, checkMe, reset,
     liveLobbies, upcomingLobbies,
   }
 })

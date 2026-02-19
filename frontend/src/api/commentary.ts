@@ -55,6 +55,12 @@ export const commentaryApi = {
     return client.get<ApiResponse<string[]>>(`/commentary/${id}/nicknames/suggest`)
   },
 
+  me(id: string) {
+    return client.get<ApiResponse<{ has_joined: boolean; nickname?: string; role?: string }>>(
+      `/commentary/${id}/me`
+    )
+  },
+
   updateParticipant(id: string, userId: string, role: 'speaker' | 'listener') {
     return client.patch<ApiResponse<{ role: string }>>(
       `/commentary/${id}/participants/${userId}`,

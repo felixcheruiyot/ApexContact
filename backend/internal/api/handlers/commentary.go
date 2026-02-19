@@ -525,6 +525,36 @@ func (h *CommentaryHandler) Messages(c *fiber.Ctx) error {
 	})
 }
 
+// ─── Me ────────────────────────────────────────────────────────────────────────
+
+// Me returns the current user's participation status in a lobby.
+func (h *CommentaryHandler) Me(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(string)
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid event id")
+	}
+
+	uid, _ := uuid.Parse(userID)
+
+	var nickname string
+	var role domain.LobbyRole
+	err = h.db.QueryRow(context.Background(),
+		`SELECT nickname, role FROM lobby_participants WHERE event_id = $1 AND user_id = $2`,
+		id, uid,
+	).Scan(&nickname, &role)
+
+	if err != nil {
+		return c.JSON(domain.Response{Data: fiber.Map{"has_joined": false}})
+	}
+
+	return c.JSON(domain.Response{Data: fiber.Map{
+		"has_joined": true,
+		"nickname":   nickname,
+		"role":       role,
+	}})
+}
+
 // ─── SuggestNicknames ──────────────────────────────────────────────────────────
 
 var adjectives = []string{

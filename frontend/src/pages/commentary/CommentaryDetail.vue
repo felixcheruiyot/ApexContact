@@ -42,57 +42,107 @@
 
       <!-- Meta row -->
       <div class="flex flex-wrap items-center gap-6 mb-6 text-sm text-text-muted">
-        <span class="flex items-center gap-1.5">
-          📅 {{ formattedDate }}
-        </span>
-        <span class="flex items-center gap-1.5">
-          👥 {{ store.participantCount }} joining
-        </span>
-        <span class="flex items-center gap-1.5 font-bold" :class="event.price === 0 ? 'text-success' : 'text-accent-orange'">
+        <span>📅 {{ formattedDate }}</span>
+        <span>👥 {{ store.participantCount }} joining</span>
+        <span class="font-bold" :class="event.price === 0 ? 'text-success' : 'text-accent-orange'">
           {{ event.price === 0 ? 'Free' : `${event.currency} ${event.price.toLocaleString()}` }}
         </span>
         <span v-if="event.status === 'completed'" class="text-text-muted">Ended</span>
       </div>
 
       <!-- Description -->
-      <p v-if="event.description" class="text-text-muted leading-relaxed mb-8">
-        {{ event.description }}
-      </p>
+      <p v-if="event.description" class="text-text-muted leading-relaxed mb-8">{{ event.description }}</p>
 
-      <!-- CTA -->
-      <div class="mb-12">
-        <!-- Already joined & live -->
-        <RouterLink
-          v-if="hasJoined && event.status === 'live'"
-          :to="`/commentary/${event.id}/room`"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white font-bold
-                 hover:bg-orange-500 transition-colors text-base"
-        >
-          🎙 Join Live Room
-        </RouterLink>
+      <!-- ─── CTA block ──────────────────────────────────────────────────────── -->
+      <div class="flex flex-wrap items-center gap-3 mb-12">
 
-        <!-- Already joined, not live yet -->
-        <div v-else-if="hasJoined && event.status === 'scheduled'" class="flex items-center gap-4">
-          <span class="text-success font-medium">✓ You're in! Waiting for the host to start.</span>
-        </div>
+        <!-- ── CREATOR controls ── -->
+        <template v-if="isCreator">
+          <!-- Start Room -->
+          <button
+            v-if="event.status === 'scheduled'"
+            @click="handleStart"
+            :disabled="starting"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
+                   font-bold text-base hover:bg-orange-500 transition-colors disabled:opacity-50"
+          >
+            {{ starting ? 'Starting…' : '▶ Start Room' }}
+          </button>
 
-        <!-- Completed — replay only -->
-        <div v-else-if="event.status === 'completed'" class="text-text-muted">
-          This lobby has ended. See the chat replay below.
-        </div>
+          <!-- Go to live room + End Room -->
+          <template v-else-if="event.status === 'live'">
+            <RouterLink
+              :to="`/commentary/${event.id}/room`"
+              class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
+                     font-bold text-base hover:bg-orange-500 transition-colors"
+            >
+              🎙 Enter Your Room
+            </RouterLink>
+            <button
+              @click="handleEnd"
+              :disabled="ending"
+              class="px-4 py-3 rounded-xl border border-red-500/40 text-red-400 text-sm font-medium
+                     hover:bg-red-500/10 transition-colors disabled:opacity-50"
+            >
+              {{ ending ? 'Ending…' : 'End Room' }}
+            </button>
+          </template>
 
-        <!-- Join button -->
-        <button
-          v-else-if="event.status === 'scheduled' || event.status === 'live'"
-          @click="openJoinModal"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-base transition-colors"
-          :class="event.price === 0
-            ? 'bg-success text-white hover:bg-green-600'
-            : 'bg-accent-orange text-white hover:bg-orange-500'"
-        >
-          {{ event.price === 0 ? '🎙 Join Free' : '🎫 Buy Access' }}
-        </button>
+          <span v-else-if="event.status === 'completed'" class="text-text-muted text-sm">
+            This lobby has ended.
+          </span>
+        </template>
+
+        <!-- ── VIEWER / LISTENER controls ── -->
+        <template v-else>
+          <!-- Completed — no action -->
+          <span v-if="event.status === 'completed'" class="text-text-muted text-sm">
+            This lobby has ended. See the chat replay below.
+          </span>
+
+          <!-- Already joined & live → enter room -->
+          <RouterLink
+            v-else-if="hasJoined && event.status === 'live'"
+            :to="`/commentary/${event.id}/room`"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
+                   font-bold text-base hover:bg-orange-500 transition-colors"
+          >
+            🎙 Enter Room
+          </RouterLink>
+
+          <!-- Already joined, waiting for host -->
+          <div v-else-if="hasJoined && event.status === 'scheduled'"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-success/10 border border-success/20">
+            <span class="text-success text-lg">✓</span>
+            <div>
+              <p class="text-success font-semibold text-sm">You're in as <strong>{{ store.myNickname }}</strong></p>
+              <p class="text-text-muted text-xs">Waiting for the host to start the room.</p>
+            </div>
+          </div>
+
+          <!-- Not yet joined — free -->
+          <button
+            v-else-if="event.price === 0 && (event.status === 'scheduled' || event.status === 'live')"
+            @click="openJoinModal"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-success text-white
+                   font-bold text-base hover:bg-green-600 transition-colors"
+          >
+            🎙 Join Free
+          </button>
+
+          <!-- Not yet joined — paid -->
+          <button
+            v-else-if="event.price > 0 && (event.status === 'scheduled' || event.status === 'live')"
+            @click="openJoinModal"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
+                   font-bold text-base hover:bg-orange-500 transition-colors"
+          >
+            🎫 Buy Access · {{ event.currency }} {{ event.price.toLocaleString() }}
+          </button>
+        </template>
+
       </div>
+      <!-- ─────────────────────────────────────────────────────────────────────── -->
 
       <!-- Chat replay (completed) -->
       <div v-if="event.status === 'completed'" class="mt-8">
@@ -101,21 +151,17 @@
           <div v-for="i in 5" :key="i" class="h-10 bg-bg-elevated rounded animate-pulse" />
         </div>
         <div v-else-if="store.messages.length" class="space-y-3">
-          <div
-            v-for="msg in store.messages"
-            :key="msg.id"
-            class="flex gap-3 items-start"
-          >
+          <div v-for="msg in store.messages" :key="msg.id" class="flex gap-3 items-start">
             <span class="text-accent-orange text-sm font-semibold shrink-0 min-w-[80px]">{{ msg.nickname }}</span>
             <span class="text-white text-sm">{{ msg.content }}</span>
             <span class="text-text-muted text-xs shrink-0 ml-auto">{{ formatTime(msg.created_at) }}</span>
           </div>
         </div>
-        <p v-else class="text-text-muted text-sm">No chat messages for this lobby.</p>
+        <p v-else class="text-text-muted text-sm">No chat messages recorded for this lobby.</p>
       </div>
     </template>
 
-    <!-- Nickname Modal -->
+    <!-- Nickname Modal (free join) -->
     <NicknameModal
       v-if="showNicknameModal && event"
       :eventId="event.id"
@@ -124,7 +170,7 @@
       @confirm="handleJoin"
     />
 
-    <!-- Payment Modal (paid lobbies) -->
+    <!-- Payment Modal (paid join) -->
     <MpesaModal
       v-if="showPaymentModal && event"
       :event="event"
@@ -151,11 +197,18 @@ const showNicknameModal = ref(false)
 const showPaymentModal = ref(false)
 const pendingNickname = ref('')
 const hasJoined = ref(false)
+const starting = ref(false)
+const ending = ref(false)
 
 const event = computed(() => store.current)
 
+// True when the logged-in user is the creator of this lobby
+const isCreator = computed(() =>
+  auth.isAuthenticated && !!event.value && auth.user?.id === event.value.promoter_id
+)
+
 const formattedDate = computed(() =>
-  event.value ? format(new Date(event.value.scheduled_at), "MMM d, yyyy · h:mm a") : ''
+  event.value ? format(new Date(event.value.scheduled_at), 'MMM d, yyyy · h:mm a') : ''
 )
 
 function formatTime(ts: string) {
@@ -164,10 +217,50 @@ function formatTime(ts: string) {
 
 onMounted(async () => {
   await store.fetchDetail(route.params.id as string)
+
+  // Check whether the current user has already joined
+  if (auth.isAuthenticated) {
+    hasJoined.value = await store.checkMe(route.params.id as string)
+  }
+
   if (event.value?.status === 'completed') {
     store.fetchMessages(event.value.id)
   }
 })
+
+// ── Creator actions ────────────────────────────────────────────────────────────
+
+async function handleStart() {
+  if (!event.value) return
+  starting.value = true
+  try {
+    await store.startRoom(event.value.id)
+    // Auto-join as host after starting
+    if (!hasJoined.value) {
+      const nickname = auth.user?.full_name?.split(' ')[0] ?? 'Host'
+      await store.joinLobby(event.value.id, nickname)
+      hasJoined.value = true
+    }
+  } catch (e: any) {
+    alert(e.response?.data?.error ?? 'Failed to start room')
+  } finally {
+    starting.value = false
+  }
+}
+
+async function handleEnd() {
+  if (!event.value || !confirm('End this room for everyone?')) return
+  ending.value = true
+  try {
+    await store.endRoom(event.value.id)
+  } catch (e: any) {
+    alert(e.response?.data?.error ?? 'Failed to end room')
+  } finally {
+    ending.value = false
+  }
+}
+
+// ── Viewer join flow ───────────────────────────────────────────────────────────
 
 function openJoinModal() {
   if (!auth.isAuthenticated) {
@@ -181,12 +274,14 @@ async function handleJoin(nickname: string) {
   if (!event.value) return
   showNicknameModal.value = false
 
+  // Paid lobby → open M-Pesa first, then join after callback
   if (event.value.price > 0) {
     pendingNickname.value = nickname
     showPaymentModal.value = true
     return
   }
 
+  // Free lobby → join directly
   try {
     await store.joinLobby(event.value.id, nickname)
     hasJoined.value = true
@@ -198,11 +293,9 @@ async function handleJoin(nickname: string) {
   }
 }
 
-// Called when the MpesaModal closes (either after payment success or cancel)
 async function afterPaymentModalClose() {
   showPaymentModal.value = false
   if (!event.value || !pendingNickname.value) return
-  // Attempt to join — will succeed if payment completed and subscription was created
   try {
     await store.joinLobby(event.value.id, pendingNickname.value)
     hasJoined.value = true
