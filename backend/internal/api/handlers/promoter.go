@@ -48,7 +48,7 @@ func (h *PromoterHandler) MyEvents(c *fiber.Ctx) error {
 
 	rows, err := h.db.Query(context.Background(),
 		`SELECT id, title, description, sport_type, scheduled_at, status, price, currency, thumbnail_url, review_note, created_at
-		 FROM events WHERE promoter_id=$1 ORDER BY scheduled_at DESC`, promoterID)
+		 FROM events WHERE promoter_id=$1 ORDER BY created_at DESC`, promoterID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch events")
 	}

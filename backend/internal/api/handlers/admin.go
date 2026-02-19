@@ -138,7 +138,7 @@ func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
 		query += " WHERE status=$1"
 		args = append(args, statusFilter)
 	}
-	query += " ORDER BY scheduled_at DESC"
+	query += " ORDER BY created_at DESC"
 
 	rows, err := h.db.Query(context.Background(), query, args...)
 	if err != nil {

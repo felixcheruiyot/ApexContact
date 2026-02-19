@@ -40,3 +40,8 @@ How it all works end-to-end
   ├────────────────┼──────────────────────────────────────────────────────────────────────────────┤
   │ Stream key     │ No way for promoter to retrieve it — added GET /promoter/stream-key/:eventId │
   └────────────────┴──────────────────────────────────────────────────────────────────────────────┘
+
+
+# How to apply migrations
+
+  docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/004_event_publishing_flow.sql
