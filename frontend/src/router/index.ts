@@ -13,6 +13,12 @@ const router = createRouter({
         { path: '', name: 'home', component: () => import('@/pages/Home.vue') },
         { path: 'events/:id', name: 'event-detail', component: () => import('@/pages/EventDetail.vue') },
         { path: 'commentary/:id', name: 'commentary-detail', component: () => import('@/pages/commentary/CommentaryDetail.vue') },
+        {
+          path: 'commentary/create',
+          name: 'host-commentary',
+          component: () => import('@/pages/commentary/HostCommentary.vue'),
+          meta: { requiresAuth: true },
+        },
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
         {

@@ -19,10 +19,6 @@
           active-class="text-white">
           Home
         </RouterLink>
-        <RouterLink to="/promoters" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
-          active-class="text-white">
-          For Promoters
-        </RouterLink>
         <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }"
           class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           :class="{ 'text-white': route.query.sport === 'boxing' }">
@@ -32,6 +28,14 @@
           class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           :class="{ 'text-white': route.query.sport === 'racing' }">
           Racing
+        </RouterLink>
+        <RouterLink to="/" class="flex items-center gap-1.5 text-text-muted hover:text-accent-orange transition-colors text-sm font-medium"
+          :class="{ 'text-accent-orange': isCommentaryRoute }">
+          🎙 Commentary
+        </RouterLink>
+        <RouterLink to="/promoters" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
+          active-class="text-white">
+          For Promoters
         </RouterLink>
       </nav>
 
@@ -72,6 +76,12 @@
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 My Profile
+              </RouterLink>
+              <RouterLink to="/commentary/create"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm text-accent-orange hover:text-orange-400
+                       hover:bg-accent-orange/5 transition-colors">
+                <span class="text-base leading-none">🎙</span>
+                Host a Commentary
               </RouterLink>
               <button @click="handleLogout"
                 class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-text-muted hover:text-white
@@ -123,18 +133,36 @@
           </RouterLink>
           <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }" @click="mobileMenuOpen = false"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-            Boxing
+            🥊 Boxing
           </RouterLink>
           <RouterLink :to="{ name: 'home', query: { sport: 'racing' } }" @click="mobileMenuOpen = false"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-            Racing
-          </RouterLink>
-          <RouterLink to="/promoters" @click="mobileMenuOpen = false"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-            For Promoters
+            🏎️ Racing
           </RouterLink>
 
+          <!-- Commentary section -->
+          <div class="border-t border-white/5 pt-3 mt-3">
+            <p class="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">Commentary</p>
+            <RouterLink to="/" @click="mobileMenuOpen = false"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-accent-orange hover:bg-accent-orange/5 transition-colors">
+              🎙 Browse Lobbies
+            </RouterLink>
+            <RouterLink v-if="auth.isAuthenticated" to="/commentary/create" @click="mobileMenuOpen = false"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent-orange hover:bg-accent-orange/10 transition-colors">
+              + Host a Commentary
+            </RouterLink>
+            <RouterLink v-else to="/login" @click="mobileMenuOpen = false"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-accent-orange hover:bg-accent-orange/5 transition-colors">
+              + Host a Commentary
+            </RouterLink>
+          </div>
+
           <div class="border-t border-white/5 pt-3 mt-3 space-y-1">
+            <RouterLink to="/promoters" @click="mobileMenuOpen = false"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+              For Promoters
+            </RouterLink>
+
             <template v-if="auth.isAuthenticated">
               <RouterLink v-if="auth.isAdmin" to="/admin" @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-accent-red hover:bg-accent-red/10 transition-colors">
@@ -173,6 +201,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+
 import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -184,6 +213,8 @@ const mobileMenuOpen = ref(false)
 
 // Close mobile menu on navigation
 watch(() => route.path, () => { mobileMenuOpen.value = false })
+
+const isCommentaryRoute = computed(() => route.path.startsWith('/commentary'))
 
 const initials = computed(() => {
   const name = auth.user?.full_name ?? ''

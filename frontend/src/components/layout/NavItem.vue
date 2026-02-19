@@ -31,6 +31,9 @@
       <!-- user / profile -->
       <path v-else-if="icon === 'user'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <!-- mic / commentary -->
+      <path v-else-if="icon === 'mic'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
       <!-- fallback circle -->
       <circle v-else cx="12" cy="12" r="4" stroke-width="2" />
     </svg>

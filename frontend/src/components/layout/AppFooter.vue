@@ -21,15 +21,16 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Sports</h4>
           <ul class="space-y-2">
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">Boxing</a></li>
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">Car Racing</a></li>
-            <li><a href="#" class="text-text-muted text-sm hover:text-white transition-colors">Upcoming Events</a></li>
+            <li><RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }" class="text-text-muted text-sm hover:text-white transition-colors">🥊 Boxing</RouterLink></li>
+            <li><RouterLink :to="{ name: 'home', query: { sport: 'racing' } }" class="text-text-muted text-sm hover:text-white transition-colors">🏎️ Car Racing</RouterLink></li>
+            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-accent-orange transition-colors">🎙 Commentary Lobbies</RouterLink></li>
           </ul>
         </div>
 
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Platform</h4>
           <ul class="space-y-2">
+            <li><RouterLink to="/commentary/create" class="text-text-muted text-sm hover:text-accent-orange transition-colors">Host a Commentary</RouterLink></li>
             <li><RouterLink to="/promoters" class="text-text-muted text-sm hover:text-white transition-colors">For Promoters</RouterLink></li>
             <li><a href="mailto:support@livestreamify.com" class="text-text-muted text-sm hover:text-white transition-colors">Help Center</a></li>
             <li><RouterLink to="/privacy" class="text-text-muted text-sm hover:text-white transition-colors">Privacy Policy</RouterLink></li>
