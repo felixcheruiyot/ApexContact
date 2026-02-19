@@ -13,7 +13,7 @@ services:
   media-server:
     ports:
       - "1935:1935"  # keep RTMP open for broadcasters
-      # remove 8888 — serve HLS only through nginx
+      # 8888 not exposed — HLS served only through nginx
 
   backend:
     ports: []   # behind nginx only
