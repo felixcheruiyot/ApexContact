@@ -50,6 +50,7 @@ const router = createRouter({
         { path: '', name: 'dashboard', component: () => import('@/pages/dashboard/PromoterDashboard.vue') },
         { path: 'create', name: 'create-event', component: () => import('@/pages/dashboard/CreateEvent.vue') },
         { path: 'analytics/:eventId', name: 'analytics', component: () => import('@/pages/dashboard/Analytics.vue') },
+        { path: 'revenue', name: 'revenue', component: () => import('@/pages/dashboard/Revenue.vue') },
       ],
     },
 

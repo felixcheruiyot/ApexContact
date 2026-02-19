@@ -40,7 +40,7 @@
         <template v-else-if="auth.user?.role === 'promoter'">
           <NavItem to="/dashboard" :exact="true" icon="grid" label="My Events" />
           <NavItem to="/dashboard/create" icon="plus" label="Create Event" />
-          <NavItem to="/dashboard/analytics" icon="bar-chart" label="Revenue" />
+          <NavItem to="/dashboard/revenue" icon="bar-chart" label="Revenue" />
         </template>
 
         <!-- Broadcaster nav -->
@@ -160,7 +160,8 @@ const pageTitle = computed(() => {
   if (p.startsWith('/admin/events')) return 'Event Management'
   if (p.startsWith('/admin/fraud')) return 'Fraud Monitor'
   if (p.startsWith('/dashboard/create')) return 'Create Event'
-  if (p.startsWith('/dashboard/analytics')) return 'Analytics & Revenue'
+  if (p.startsWith('/dashboard/analytics')) return 'Event Analytics'
+  if (p.startsWith('/dashboard/revenue')) return 'Revenue & Analytics'
   if (p.startsWith('/profile')) return 'My Profile'
   return sectionLabel.value
 })

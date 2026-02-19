@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"time"
 
 	"github.com/livestreamify/backend/internal/config"
 	"github.com/livestreamify/backend/internal/domain"
@@ -102,12 +103,18 @@ func (h *PromoterHandler) Revenue(c *fiber.Ctx) error {
 	promoterID := c.Locals("user_id").(string)
 
 	rows, err := h.db.Query(context.Background(),
-		`SELECT e.id, e.title, COUNT(s.id) as tickets, COALESCE(SUM(p.amount),0) as revenue
+		`SELECT
+		   e.id, e.title, e.sport_type, e.status, e.scheduled_at,
+		   e.price, e.currency,
+		   COUNT(s.id)                         AS tickets,
+		   COALESCE(SUM(p.amount), 0)          AS revenue,
+		   COALESCE(MAX(sa.peak_viewers), 0)   AS peak_viewers
 		 FROM events e
-		 LEFT JOIN subscriptions s ON e.id=s.event_id
-		 LEFT JOIN payments p ON s.payment_id=p.id AND p.status='success'
-		 WHERE e.promoter_id=$1
-		 GROUP BY e.id, e.title
+		 LEFT JOIN subscriptions s  ON e.id = s.event_id
+		 LEFT JOIN payments p       ON s.payment_id = p.id AND p.status = 'success'
+		 LEFT JOIN stream_analytics sa ON e.id = sa.event_id
+		 WHERE e.promoter_id = $1
+		 GROUP BY e.id, e.title, e.sport_type, e.status, e.scheduled_at, e.price, e.currency
 		 ORDER BY e.scheduled_at DESC`, promoterID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch revenue data")
@@ -115,16 +122,28 @@ func (h *PromoterHandler) Revenue(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	type eventRevenue struct {
-		EventID string  `json:"event_id"`
-		Title   string  `json:"title"`
-		Tickets int     `json:"tickets"`
-		Revenue float64 `json:"revenue"`
+		EventID      string    `json:"event_id"`
+		Title        string    `json:"title"`
+		SportType    string    `json:"sport_type"`
+		Status       string    `json:"status"`
+		ScheduledAt  time.Time `json:"scheduled_at"`
+		Price        float64   `json:"price"`
+		Currency     string    `json:"currency"`
+		Tickets      int       `json:"tickets"`
+		Revenue      float64   `json:"revenue"`
+		PromoterCut  float64   `json:"promoter_cut"`
+		PeakViewers  int       `json:"peak_viewers"`
 	}
 	var results []eventRevenue
 	for rows.Next() {
 		var er eventRevenue
-		rows.Scan(&er.EventID, &er.Title, &er.Tickets, &er.Revenue)
+		rows.Scan(&er.EventID, &er.Title, &er.SportType, &er.Status, &er.ScheduledAt,
+			&er.Price, &er.Currency, &er.Tickets, &er.Revenue, &er.PeakViewers)
+		er.PromoterCut = er.Revenue * 0.70
 		results = append(results, er)
+	}
+	if results == nil {
+		results = []eventRevenue{}
 	}
 
 	return c.JSON(domain.Response{Data: results})
