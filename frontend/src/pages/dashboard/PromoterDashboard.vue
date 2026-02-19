@@ -28,7 +28,7 @@
     <!-- Events table -->
     <div class="card overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full min-w-[600px]">
           <thead>
             <tr class="border-b border-white/5">
               <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Event</th>

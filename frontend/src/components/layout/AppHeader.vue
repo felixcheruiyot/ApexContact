@@ -2,7 +2,7 @@
   <header class="sticky top-0 z-50 bg-bg/80 backdrop-blur-md border-b border-white/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-2">
+      <RouterLink to="/" class="flex items-center gap-2 shrink-0">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="14" cy="14" r="14" fill="#E8002D"/>
           <polygon points="11,8 22,14 11,20" fill="white"/>
@@ -10,10 +10,10 @@
           <rect x="8.5" y="9" width="2.5" height="10" rx="1" fill="white"/>
         </svg>
         <span class="font-display text-2xl text-accent-red tracking-widest">LIVE</span>
-        <span class="font-display text-2xl text-white tracking-widest">STREAMIFY</span>
+        <span class="font-display text-2xl text-white tracking-widest hidden xs:inline">STREAMIFY</span>
       </RouterLink>
 
-      <!-- Nav links -->
+      <!-- Desktop nav links -->
       <nav class="hidden md:flex items-center gap-6">
         <RouterLink to="/" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           active-class="text-white">
@@ -35,29 +35,26 @@
         </RouterLink>
       </nav>
 
-      <!-- Right: auth actions -->
-      <div class="flex items-center gap-3">
+      <!-- Right side -->
+      <div class="flex items-center gap-2 sm:gap-3">
         <template v-if="auth.isAuthenticated">
-          <!-- Admin panel link -->
           <RouterLink v-if="auth.isAdmin" to="/admin"
-            class="text-accent-red hover:opacity-80 text-sm font-semibold transition-opacity flex items-center gap-1.5">
+            class="text-accent-red hover:opacity-80 text-sm font-semibold transition-opacity hidden sm:flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
             Admin Panel
           </RouterLink>
-          <!-- Promoter/broadcaster dashboard link -->
           <RouterLink v-else-if="auth.isPromoter" to="/dashboard"
-            class="text-text-muted hover:text-white text-sm font-medium transition-colors">
+            class="text-text-muted hover:text-white text-sm font-medium transition-colors hidden sm:block">
             Dashboard
           </RouterLink>
 
-          <!-- User avatar dropdown -->
-          <div class="relative group">
+          <!-- User avatar dropdown (desktop) -->
+          <div class="relative group hidden md:block">
             <button class="flex items-center gap-2 text-sm font-medium">
               <div class="w-8 h-8 rounded-full bg-accent-red flex items-center justify-center text-white font-bold text-xs">
                 {{ initials }}
               </div>
             </button>
-            <!-- Dropdown -->
             <div class="absolute right-0 top-full mt-2 w-48 bg-bg-elevated border border-white/10 rounded-xl
                         shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible
                         transition-all duration-200">
@@ -89,22 +86,104 @@
           </div>
         </template>
         <template v-else>
-          <RouterLink to="/login" class="btn-ghost text-sm py-2 px-4">Sign in</RouterLink>
-          <RouterLink to="/register" class="btn-primary text-sm py-2 px-4">Get Started</RouterLink>
+          <RouterLink to="/login" class="btn-ghost text-sm py-2 px-3 sm:px-4 hidden sm:inline-flex">Sign in</RouterLink>
+          <RouterLink to="/register" class="btn-primary text-sm py-2 px-3 sm:px-4">Get Started</RouterLink>
         </template>
+
+        <!-- Hamburger (mobile only) -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+          class="md:hidden p-2 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-colors"
+          :aria-expanded="mobileMenuOpen">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     </div>
+
+    <!-- Mobile menu drawer -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div v-if="mobileMenuOpen"
+        class="md:hidden border-t border-white/5 bg-bg/95 backdrop-blur-md">
+        <nav class="px-4 py-4 space-y-1">
+          <RouterLink to="/" @click="mobileMenuOpen = false"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors"
+            active-class="text-white bg-white/5">
+            Home
+          </RouterLink>
+          <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }" @click="mobileMenuOpen = false"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+            Boxing
+          </RouterLink>
+          <RouterLink :to="{ name: 'home', query: { sport: 'racing' } }" @click="mobileMenuOpen = false"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+            Racing
+          </RouterLink>
+          <RouterLink to="/promoters" @click="mobileMenuOpen = false"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+            For Promoters
+          </RouterLink>
+
+          <div class="border-t border-white/5 pt-3 mt-3 space-y-1">
+            <template v-if="auth.isAuthenticated">
+              <RouterLink v-if="auth.isAdmin" to="/admin" @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-accent-red hover:bg-accent-red/10 transition-colors">
+                <span class="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
+                Admin Panel
+              </RouterLink>
+              <RouterLink v-else-if="auth.isPromoter" to="/dashboard" @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+                Dashboard
+              </RouterLink>
+              <RouterLink to="/profile" @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+                My Profile
+              </RouterLink>
+              <button @click="handleLogout"
+                class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+                Sign out
+              </button>
+            </template>
+            <template v-else>
+              <RouterLink to="/login" @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
+                Sign in
+              </RouterLink>
+              <RouterLink to="/register" @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent-red hover:bg-accent-red/10 transition-colors">
+                Get Started
+              </RouterLink>
+            </template>
+          </div>
+        </nav>
+      </div>
+    </Transition>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+
+const mobileMenuOpen = ref(false)
+
+// Close mobile menu on navigation
+watch(() => route.path, () => { mobileMenuOpen.value = false })
 
 const initials = computed(() => {
   const name = auth.user?.full_name ?? ''
@@ -121,6 +200,7 @@ const roleBadgeClass = computed(() => {
 })
 
 function handleLogout() {
+  mobileMenuOpen.value = false
   auth.logout()
   router.push('/')
 }

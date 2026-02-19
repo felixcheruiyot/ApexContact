@@ -1,9 +1,30 @@
 <template>
   <div class="min-h-screen bg-bg flex">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-bg-surface border-r border-white/5 flex flex-col shrink-0">
+    <!-- Mobile backdrop -->
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="sidebarOpen"
+        class="fixed inset-0 z-30 bg-black/60 lg:hidden"
+        @click="sidebarOpen = false"
+      />
+    </Transition>
 
+    <!-- Sidebar -->
+    <aside
+      :class="[
+        'fixed inset-y-0 left-0 z-40 w-64 bg-bg-surface border-r border-white/5 flex flex-col shrink-0',
+        'transition-transform duration-200 ease-in-out',
+        'lg:relative lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      ]"
+    >
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2 px-5 py-5 border-b border-white/5 shrink-0">
         <svg width="22" height="22" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,30 +48,23 @@
 
       <!-- Nav -->
       <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-
-        <!-- Admin nav -->
         <template v-if="auth.isAdmin">
           <NavItem to="/admin" :exact="true" icon="grid" label="Platform Overview" />
           <NavItem to="/admin/users" icon="users" label="Users" />
           <NavItem to="/admin/events" icon="film" label="Events" />
           <NavItem to="/admin/fraud" icon="shield" label="Fraud Monitor" />
         </template>
-
-        <!-- Promoter nav -->
         <template v-else-if="auth.user?.role === 'promoter'">
           <NavItem to="/dashboard" :exact="true" icon="grid" label="My Events" />
           <NavItem to="/dashboard/create" icon="plus" label="Create Event" />
           <NavItem to="/dashboard/revenue" icon="bar-chart" label="Revenue" />
         </template>
-
-        <!-- Broadcaster nav -->
         <template v-else-if="auth.user?.role === 'broadcaster'">
           <NavItem to="/dashboard" :exact="true" icon="grid" label="Overview" />
         </template>
-
       </nav>
 
-      <!-- Bottom: profile + user info + sign out -->
+      <!-- Bottom: profile + sign out -->
       <div class="px-3 pb-4 border-t border-white/5 shrink-0 pt-3 space-y-0.5">
         <NavItem to="/profile" icon="user" label="My Profile" />
 
@@ -82,8 +96,20 @@
     <!-- Main content -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Top bar -->
-      <header class="h-14 border-b border-white/5 px-8 flex items-center justify-between shrink-0 bg-bg-surface/50">
-        <p class="text-white font-semibold text-sm">{{ pageTitle }}</p>
+      <header class="h-14 border-b border-white/5 px-4 sm:px-8 flex items-center justify-between shrink-0 bg-bg-surface/50">
+        <div class="flex items-center gap-3">
+          <!-- Hamburger — mobile only -->
+          <button
+            @click="sidebarOpen = !sidebarOpen"
+            class="lg:hidden p-1.5 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <p class="text-white font-semibold text-sm">{{ pageTitle }}</p>
+        </div>
         <div class="flex items-center gap-3">
           <span class="text-text-muted text-xs hidden sm:block">{{ auth.user?.email }}</span>
           <RouterLink to="/profile"
@@ -95,7 +121,7 @@
         </div>
       </header>
 
-      <main class="flex-1 p-8 overflow-auto">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
         <RouterView />
       </main>
     </div>
@@ -104,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import NavItem from '@/components/layout/NavItem.vue'
@@ -112,6 +138,11 @@ import NavItem from '@/components/layout/NavItem.vue'
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+
+const sidebarOpen = ref(false)
+
+// Close sidebar on navigation (mobile)
+watch(() => route.path, () => { sidebarOpen.value = false })
 
 const initials = computed(() =>
   (auth.user?.full_name ?? '')

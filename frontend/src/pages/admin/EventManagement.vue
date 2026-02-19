@@ -22,12 +22,12 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 flex-wrap border-b border-white/5 pb-0">
+    <div class="flex gap-1 overflow-x-auto border-b border-white/5 pb-0 scrollbar-none">
       <button
         v-for="tab in tabs" :key="tab.value"
         @click="activeTab = tab.value"
         :class="[
-          'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors relative',
+          'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors relative shrink-0',
           activeTab === tab.value
             ? 'text-white bg-bg-elevated border-b-2 border-accent-red'
             : 'text-text-muted hover:text-white'
@@ -42,14 +42,14 @@
     </div>
 
     <!-- Search -->
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-col sm:flex-row flex-wrap gap-3">
       <input
         v-model="search"
         type="text"
         placeholder="Search events..."
-        class="input text-sm py-2 px-3 w-60"
+        class="input text-sm py-2 px-3 w-full sm:w-60"
       />
-      <select v-model="filterSport" class="input text-sm py-2 px-3">
+      <select v-model="filterSport" class="input text-sm py-2 px-3 w-full sm:w-auto">
         <option value="">All sports</option>
         <option value="boxing">Boxing</option>
         <option value="racing">Racing</option>
@@ -68,7 +68,8 @@
 
     <!-- Table -->
     <div v-else-if="filtered.length" class="card overflow-hidden">
-      <table class="w-full">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[640px]">
         <thead>
           <tr class="border-b border-white/5">
             <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Event</th>
@@ -132,6 +133,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <div v-else-if="!loading" class="card p-12 text-center">

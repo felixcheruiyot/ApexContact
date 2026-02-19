@@ -1,5 +1,5 @@
 <template>
-  <div v-if="event" class="relative min-h-[70vh] flex items-end overflow-hidden">
+  <div v-if="event" class="relative min-h-[55vh] sm:min-h-[70vh] flex items-end overflow-hidden">
     <!-- Background image -->
     <div class="absolute inset-0">
       <img
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Content -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 sm:pb-16 w-full">
       <div class="max-w-2xl animate-slide-up">
         <!-- Badges -->
         <div class="flex items-center gap-3 mb-4">
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Title -->
-        <h1 class="font-display text-5xl md:text-7xl uppercase tracking-wide text-white mb-4 leading-none">
+        <h1 class="font-display text-4xl sm:text-5xl md:text-7xl uppercase tracking-wide text-white mb-4 leading-none">
           {{ event.title }}
         </h1>
 
@@ -52,7 +52,7 @@
         </div>
 
         <!-- CTA -->
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <button v-if="event.status === 'live'" @click="$emit('buy-ticket')" class="btn-primary text-base px-8 py-4">
             Watch Live
           </button>
