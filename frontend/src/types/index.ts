@@ -1,5 +1,5 @@
 export type UserRole = 'viewer' | 'promoter' | 'broadcaster' | 'admin'
-export type EventStatus = 'scheduled' | 'live' | 'completed' | 'cancelled'
+export type EventStatus = 'draft' | 'pending_review' | 'scheduled' | 'live' | 'completed' | 'cancelled' | 'declined'
 export type SportType = 'boxing' | 'racing'
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled'
 
@@ -27,6 +27,7 @@ export interface Event {
   price: number
   currency: string
   thumbnail_url: string
+  review_note?: string
   created_at: string
 }
 

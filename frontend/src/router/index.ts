@@ -49,6 +49,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'dashboard', component: () => import('@/pages/dashboard/PromoterDashboard.vue') },
         { path: 'create', name: 'create-event', component: () => import('@/pages/dashboard/CreateEvent.vue') },
+        { path: 'edit/:eventId', name: 'edit-event', component: () => import('@/pages/dashboard/EditEvent.vue') },
         { path: 'analytics/:eventId', name: 'analytics', component: () => import('@/pages/dashboard/Analytics.vue') },
         { path: 'revenue', name: 'revenue', component: () => import('@/pages/dashboard/Revenue.vue') },
       ],

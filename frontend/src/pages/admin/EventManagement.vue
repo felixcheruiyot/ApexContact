@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-white font-bold text-2xl">Event Management</h1>
-        <p class="text-text-muted text-sm mt-1">Edit event details and manage statuses</p>
+        <p class="text-text-muted text-sm mt-1">Review, approve, and manage all events</p>
       </div>
       <button @click="loadEvents" class="btn-ghost text-sm py-2 px-4 flex items-center gap-2">
         <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,27 @@
       {{ error }}
     </div>
 
-    <!-- Filters -->
+    <!-- Tabs -->
+    <div class="flex gap-1 flex-wrap border-b border-white/5 pb-0">
+      <button
+        v-for="tab in tabs" :key="tab.value"
+        @click="activeTab = tab.value"
+        :class="[
+          'px-4 py-2 text-sm font-medium rounded-t-lg transition-colors relative',
+          activeTab === tab.value
+            ? 'text-white bg-bg-elevated border-b-2 border-accent-red'
+            : 'text-text-muted hover:text-white'
+        ]"
+      >
+        {{ tab.label }}
+        <span v-if="tab.value === 'pending_review' && pendingCount > 0"
+          class="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-accent-red text-white">
+          {{ pendingCount }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Search -->
     <div class="flex flex-wrap gap-3">
       <input
         v-model="search"
@@ -29,13 +49,6 @@
         placeholder="Search events..."
         class="input text-sm py-2 px-3 w-60"
       />
-      <select v-model="filterStatus" class="input text-sm py-2 px-3">
-        <option value="">All statuses</option>
-        <option value="scheduled">Scheduled</option>
-        <option value="live">Live</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
       <select v-model="filterSport" class="input text-sm py-2 px-3">
         <option value="">All sports</option>
         <option value="boxing">Boxing</option>
@@ -71,6 +84,9 @@
             <td class="px-6 py-4 max-w-xs">
               <p class="text-white text-sm font-medium line-clamp-1">{{ event.title }}</p>
               <p class="text-text-muted text-xs mt-0.5 line-clamp-1">{{ event.description }}</p>
+              <p v-if="event.review_note" class="text-text-muted text-xs mt-1 italic line-clamp-1">
+                Note: {{ event.review_note }}
+              </p>
             </td>
             <td class="px-6 py-4">
               <span class="text-text-muted text-sm capitalize">{{ event.sport_type }}</span>
@@ -82,12 +98,34 @@
               {{ event.currency }} {{ event.price.toLocaleString() }}
             </td>
             <td class="px-6 py-4">
-              <span :class="statusClass(event.status)" class="text-xs font-semibold px-2 py-0.5 rounded-full">
-                {{ event.status }}
+              <span :class="statusClass(event.status)" class="text-xs font-semibold px-2 py-0.5 rounded-full capitalize">
+                {{ event.status.replace('_', ' ') }}
               </span>
             </td>
             <td class="px-6 py-4 text-right">
-              <button @click="openEdit(event)" class="btn-ghost text-xs py-1.5 px-3">
+              <!-- Pending review actions -->
+              <div v-if="event.status === 'pending_review'" class="flex items-center gap-2 justify-end">
+                <button @click="approve(event)"
+                  :disabled="actioning === event.id"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success
+                         hover:bg-status-success/20 transition-colors disabled:opacity-50">
+                  Approve
+                </button>
+                <button @click="openReasonModal(event, 'request_edits')"
+                  :disabled="actioning === event.id"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-accent-orange/10 text-accent-orange
+                         hover:bg-accent-orange/20 transition-colors disabled:opacity-50">
+                  Request Edits
+                </button>
+                <button @click="openReasonModal(event, 'decline')"
+                  :disabled="actioning === event.id"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-error/10 text-status-error
+                         hover:bg-status-error/20 transition-colors disabled:opacity-50">
+                  Decline
+                </button>
+              </div>
+              <!-- Other events: edit -->
+              <button v-else @click="openEdit(event)" class="btn-ghost text-xs py-1.5 px-3">
                 Edit
               </button>
             </td>
@@ -100,6 +138,61 @@
       <p class="text-3xl mb-3">🎬</p>
       <p class="text-text-muted text-sm">No events found.</p>
     </div>
+
+    <!-- Reason Modal (Request Edits / Decline) -->
+    <Teleport to="body">
+      <div v-if="reasonModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeReasonModal" />
+        <div class="relative card w-full max-w-md p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-white font-semibold text-lg">
+              {{ reasonModal.action === 'decline' ? 'Decline Event' : 'Request Edits' }}
+            </h2>
+            <button @click="closeReasonModal" class="text-text-muted hover:text-white transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <p class="text-text-muted text-sm">
+            {{ reasonModal.action === 'decline'
+              ? 'This action is final. The promoter will not be able to edit or resubmit this event.'
+              : 'Describe the changes the promoter needs to make before the event can be approved.' }}
+          </p>
+
+          <div v-if="reasonError" class="bg-status-error/10 border border-status-error/20 rounded-lg px-4 py-3 text-status-error text-sm">
+            {{ reasonError }}
+          </div>
+
+          <div>
+            <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Reason *</label>
+            <textarea
+              v-model="reasonText"
+              rows="4"
+              class="input w-full resize-none"
+              :placeholder="reasonModal.action === 'decline' ? 'Why is this event being declined?' : 'What needs to be changed?'"
+            />
+          </div>
+
+          <div class="flex gap-3 pt-1">
+            <button @click="closeReasonModal" class="btn-ghost flex-1 py-2.5">Cancel</button>
+            <button
+              @click="submitReason"
+              :disabled="actioning === reasonModal.event.id"
+              :class="[
+                'flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50',
+                reasonModal.action === 'decline'
+                  ? 'bg-status-error/20 text-status-error hover:bg-status-error/30'
+                  : 'bg-accent-orange/20 text-accent-orange hover:bg-accent-orange/30'
+              ]"
+            >
+              {{ actioning === reasonModal.event.id ? 'Submitting…' : (reasonModal.action === 'decline' ? 'Decline Event' : 'Send to Promoter') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <!-- Edit Modal -->
     <Teleport to="body">
@@ -121,19 +214,14 @@
           </div>
 
           <div class="space-y-4">
-            <!-- Title -->
             <div>
               <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Title</label>
               <input v-model="form.title" type="text" class="input w-full" placeholder="Event title" />
             </div>
-
-            <!-- Description -->
             <div>
               <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Description</label>
               <textarea v-model="form.description" rows="3" class="input w-full resize-none" placeholder="Event description" />
             </div>
-
-            <!-- Sport + Status row -->
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Sport</label>
@@ -145,21 +233,20 @@
               <div>
                 <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Status</label>
                 <select v-model="form.status" class="input w-full">
+                  <option value="draft">Draft</option>
+                  <option value="pending_review">Pending Review</option>
                   <option value="scheduled">Scheduled</option>
                   <option value="live">Live</option>
                   <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
+                  <option value="declined">Declined</option>
                 </select>
               </div>
             </div>
-
-            <!-- Scheduled At -->
             <div>
               <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Scheduled At</label>
               <input v-model="form.scheduled_at" type="datetime-local" class="input w-full" />
             </div>
-
-            <!-- Price + Currency row -->
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Price</label>
@@ -170,15 +257,12 @@
                 <input v-model="form.currency" type="text" class="input w-full" placeholder="KES" maxlength="3" />
               </div>
             </div>
-
-            <!-- Thumbnail URL -->
             <div>
               <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Thumbnail URL</label>
               <input v-model="form.thumbnail_url" type="url" class="input w-full" placeholder="https://..." />
             </div>
           </div>
 
-          <!-- Actions -->
           <div class="flex gap-3 pt-2">
             <button @click="closeEdit" class="btn-ghost flex-1 py-2.5">Cancel</button>
             <button @click="saveEvent" :disabled="saving" class="btn-primary flex-1 py-2.5 flex items-center justify-center gap-2">
@@ -205,10 +289,26 @@ import type { Event, EventStatus, SportType } from '@/types'
 const events = ref<Event[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const actioning = ref<string | null>(null)
 
 const search = ref('')
-const filterStatus = ref('')
 const filterSport = ref('')
+
+const activeTab = ref<EventStatus | 'all'>('all')
+
+const tabs: { label: string; value: EventStatus | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Pending Review', value: 'pending_review' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Scheduled', value: 'scheduled' },
+  { label: 'Live', value: 'live' },
+  { label: 'Completed', value: 'completed' },
+  { label: 'Declined', value: 'declined' },
+]
+
+const pendingCount = computed(() =>
+  events.value.filter(e => e.status === 'pending_review').length,
+)
 
 const editing = ref<Event | null>(null)
 const saving = ref(false)
@@ -236,14 +336,19 @@ const form = ref<EditForm>({
   status: 'scheduled',
 })
 
+// Reason modal
+const reasonModal = ref<{ event: Event; action: 'request_edits' | 'decline' } | null>(null)
+const reasonText = ref('')
+const reasonError = ref<string | null>(null)
+
 const filtered = computed(() => {
   return events.value.filter(e => {
+    const matchTab = activeTab.value === 'all' || e.status === activeTab.value
     const matchSearch = !search.value ||
       e.title.toLowerCase().includes(search.value.toLowerCase()) ||
       e.description.toLowerCase().includes(search.value.toLowerCase())
-    const matchStatus = !filterStatus.value || e.status === filterStatus.value
     const matchSport = !filterSport.value || e.sport_type === filterSport.value
-    return matchSearch && matchStatus && matchSport
+    return matchTab && matchSearch && matchSport
   })
 })
 
@@ -256,11 +361,13 @@ function statusClass(status: EventStatus) {
     case 'live': return 'bg-accent-red/20 text-accent-red'
     case 'scheduled': return 'bg-accent-orange/20 text-accent-orange'
     case 'completed': return 'bg-status-success/20 text-status-success'
-    case 'cancelled': return 'bg-white/10 text-text-muted'
+    case 'pending_review': return 'bg-blue-500/20 text-blue-400'
+    case 'draft': return 'bg-white/10 text-text-muted'
+    case 'declined': return 'bg-status-error/20 text-status-error'
+    default: return 'bg-white/10 text-text-muted'
   }
 }
 
-// Convert ISO datetime to datetime-local input format (YYYY-MM-DDTHH:mm)
 function toLocalInput(iso: string) {
   const d = new Date(iso)
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -277,6 +384,58 @@ async function loadEvents() {
     error.value = e.response?.data?.error ?? 'Failed to load events'
   } finally {
     loading.value = false
+  }
+}
+
+async function approve(event: Event) {
+  actioning.value = event.id
+  try {
+    await adminApi.approveEvent(event.id)
+    const idx = events.value.findIndex(e => e.id === event.id)
+    if (idx !== -1) events.value[idx] = { ...events.value[idx], status: 'scheduled', review_note: '' }
+  } catch (e: any) {
+    error.value = e.response?.data?.error ?? 'Failed to approve event'
+  } finally {
+    actioning.value = null
+  }
+}
+
+function openReasonModal(event: Event, action: 'request_edits' | 'decline') {
+  reasonModal.value = { event, action }
+  reasonText.value = ''
+  reasonError.value = null
+}
+
+function closeReasonModal() {
+  reasonModal.value = null
+  reasonText.value = ''
+  reasonError.value = null
+}
+
+async function submitReason() {
+  if (!reasonModal.value) return
+  if (!reasonText.value.trim()) {
+    reasonError.value = 'Reason is required'
+    return
+  }
+  const { event, action } = reasonModal.value
+  actioning.value = event.id
+  reasonError.value = null
+  try {
+    if (action === 'request_edits') {
+      await adminApi.requestEdits(event.id, reasonText.value.trim())
+      const idx = events.value.findIndex(e => e.id === event.id)
+      if (idx !== -1) events.value[idx] = { ...events.value[idx], status: 'draft', review_note: reasonText.value.trim() }
+    } else {
+      await adminApi.declineEvent(event.id, reasonText.value.trim())
+      const idx = events.value.findIndex(e => e.id === event.id)
+      if (idx !== -1) events.value[idx] = { ...events.value[idx], status: 'declined', review_note: reasonText.value.trim() }
+    }
+    closeReasonModal()
+  } catch (e: any) {
+    reasonError.value = e.response?.data?.error ?? 'Action failed'
+  } finally {
+    actioning.value = null
   }
 }
 
@@ -309,7 +468,6 @@ async function saveEvent() {
       ...form.value,
       scheduled_at: new Date(form.value.scheduled_at).toISOString(),
     })
-    // Patch local list so the table updates immediately
     const idx = events.value.findIndex(e => e.id === editing.value!.id)
     if (idx !== -1) {
       events.value[idx] = {

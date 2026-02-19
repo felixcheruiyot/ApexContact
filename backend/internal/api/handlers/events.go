@@ -101,7 +101,7 @@ func (h *EventHandler) Create(c *fiber.Ctx) error {
 		Description:  req.Description,
 		SportType:    req.SportType,
 		ScheduledAt:  req.ScheduledAt,
-		Status:       domain.StatusScheduled,
+		Status:       domain.StatusDraft,
 		Price:        req.Price,
 		Currency:     req.Currency,
 		ThumbnailURL: req.ThumbnailURL,
@@ -127,21 +127,25 @@ func (h *EventHandler) Create(c *fiber.Ctx) error {
 
 func (h *EventHandler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
+	promoterID := c.Locals("user_id").(string)
 
 	var req createEventRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
 	}
 
-	_, err := h.db.Exec(context.Background(),
+	tag, err := h.db.Exec(context.Background(),
 		`UPDATE events SET title=$1, description=$2, sport_type=$3, scheduled_at=$4,
 		  price=$5, currency=$6, thumbnail_url=$7, updated_at=$8
-		 WHERE id=$9`,
+		 WHERE id=$9 AND promoter_id=$10 AND status='draft'`,
 		req.Title, req.Description, req.SportType, req.ScheduledAt,
-		req.Price, req.Currency, req.ThumbnailURL, time.Now(), id,
+		req.Price, req.Currency, req.ThumbnailURL, time.Now(), id, promoterID,
 	)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to update event")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "event not found, not in draft status, or access denied")
 	}
 
 	return c.JSON(domain.Response{Data: "event updated"})

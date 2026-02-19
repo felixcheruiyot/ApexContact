@@ -128,10 +128,19 @@ type adminUpdateEventRequest struct {
 }
 
 func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
-	rows, err := h.db.Query(context.Background(),
-		`SELECT id, promoter_id, title, description, sport_type, scheduled_at,
-		        status, price, currency, thumbnail_url, created_at, updated_at
-		 FROM events ORDER BY scheduled_at DESC`)
+	statusFilter := c.Query("status")
+
+	query := `SELECT id, promoter_id, title, description, sport_type, scheduled_at,
+		        status, price, currency, thumbnail_url, review_note, created_at, updated_at
+		 FROM events`
+	var args []interface{}
+	if statusFilter != "" {
+		query += " WHERE status=$1"
+		args = append(args, statusFilter)
+	}
+	query += " ORDER BY scheduled_at DESC"
+
+	rows, err := h.db.Query(context.Background(), query, args...)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch events")
 	}
@@ -142,13 +151,86 @@ func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
 		var e domain.Event
 		if err := rows.Scan(&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType,
 			&e.ScheduledAt, &e.Status, &e.Price, &e.Currency, &e.ThumbnailURL,
-			&e.CreatedAt, &e.UpdatedAt); err != nil {
+			&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt); err != nil {
 			continue
 		}
 		events = append(events, e)
 	}
 
 	return c.JSON(domain.Response{Data: events})
+}
+
+func (h *AdminHandler) ApproveEvent(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE events SET status='scheduled', review_note='', updated_at=NOW()
+		 WHERE id=$1 AND status='pending_review'`, id,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to approve event")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "event not found or not pending review")
+	}
+
+	return c.JSON(domain.Response{Data: "event approved"})
+}
+
+func (h *AdminHandler) RequestEdits(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req struct {
+		Reason string `json:"reason"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+	if req.Reason == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "reason is required")
+	}
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE events SET status='draft', review_note=$1, updated_at=NOW()
+		 WHERE id=$2 AND status='pending_review'`,
+		req.Reason, id,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to request edits")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "event not found or not pending review")
+	}
+
+	return c.JSON(domain.Response{Data: "edits requested"})
+}
+
+func (h *AdminHandler) DeclineEvent(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req struct {
+		Reason string `json:"reason"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+	if req.Reason == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "reason is required")
+	}
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE events SET status='declined', review_note=$1, updated_at=NOW()
+		 WHERE id=$2 AND status='pending_review'`,
+		req.Reason, id,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to decline event")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "event not found or not pending review")
+	}
+
+	return c.JSON(domain.Response{Data: "event declined"})
 }
 
 func (h *AdminHandler) UpdateEvent(c *fiber.Ctx) error {

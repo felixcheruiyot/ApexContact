@@ -23,6 +23,10 @@ export const eventsApi = {
     return client.get<ApiResponse<Event[]>>('/promoter/events')
   },
 
+  submit(eventId: string) {
+    return client.post<ApiResponse<string>>(`/promoter/events/${eventId}/submit`)
+  },
+
   analytics(eventId: string) {
     return client.get(`/promoter/analytics/${eventId}`)
   },

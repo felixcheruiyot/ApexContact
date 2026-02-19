@@ -160,6 +160,7 @@ const pageTitle = computed(() => {
   if (p.startsWith('/admin/events')) return 'Event Management'
   if (p.startsWith('/admin/fraud')) return 'Fraud Monitor'
   if (p.startsWith('/dashboard/create')) return 'Create Event'
+  if (p.startsWith('/dashboard/edit')) return 'Edit Event'
   if (p.startsWith('/dashboard/analytics')) return 'Event Analytics'
   if (p.startsWith('/dashboard/revenue')) return 'Revenue & Analytics'
   if (p.startsWith('/profile')) return 'My Profile'

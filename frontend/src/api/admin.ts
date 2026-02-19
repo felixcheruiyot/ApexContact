@@ -35,12 +35,24 @@ export const adminApi = {
     return client.get<ApiResponse<Event[]>>('/events', { params: { status: 'live' } })
   },
 
-  listAllEvents() {
-    return client.get<ApiResponse<Event[]>>('/admin/events')
+  listAllEvents(status?: string) {
+    return client.get<ApiResponse<Event[]>>('/admin/events', { params: status ? { status } : undefined })
   },
 
   updateEvent(eventId: string, data: Partial<Event> & { status?: string }) {
     return client.put<ApiResponse<string>>(`/admin/events/${eventId}`, data)
+  },
+
+  approveEvent(eventId: string) {
+    return client.post<ApiResponse<string>>(`/admin/events/${eventId}/approve`)
+  },
+
+  requestEdits(eventId: string, reason: string) {
+    return client.post<ApiResponse<string>>(`/admin/events/${eventId}/request-edits`, { reason })
+  },
+
+  declineEvent(eventId: string, reason: string) {
+    return client.post<ApiResponse<string>>(`/admin/events/${eventId}/decline`, { reason })
   },
 
   updateUserRole(userId: string, role: UserRole) {

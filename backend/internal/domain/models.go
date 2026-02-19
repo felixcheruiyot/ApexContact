@@ -20,10 +20,13 @@ const (
 type EventStatus string
 
 const (
-	StatusScheduled EventStatus = "scheduled"
-	StatusLive      EventStatus = "live"
-	StatusCompleted EventStatus = "completed"
-	StatusCancelled EventStatus = "cancelled"
+	StatusDraft         EventStatus = "draft"
+	StatusPendingReview EventStatus = "pending_review"
+	StatusScheduled     EventStatus = "scheduled"
+	StatusLive          EventStatus = "live"
+	StatusCompleted     EventStatus = "completed"
+	StatusCancelled     EventStatus = "cancelled"
+	StatusDeclined      EventStatus = "declined"
 )
 
 // SportType categorises what kind of event is being streamed.
@@ -76,6 +79,7 @@ type Event struct {
 	ThumbnailURL string      `json:"thumbnail_url" db:"thumbnail_url"`
 	StreamKey    string      `json:"-" db:"stream_key"`  // never expose to viewers
 	HLSPath      string      `json:"-" db:"hls_path"`
+	ReviewNote   string      `json:"review_note" db:"review_note"`
 	CreatedAt    time.Time   `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at" db:"updated_at"`
 }

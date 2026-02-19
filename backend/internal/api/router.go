@@ -72,8 +72,8 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	events := v1.Group("/events")
 	events.Get("/", eventHandler.List)
 	events.Get("/:id", eventHandler.Get)
-	events.Post("/", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"), eventHandler.Create)
-	events.Put("/:id", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"), eventHandler.Update)
+	events.Post("/", middleware.RequireAuth(cfg), middleware.RequireRole("promoter"), eventHandler.Create)
+	events.Put("/:id", middleware.RequireAuth(cfg), middleware.RequireRole("promoter"), eventHandler.Update)
 
 	// ── Streaming ──────────────────────────────────────────────────────────────
 	// Ingest callback first — no JWT (nginx-rtmp can't send auth headers).
@@ -91,6 +91,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	// ── Promoter dashboard ─────────────────────────────────────────────────────
 	promoter := v1.Group("/promoter", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"))
 	promoter.Get("/events", promoterHandler.MyEvents)
+	promoter.Post("/events/:eventId/submit", promoterHandler.Submit)
 	promoter.Get("/stream-key/:eventId", promoterHandler.StreamKey)
 	promoter.Get("/analytics/:eventId", promoterHandler.Analytics)
 	promoter.Get("/revenue", promoterHandler.Revenue)
@@ -104,6 +105,9 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	admin.Get("/analytics", adminHandler.PlatformAnalytics)
 	admin.Get("/events", adminHandler.ListEvents)
 	admin.Put("/events/:id", adminHandler.UpdateEvent)
+	admin.Post("/events/:id/approve", adminHandler.ApproveEvent)
+	admin.Post("/events/:id/request-edits", adminHandler.RequestEdits)
+	admin.Post("/events/:id/decline", adminHandler.DeclineEvent)
 	admin.Put("/users/:id/role", adminHandler.UpdateUserRole)
 
 	// ── Profile (any authenticated user) ───────────────────────────────────────

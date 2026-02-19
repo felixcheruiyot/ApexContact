@@ -47,7 +47,7 @@ func (h *PromoterHandler) MyEvents(c *fiber.Ctx) error {
 	promoterID := c.Locals("user_id").(string)
 
 	rows, err := h.db.Query(context.Background(),
-		`SELECT id, title, description, sport_type, scheduled_at, status, price, currency, thumbnail_url, created_at
+		`SELECT id, title, description, sport_type, scheduled_at, status, price, currency, thumbnail_url, review_note, created_at
 		 FROM events WHERE promoter_id=$1 ORDER BY scheduled_at DESC`, promoterID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch events")
@@ -58,11 +58,30 @@ func (h *PromoterHandler) MyEvents(c *fiber.Ctx) error {
 	for rows.Next() {
 		var e domain.Event
 		rows.Scan(&e.ID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
-			&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.CreatedAt)
+			&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.ReviewNote, &e.CreatedAt)
 		events = append(events, e)
 	}
 
 	return c.JSON(domain.Response{Data: events})
+}
+
+func (h *PromoterHandler) Submit(c *fiber.Ctx) error {
+	eventID := c.Params("eventId")
+	promoterID := c.Locals("user_id").(string)
+
+	tag, err := h.db.Exec(context.Background(),
+		`UPDATE events SET status='pending_review', updated_at=NOW()
+		 WHERE id=$1 AND promoter_id=$2 AND status='draft'`,
+		eventID, promoterID,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to submit event")
+	}
+	if tag.RowsAffected() == 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "event not found, not in draft status, or access denied")
+	}
+
+	return c.JSON(domain.Response{Data: "event submitted for review"})
 }
 
 func (h *PromoterHandler) Analytics(c *fiber.Ctx) error {
