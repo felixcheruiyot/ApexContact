@@ -45,3 +45,5 @@ How it all works end-to-end
 # How to apply migrations
 
   docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/004_event_publishing_flow.sql
+
+  docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/003_user_profile.sql

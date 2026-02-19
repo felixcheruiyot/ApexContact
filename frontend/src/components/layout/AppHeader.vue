@@ -10,7 +10,7 @@
           <rect x="8.5" y="9" width="2.5" height="10" rx="1" fill="white"/>
         </svg>
         <span class="font-display text-2xl text-accent-red tracking-widest">LIVE</span>
-        <span class="font-display text-2xl text-white tracking-widest hidden xs:inline">STREAMIFY</span>
+        <span class="font-display text-2xl text-white tracking-widest">STREAMIFY</span>
       </RouterLink>
 
       <!-- Desktop nav links -->
