@@ -104,7 +104,8 @@ watch(() => [props.isLive, props.token], ([isLive, token]) => {
 }, { immediate: true })
 
 function connectWs(token: string) {
-  const wsBase = import.meta.env.VITE_WS_URL ?? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+  const wsBase = `${wsProtocol}://${window.location.host}`
   const url = `${wsBase}/ws/commentary/${props.eventId}/chat?token=${encodeURIComponent(token)}`
   ws = new WebSocket(url)
 

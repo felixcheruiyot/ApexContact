@@ -39,8 +39,8 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
       MEDIA_SERVER_URL: http://media-server:8888
       LIVEKIT_URL: ws://livekit:7880
-      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
-      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-devsecret0000000000000000000000}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
     ports:
       - "8000:8000"
     depends_on:

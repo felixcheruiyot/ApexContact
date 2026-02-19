@@ -91,10 +91,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import {
   Room,
   RoomEvent,
-  LocalTrack,
   RemoteParticipant,
-  LocalParticipant,
-  Track,
 } from 'livekit-client'
 
 interface ParticipantInfo {
