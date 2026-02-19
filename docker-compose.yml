@@ -83,8 +83,10 @@ services:
     build:
       context: ./media-server
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      MEDIA_SERVER_KEY: ${MEDIA_SERVER_KEY:-change-me-media-server-secret}
+      MEDIA_SERVER_KEY: ${MEDIA_SERVER_KEY}
     ports:
       - "1935:1935"   # RTMP (broadcasters push here)
       - "8888:8888"   # HLS (internal; exposed via nginx)
@@ -107,8 +109,8 @@ services:
         condition: service_healthy
       frontend:
         condition: service_healthy
-      media-server:
-        condition: service_started
+      # media-server:
+      #   condition: service_started
 
 volumes:
   postgres_data:
