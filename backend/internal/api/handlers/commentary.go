@@ -323,26 +323,6 @@ func (h *CommentaryHandler) Join(c *fiber.Ctx) error {
 		}
 	}
 
-	// For free lobbies or the creator, ensure a subscription row exists (zero-amount)
-	if price == 0 || promoterIDStr == userID {
-		var subCount int
-		_ = h.db.QueryRow(context.Background(),
-			`SELECT COUNT(*) FROM subscriptions WHERE user_id = $1 AND event_id = $2`, uid, id,
-		).Scan(&subCount)
-		if subCount == 0 {
-			nilUUID := uuid.Nil
-			streamToken := uuid.New().String()
-			_, _ = h.db.Exec(context.Background(), `
-				INSERT INTO subscriptions
-				  (user_id, event_id, payment_id, stream_token, device_fingerprint, ip_lock,
-				   active_session_id, expires_at)
-				VALUES ($1, $2, $3, $4, '', '', '', NOW() + INTERVAL '30 days')
-				ON CONFLICT DO NOTHING`,
-				uid, id, nilUUID, streamToken,
-			)
-		}
-	}
-
 	// Upsert lobby_participants
 	_, err = h.db.Exec(context.Background(), `
 		INSERT INTO lobby_participants (event_id, user_id, nickname, role)
@@ -371,13 +351,13 @@ func (h *CommentaryHandler) GetToken(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid event id")
 	}
 
-	// Verify subscription/membership
+	// Verify the user has joined this lobby (lobby_participants is the source of truth)
 	uid, _ := uuid.Parse(userID)
-	var subCount int
+	var participantCount int
 	_ = h.db.QueryRow(context.Background(),
-		`SELECT COUNT(*) FROM subscriptions WHERE user_id = $1 AND event_id = $2`, uid, id,
-	).Scan(&subCount)
-	if subCount == 0 {
+		`SELECT COUNT(*) FROM lobby_participants WHERE user_id = $1 AND event_id = $2`, uid, id,
+	).Scan(&participantCount)
+	if participantCount == 0 {
 		return fiber.NewError(fiber.StatusForbidden, "you have not joined this lobby")
 	}
 
