@@ -179,19 +179,22 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "invalid user id")
 	}
 
-	// Commentary lobbies skip review → go straight to scheduled
+	// Commentary lobbies skip review → go straight to scheduled.
+	// stream_key must be unique even though commentary doesn't use RTMP.
+	streamKey := "commentary-" + uuid.New().String()
+
 	var e domain.Event
 	err = h.db.QueryRow(context.Background(), `
 		INSERT INTO events
 		  (promoter_id, title, teaser_hook, description, sport_type, scheduled_at,
 		   status, price, currency, thumbnail_url, stream_key, hls_path,
 		   event_type, livekit_room, review_note)
-		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,'','','commentary','','')
+		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,$9,'','commentary','','')
 		RETURNING id, promoter_id, title, description, sport_type, scheduled_at,
 		          status, price, currency, thumbnail_url, teaser_hook, event_type,
 		          review_note, created_at, updated_at`,
 		promoterID, req.Title, req.TeaserHook, req.Description, req.SportType,
-		scheduledAt, req.Price, req.ThumbnailURL,
+		scheduledAt, req.Price, req.ThumbnailURL, streamKey,
 	).Scan(
 		&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 		&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
