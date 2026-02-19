@@ -13,6 +13,8 @@ services:
       - ./backend/migrations:/docker-entrypoint-initdb.d  # auto-run migrations on first start
     ports:
       - "5432:5432"
+    networks:
+      - app-network
   
   redis:
     image: redis:7-alpine
@@ -22,6 +24,8 @@ services:
       - redis_data:/data
     ports:
       - "6379:6379"
+    networks:
+      - app-network
   
   backend:
     build:
@@ -39,6 +43,9 @@ services:
     depends_on:
       - postgres
       - redis
+    networks:
+      - app-network
+      - proxy
   
   frontend:
     build:
@@ -46,6 +53,9 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    networks:
+      - app-network
+      - proxy
   
   media-server:
     build:
@@ -62,6 +72,9 @@ services:
       - hls_data:/tmp/hls
     depends_on:
       - backend
+    networks:
+      - app-network
+      - proxy
   
   nginx:
     image: nginx:1.27-alpine
@@ -74,8 +87,16 @@ services:
       - backend
       - frontend
       # media-server
+    networks:
+      - app-network
+      - proxy
 
 volumes:
   postgres_data:
   redis_data:
   hls_data:
+networks:
+  app-network:
+    driver: bridge
+  proxy:
+    external: true
