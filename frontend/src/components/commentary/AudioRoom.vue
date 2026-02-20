@@ -11,7 +11,22 @@
 
     <!-- Participants grid -->
     <div class="flex-1 overflow-y-auto p-4">
-      <div v-if="!connected && !connectionError" class="flex flex-col items-center justify-center h-full gap-4">
+      <!-- Pre-join: user must click to allow AudioContext + mic -->
+      <div v-if="!joined" class="flex flex-col items-center justify-center h-full gap-4">
+        <span class="text-4xl">🎙</span>
+        <p class="text-white font-medium text-sm">Ready to join the audio room?</p>
+        <p class="text-text-muted text-xs text-center max-w-xs">
+          {{ canPublish ? 'Your microphone will be enabled.' : 'You will join as a listener.' }}
+        </p>
+        <button
+          @click="join"
+          class="px-6 py-2.5 rounded-lg bg-accent-orange text-white text-sm font-semibold hover:bg-orange-500 transition-colors"
+        >
+          Join Audio
+        </button>
+      </div>
+
+      <div v-else-if="!connected && !connectionError" class="flex flex-col items-center justify-center h-full gap-4">
         <div class="w-12 h-12 rounded-full border-2 border-accent-orange border-t-transparent animate-spin" />
         <p class="text-text-muted text-sm">Connecting to audio room…</p>
       </div>
@@ -87,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed } from 'vue'
 import {
   Room,
   RoomEvent,
@@ -113,7 +128,11 @@ const emit = defineEmits<{
   (e: 'error', msg: string): void
 }>()
 
-const room = new Room()
+// Room is created lazily inside connect() so no AudioContext is created
+// until the user explicitly clicks "Join Audio".
+let room: Room | null = null
+
+const joined = ref(false)
 const connected = ref(false)
 const connectionError = ref('')
 const participants = ref<ParticipantInfo[]>([])
@@ -126,9 +145,9 @@ function initials(identity: string) {
 }
 
 function buildParticipantList() {
+  if (!room) return
   const list: ParticipantInfo[] = []
 
-  // Local participant
   const local = room.localParticipant
   list.push({
     identity: local.identity,
@@ -136,7 +155,6 @@ function buildParticipantList() {
     isMuted: local.isMicrophoneEnabled === false,
   })
 
-  // Remote participants
   room.remoteParticipants.forEach((p: RemoteParticipant) => {
     list.push({
       identity: p.identity,
@@ -148,9 +166,16 @@ function buildParticipantList() {
   participants.value = list
 }
 
+// Called on explicit user click — satisfies browser autoplay + getUserMedia policies.
+async function join() {
+  joined.value = true
+  await connect()
+}
+
 async function connect() {
   connectionError.value = ''
   try {
+    room = new Room()
     await room.connect(props.livekitUrl, props.token)
 
     if (canPublish.value) {
@@ -173,18 +198,18 @@ async function connect() {
 }
 
 async function toggleMute() {
+  if (!room) return
   muted.value = !muted.value
   await room.localParticipant.setMicrophoneEnabled(!muted.value)
   buildParticipantList()
 }
 
 function retry() {
+  room?.disconnect()
   connect()
 }
 
-onMounted(connect)
-
 onUnmounted(() => {
-  room.disconnect()
+  room?.disconnect()
 })
 </script>
