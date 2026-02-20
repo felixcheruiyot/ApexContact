@@ -30,7 +30,8 @@ type Config struct {
 	MediaServerKey string
 
 	// LiveKit
-	LiveKitURL       string
+	LiveKitURL       string // internal Docker URL used by backend → LiveKit server
+	LiveKitPublicURL string // public WSS URL sent to browser clients
 	LiveKitAPIKey    string
 	LiveKitAPISecret string
 
@@ -55,6 +56,7 @@ func Load() (*Config, error) {
 		MediaServerURL:     getEnv("MEDIA_SERVER_URL", "http://media-server:8888"),
 		MediaServerKey:     getEnv("MEDIA_SERVER_KEY", ""),
 		LiveKitURL:         getEnv("LIVEKIT_URL", "ws://livekit:7880"),
+		LiveKitPublicURL:   getEnv("LIVEKIT_PUBLIC_URL", ""),
 		LiveKitAPIKey:      getEnv("LIVEKIT_API_KEY", "devkey"),
 		LiveKitAPISecret:   getEnv("LIVEKIT_API_SECRET", "devsecret0000000000000000000000"),
 		AppEnv:             getEnv("APP_ENV", "development"),

@@ -392,10 +392,15 @@ func (h *CommentaryHandler) GetToken(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to generate token")
 	}
 
+	livekitURL := h.cfg.LiveKitPublicURL
+	if livekitURL == "" {
+		livekitURL = h.cfg.LiveKitURL
+	}
+
 	return c.JSON(domain.Response{Data: fiber.Map{
-		"token":    token,
-		"room":     roomName,
-		"livekit_url": h.cfg.LiveKitURL,
+		"token":       token,
+		"room":        roomName,
+		"livekit_url": livekitURL,
 	}})
 }
 
