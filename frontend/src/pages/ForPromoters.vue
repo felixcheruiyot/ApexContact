@@ -9,16 +9,16 @@
 
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div class="animate-fade-in">
-          <p class="text-accent-red font-semibold text-sm uppercase tracking-widest mb-4">For Event Promoters</p>
+          <p class="text-accent-red font-semibold text-sm uppercase tracking-widest mb-4">For Event Hosts</p>
           <h1 class="font-display text-6xl md:text-7xl uppercase tracking-wide text-white leading-none mb-6">
             Bring Your<br />
             <span class="text-accent-red">Events</span><br />
             Worldwide
           </h1>
           <p class="text-text-muted text-lg leading-relaxed mb-8 max-w-lg">
-            Live Streamify gives boxing and car racing promoters a complete platform to schedule,
-            sell tickets, and stream live events — with zero technical setup and real-time
-            revenue in your account.
+            Live Streamify gives experts, coaches, promoters, and creators a complete platform
+            to schedule, sell tickets, and stream live events — with zero technical setup and
+            real-time revenue in your account via M-Pesa.
           </p>
           <div class="flex items-center gap-4">
             <RouterLink to="/register" class="btn-primary text-base px-8 py-4">
@@ -82,10 +82,10 @@
             <p class="text-text-muted leading-relaxed mb-6">
               No hidden fees, no monthly subscriptions. Live Streamify takes a
               <strong class="text-white">30% platform fee</strong> per ticket sold to cover streaming
-              infrastructure, payment processing (M-Pesa), fraud protection, and customer support.
+              infrastructure, payment processing (M-Pesa), content protection, and customer support.
             </p>
             <p class="text-text-muted leading-relaxed mb-8">
-              Revenue is tracked in real time and visible in your promoter dashboard. Payouts
+              Revenue is tracked in real time and visible in your host dashboard. Payouts
               are processed within 48 hours of event completion.
             </p>
 
@@ -161,6 +161,9 @@
           <h2 class="font-display text-4xl md:text-5xl uppercase tracking-wide text-white">
             Your Complete Toolkit
           </h2>
+          <p class="text-text-muted text-base mt-3 max-w-xl mx-auto">
+            Everything you need to host sports events, mentorship sessions, workshops, concerts, and more.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -204,14 +207,14 @@
           Ready to Go Live?
         </h2>
         <p class="text-white/80 text-lg mb-8">
-          Create your promoter account in minutes. No upfront costs — you only pay when tickets sell.
+          Create your host account in minutes. No upfront costs — you only pay when tickets sell.
         </p>
         <div class="flex items-center justify-center gap-4 flex-wrap">
           <RouterLink to="/register" class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg
                                             hover:bg-white/90 transition-colors text-base">
-            Create Promoter Account
+            Create Host Account
           </RouterLink>
-          <a href="mailto:promoters@livestreamify.com"
+          <a href="mailto:hosts@livestreamify.com"
             class="border-2 border-white/50 text-white font-bold px-8 py-4 rounded-lg
                    hover:border-white transition-colors text-base">
             Contact Sales
@@ -234,10 +237,10 @@ const stats = [
 ]
 
 const steps = [
-  { title: 'Create Your Account', desc: 'Register as a promoter — free, instant, no credit card required.' },
-  { title: 'Schedule Your Event', desc: 'Add event details, set your ticket price, and upload a banner image.' },
-  { title: 'Go Live with OBS', desc: 'Copy your stream key, paste it into OBS, click Start Streaming.' },
-  { title: 'Get Paid', desc: 'Viewers pay via M-Pesa. Revenue tracked live, paid out within 48 hours.' },
+  { title: 'Create Your Account', desc: 'Register as a host — free, instant, no credit card required.' },
+  { title: 'Schedule Your Event', desc: 'Add event details, set your ticket price (or make it free), and upload a banner image.' },
+  { title: 'Go Live', desc: 'Stream from OBS, a phone, or any encoder. Copy your stream key and start broadcasting.' },
+  { title: 'Get Paid', desc: 'Attendees pay via M-Pesa. Revenue tracked live, paid out within 48 hours.' },
 ]
 
 const revenueItems = [

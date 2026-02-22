@@ -20,6 +20,7 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
+        { path: 'use-cases', name: 'use-cases', component: () => import('@/pages/UseCases.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
         {
           path: 'profile',

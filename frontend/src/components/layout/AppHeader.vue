@@ -19,23 +19,17 @@
           active-class="text-white">
           Home
         </RouterLink>
-        <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }"
-          class="text-text-muted hover:text-white transition-colors text-sm font-medium"
-          :class="{ 'text-white': route.query.sport === 'boxing' }">
-          Boxing
-        </RouterLink>
-        <RouterLink :to="{ name: 'home', query: { sport: 'racing' } }"
-          class="text-text-muted hover:text-white transition-colors text-sm font-medium"
-          :class="{ 'text-white': route.query.sport === 'racing' }">
-          Racing
+        <RouterLink to="/use-cases" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
+          active-class="text-white">
+          Use Cases
         </RouterLink>
         <RouterLink to="/" class="flex items-center gap-1.5 text-text-muted hover:text-accent-orange transition-colors text-sm font-medium"
           :class="{ 'text-accent-orange': isCommentaryRoute }">
-          🎙 Commentary
+          🎙 Live Rooms
         </RouterLink>
         <RouterLink to="/promoters" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           active-class="text-white">
-          For Promoters
+          For Hosts
         </RouterLink>
       </nav>
 
@@ -81,7 +75,7 @@
                 class="flex items-center gap-2 px-4 py-2.5 text-sm text-accent-orange hover:text-orange-400
                        hover:bg-accent-orange/5 transition-colors">
                 <span class="text-base leading-none">🎙</span>
-                Host a Commentary
+                Host a Live Room
               </RouterLink>
               <button @click="handleLogout"
                 class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-text-muted hover:text-white
@@ -131,36 +125,33 @@
             active-class="text-white bg-white/5">
             Home
           </RouterLink>
-          <RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }" @click="mobileMenuOpen = false"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-            🥊 Boxing
-          </RouterLink>
-          <RouterLink :to="{ name: 'home', query: { sport: 'racing' } }" @click="mobileMenuOpen = false"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-            🏎️ Racing
+          <RouterLink to="/use-cases" @click="mobileMenuOpen = false"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors"
+            active-class="text-white bg-white/5">
+            💡 Use Cases
           </RouterLink>
 
-          <!-- Commentary section -->
+          <!-- Live Rooms section -->
           <div class="border-t border-white/5 pt-3 mt-3">
-            <p class="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">Commentary</p>
+            <p class="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">Live Rooms</p>
             <RouterLink to="/" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-accent-orange hover:bg-accent-orange/5 transition-colors">
-              🎙 Browse Lobbies
+              🎙 Browse Rooms
             </RouterLink>
             <RouterLink v-if="auth.isAuthenticated" to="/commentary/create" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent-orange hover:bg-accent-orange/10 transition-colors">
-              + Host a Commentary
+              + Host a Live Room
             </RouterLink>
             <RouterLink v-else to="/login" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-accent-orange hover:bg-accent-orange/5 transition-colors">
-              + Host a Commentary
+              + Host a Live Room
             </RouterLink>
           </div>
 
           <div class="border-t border-white/5 pt-3 mt-3 space-y-1">
             <RouterLink to="/promoters" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
-              For Promoters
+              For Hosts
             </RouterLink>
 
             <template v-if="auth.isAuthenticated">

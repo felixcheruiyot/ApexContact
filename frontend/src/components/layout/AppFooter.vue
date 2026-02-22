@@ -1,7 +1,8 @@
 <template>
   <footer class="bg-bg-surface border-t border-white/5 mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <!-- Brand -->
         <div>
           <div class="flex items-center gap-2 mb-4">
             <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,24 +15,44 @@
             <span class="font-display text-xl text-white tracking-widest">STREAMIFY</span>
           </div>
           <p class="text-text-muted text-sm leading-relaxed max-w-xs">
-            Premium live sports streaming. Boxing and car racing events — live, secure, unstoppable.
+            The open platform for live knowledge and event monetisation. Host paid or free events — sports, mentoring, education, and more.
+          </p>
+          <p class="text-text-muted text-xs mt-4">
+            <a href="mailto:hello@livestreamify.com" class="hover:text-white transition-colors">hello@livestreamify.com</a>
           </p>
         </div>
 
+        <!-- Explore -->
         <div>
-          <h4 class="text-white font-semibold text-sm mb-4">Sports</h4>
+          <h4 class="text-white font-semibold text-sm mb-4">Explore</h4>
           <ul class="space-y-2">
-            <li><RouterLink :to="{ name: 'home', query: { sport: 'boxing' } }" class="text-text-muted text-sm hover:text-white transition-colors">🥊 Boxing</RouterLink></li>
-            <li><RouterLink :to="{ name: 'home', query: { sport: 'racing' } }" class="text-text-muted text-sm hover:text-white transition-colors">🏎️ Car Racing</RouterLink></li>
-            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-accent-orange transition-colors">🎙 Commentary Lobbies</RouterLink></li>
+            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-white transition-colors">🔴 Live Now</RouterLink></li>
+            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-white transition-colors">📅 Upcoming Events</RouterLink></li>
+            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-accent-orange transition-colors">🎙 Live Rooms</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">💡 Use Cases</RouterLink></li>
           </ul>
         </div>
 
+        <!-- Use Cases -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Use Cases</h4>
+          <ul class="space-y-2">
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🥊 Sports & Combat</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🏫 Mentoring & Coaching</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🌍 Visa & Immigration</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">📚 Education</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🎵 Music & Performances</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">⚖️ Legal Consultations</RouterLink></li>
+          </ul>
+        </div>
+
+        <!-- Platform -->
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Platform</h4>
           <ul class="space-y-2">
-            <li><RouterLink to="/commentary/create" class="text-text-muted text-sm hover:text-accent-orange transition-colors">Host a Commentary</RouterLink></li>
-            <li><RouterLink to="/promoters" class="text-text-muted text-sm hover:text-white transition-colors">For Promoters</RouterLink></li>
+            <li><RouterLink to="/promoters" class="text-text-muted text-sm hover:text-white transition-colors">Host an Event</RouterLink></li>
+            <li><RouterLink to="/commentary/create" class="text-text-muted text-sm hover:text-accent-orange transition-colors">Start a Live Room</RouterLink></li>
+            <li><RouterLink to="/promoters" class="text-text-muted text-sm hover:text-white transition-colors">Pricing</RouterLink></li>
             <li><a href="mailto:support@livestreamify.com" class="text-text-muted text-sm hover:text-white transition-colors">Help Center</a></li>
             <li><RouterLink to="/privacy" class="text-text-muted text-sm hover:text-white transition-colors">Privacy Policy</RouterLink></li>
           </ul>
