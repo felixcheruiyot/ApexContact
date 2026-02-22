@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#0A0A0F"/>
+  <!-- Red circle -->
+  <circle cx="90" cy="90" r="68" fill="#E8002D"/>
+  <!-- Play triangle -->
+  <polygon points="76,60 130,90 76,120" fill="white"/>
+  <!-- Signal bars -->
+  <rect x="24" y="74" width="11" height="32" rx="4" fill="white"/>
+  <rect x="39" y="63" width="11" height="54" rx="4" fill="white"/>
+</svg>

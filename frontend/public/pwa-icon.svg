@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Dark background -->
+  <rect width="512" height="512" rx="96" fill="#0A0A0F"/>
+  <!-- Red circle -->
+  <circle cx="256" cy="256" r="192" fill="#E8002D"/>
+  <!-- Play triangle -->
+  <polygon points="216,168 368,256 216,344" fill="white"/>
+  <!-- Signal bars (left) -->
+  <rect x="68" y="210" width="32" height="92" rx="12" fill="white"/>
+  <rect x="112" y="178" width="32" height="156" rx="12" fill="white"/>
+</svg>
