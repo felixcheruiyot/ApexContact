@@ -91,6 +91,7 @@ services:
     command: --dev
     networks:
       - app-network
+      - proxy
 
   nginx:
     image: nginx:1.27-alpine
