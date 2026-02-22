@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-bg-page flex flex-col">
+  <div class="h-screen bg-bg-page flex flex-col overflow-hidden">
     <!-- Top bar -->
     <div class="flex items-center justify-between px-4 py-3 bg-bg-surface border-b border-white/5">
       <RouterLink :to="`/commentary/${eventId}`" class="text-text-muted hover:text-white transition-colors">
@@ -25,9 +25,9 @@
     </div>
 
     <!-- Main layout -->
-    <div class="flex-1 flex flex-col md:flex-row gap-0 overflow-hidden" style="height: calc(100vh - 57px)">
+    <div class="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
       <!-- Audio Room (left / top on mobile) -->
-      <div class="flex-1 md:flex-none md:w-[60%] p-4 flex flex-col gap-4 overflow-y-auto">
+      <div class="flex-1 min-h-0 md:flex-none md:w-[60%] p-4 flex flex-col gap-4 overflow-y-auto">
         <AudioRoom
           v-if="livekitToken && livekitUrl"
           :livekitUrl="livekitUrl"
@@ -51,7 +51,7 @@
       </div>
 
       <!-- Chat Panel (right / bottom on mobile) -->
-      <div class="md:w-[40%] border-t md:border-t-0 md:border-l border-white/5 flex flex-col overflow-hidden" style="min-height: 300px; max-height: 100%">
+      <div class="shrink-0 h-[260px] md:h-auto md:flex-none md:w-[40%] md:min-h-0 border-t md:border-t-0 md:border-l border-white/5 flex flex-col overflow-hidden">
         <ChatPanel
           ref="chatPanelEl"
           :eventId="eventId"
@@ -140,7 +140,10 @@ function handleIncomingReaction(emoji: string) {
 }
 
 function raiseHand() {
-  // TODO: could emit a chat message like "✋ [nickname] wants to speak"
+  const msg = store.myNickname
+    ? `✋ ${store.myNickname} wants to speak`
+    : '✋ Someone wants to speak'
+  chatPanelEl.value?.sendMessage(msg)
 }
 
 async function leave() {

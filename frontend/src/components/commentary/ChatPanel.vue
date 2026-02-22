@@ -155,9 +155,19 @@ onUnmounted(() => {
   ws?.close()
 })
 
-defineExpose({ ws: () => ws, sendRawReaction: (emoji: string) => {
-  if (ws?.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type: 'reaction', content: emoji }))
-  }
-}})
+defineExpose({
+  ws: () => ws,
+  sendRawReaction: (emoji: string) => {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'reaction', content: emoji }))
+    }
+  },
+  sendMessage: (content: string) => {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'message', content }))
+      return true
+    }
+    return false
+  },
+})
 </script>
