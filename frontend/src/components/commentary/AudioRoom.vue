@@ -65,6 +65,23 @@
           <span class="text-text-muted text-[10px]">
             {{ p.isMuted ? '🔇' : '🎙' }}
           </span>
+          <!-- Host: grant/revoke mic button (not for self) -->
+          <template v-if="isHost && p.identity !== myUserId">
+            <button
+              v-if="speakerIds.includes(p.identity)"
+              @click="$emit('revokeMic', p.identity)"
+              class="px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+            >
+              Revoke Mic
+            </button>
+            <button
+              v-else
+              @click="$emit('grantMic', p.identity)"
+              class="px-2 py-0.5 rounded text-[10px] font-medium bg-success/20 text-success hover:bg-success/30 transition-colors"
+            >
+              Grant Mic
+            </button>
+          </template>
         </div>
       </div>
     </div>
@@ -102,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, computed } from 'vue'
+import { ref, onUnmounted, computed, watch } from 'vue'
 import {
   Room,
   RoomEvent,
@@ -119,6 +136,9 @@ const props = defineProps<{
   livekitUrl: string
   token: string
   myRole: 'host' | 'speaker' | 'listener'
+  isHost?: boolean
+  myUserId?: string
+  speakerIds?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -126,6 +146,8 @@ const emit = defineEmits<{
   (e: 'leave'): void
   (e: 'connected'): void
   (e: 'error', msg: string): void
+  (e: 'grantMic', userId: string): void
+  (e: 'revokeMic', userId: string): void
 }>()
 
 // Room is created lazily inside connect() so no AudioContext is created
@@ -208,6 +230,16 @@ function retry() {
   room?.disconnect()
   connect()
 }
+
+// When the token changes (e.g. role upgraded from listener → speaker),
+// reconnect to LiveKit so the new permissions take effect immediately.
+watch(() => props.token, async (newToken, oldToken) => {
+  if (newToken && oldToken && newToken !== oldToken && connected.value) {
+    room?.disconnect()
+    connected.value = false
+    await connect()
+  }
+})
 
 onUnmounted(() => {
   room?.disconnect()

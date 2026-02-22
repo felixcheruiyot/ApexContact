@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -449,16 +450,27 @@ func (h *CommentaryHandler) UpdateParticipant(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to update participant")
 	}
 
+	// Look up nickname so the broadcast event is self-contained
+	var targetNickname string
+	_ = h.db.QueryRow(context.Background(),
+		`SELECT nickname FROM lobby_participants WHERE event_id = $1 AND user_id = $2`,
+		id, targetID,
+	).Scan(&targetNickname)
+
 	// Notify via Redis pub/sub so the chat hub can broadcast a role-change event
 	eventType := "speaker_granted"
 	if req.Role == "listener" {
 		eventType = "speaker_revoked"
 	}
-	h.rdb.Publish(context.Background(),
-		fmt.Sprintf("lobby_chat:%s", id.String()),
-		fmt.Sprintf(`{"type":"%s","user_id":"%s","nickname":"","created_at":"%s"}`,
-			eventType, targetID.String(), time.Now().UTC().Format(time.RFC3339)),
-	)
+	evt := domain.ChatEvent{
+		Type:      eventType,
+		UserID:    targetID.String(),
+		Nickname:  targetNickname,
+		CreatedAt: time.Now().UTC(),
+	}
+	if payload, err := json.Marshal(evt); err == nil {
+		h.rdb.Publish(context.Background(), fmt.Sprintf("lobby_chat:%s", id.String()), string(payload))
+	}
 
 	return c.JSON(domain.Response{Data: fiber.Map{"role": req.Role}})
 }

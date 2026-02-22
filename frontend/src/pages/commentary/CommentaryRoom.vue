@@ -33,8 +33,13 @@
           :livekitUrl="livekitUrl"
           :token="livekitToken"
           :myRole="myRole"
+          :isHost="isHost"
+          :myUserId="auth.user?.id"
+          :speakerIds="speakerIds"
           @leave="leave"
           @raiseHand="raiseHand"
+          @grantMic="grantMic"
+          @revokeMic="revokeMic"
           @connected="roomConnected = true"
           @error="audioError = $event"
           class="flex-1 min-h-[280px]"
@@ -73,6 +78,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useCommentaryStore } from '@/stores/commentary'
 import { useAuthStore } from '@/stores/auth'
+import { commentaryApi } from '@/api/commentary'
 import AudioRoom from '@/components/commentary/AudioRoom.vue'
 import ChatPanel from '@/components/commentary/ChatPanel.vue'
 import ReactionBar from '@/components/commentary/ReactionBar.vue'
@@ -94,6 +100,7 @@ const authToken = computed(() => auth.token ?? '')
 const chatMessages = ref<LobbyMessage[]>([])
 const roomConnected = ref(false)
 const audioError = ref('')
+const speakerIds = ref<string[]>([])
 const reactionBarEl = ref<InstanceType<typeof ReactionBar> | null>(null)
 const chatPanelEl = ref<InstanceType<typeof ChatPanel> | null>(null)
 
@@ -116,7 +123,6 @@ onMounted(async () => {
 
 function handleChatEvent(evt: ChatEvent) {
   if (evt.type === 'message') {
-    // Push as a LobbyMessage shape for display
     chatMessages.value.push({
       id: Date.now().toString(),
       event_id: eventId,
@@ -126,7 +132,34 @@ function handleChatEvent(evt: ChatEvent) {
       message_type: 'text',
       created_at: evt.created_at,
     })
+  } else if (evt.type === 'speaker_granted' && evt.user_id) {
+    if (!speakerIds.value.includes(evt.user_id)) {
+      speakerIds.value.push(evt.user_id)
+    }
+    // If the current user was granted the mic, re-fetch their token so
+    // AudioRoom reconnects with canPublish=true
+    if (evt.user_id === auth.user?.id) {
+      store.fetchToken(eventId).catch(() => {})
+    }
+  } else if (evt.type === 'speaker_revoked' && evt.user_id) {
+    speakerIds.value = speakerIds.value.filter(id => id !== evt.user_id)
   }
+}
+
+async function grantMic(userId: string) {
+  try {
+    await commentaryApi.updateParticipant(eventId, userId, 'speaker')
+    if (!speakerIds.value.includes(userId)) {
+      speakerIds.value.push(userId)
+    }
+  } catch { /* the WS event will sync state if it partially succeeded */ }
+}
+
+async function revokeMic(userId: string) {
+  try {
+    await commentaryApi.updateParticipant(eventId, userId, 'listener')
+    speakerIds.value = speakerIds.value.filter(id => id !== userId)
+  } catch { /* ignore */ }
 }
 
 function handleReaction(emoji: string) {
