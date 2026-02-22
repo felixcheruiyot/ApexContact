@@ -133,14 +133,15 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	commentary.Get("/:id/messages", commentaryHandler.Messages)
 	commentary.Get("/:id/nicknames/suggest", middleware.RequireAuth(cfg), commentaryHandler.SuggestNicknames)
 
-	// WebSocket upgrade middleware must be applied before the handler
-	app.Use("/ws", func(c *fiber.Ctx) error {
+	// WebSocket routes — use Group so the /ws prefix is preserved after c.Next()
+	// (app.Use strips the prefix, causing the route below not to match)
+	ws := app.Group("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
-	app.Get("/ws/commentary/:id/chat", websocket.New(chatHandler.Handle))
+	ws.Get("/commentary/:id/chat", websocket.New(chatHandler.Handle))
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {
