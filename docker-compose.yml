@@ -38,7 +38,7 @@ services:
       REDIS_ADDR: redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
       MEDIA_SERVER_URL: http://media-server:8888
-      LIVEKIT_URL: ws://livekit:7880
+      LIVEKIT_URL: wss://livekit:7880
       LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
       LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
     ports:
