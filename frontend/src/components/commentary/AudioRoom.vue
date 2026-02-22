@@ -123,6 +123,7 @@ import { ref, onUnmounted, computed, watch } from 'vue'
 import {
   Room,
   RoomEvent,
+  Track,
   RemoteParticipant,
 } from 'livekit-client'
 
@@ -153,6 +154,9 @@ const emit = defineEmits<{
 // Room is created lazily inside connect() so no AudioContext is created
 // until the user explicitly clicks "Join Audio".
 let room: Room | null = null
+
+// Keep track of audio elements we inject so we can remove them on disconnect.
+const audioElements: HTMLAudioElement[] = []
 
 const joined = ref(false)
 const connected = ref(false)
@@ -194,11 +198,23 @@ async function join() {
   await connect()
 }
 
+function cleanupAudio() {
+  audioElements.forEach(el => {
+    el.srcObject = null
+    el.remove()
+  })
+  audioElements.length = 0
+}
+
 async function connect() {
   connectionError.value = ''
   try {
     room = new Room()
     await room.connect(props.livekitUrl, props.token)
+
+    // Unlock browser audio context — must be called while inside a user-gesture
+    // call stack (join() is triggered by a button click, so this is safe).
+    await room.startAudio()
 
     // Read publish permission from the token itself — more reliable than
     // props.myRole which may not yet reflect a just-granted speaker role.
@@ -209,6 +225,23 @@ async function connect() {
     connected.value = true
     buildParticipantList()
     emit('connected')
+
+    // Attach each incoming remote audio track to a DOM <audio> element so
+    // the browser actually plays the sound.
+    room.on(RoomEvent.TrackSubscribed, (track) => {
+      if (track.kind === Track.Kind.Audio) {
+        const el = track.attach() as HTMLAudioElement
+        el.setAttribute('playsinline', '')
+        document.body.appendChild(el)
+        audioElements.push(el)
+      }
+      buildParticipantList()
+    })
+
+    room.on(RoomEvent.TrackUnsubscribed, (track) => {
+      track.detach()
+      buildParticipantList()
+    })
 
     room.on(RoomEvent.ParticipantConnected, buildParticipantList)
     room.on(RoomEvent.ParticipantDisconnected, buildParticipantList)
@@ -229,6 +262,7 @@ async function toggleMute() {
 }
 
 function retry() {
+  cleanupAudio()
   room?.disconnect()
   connect()
 }
@@ -237,6 +271,7 @@ function retry() {
 // reconnect to LiveKit so the new permissions take effect immediately.
 watch(() => props.token, async (newToken, oldToken) => {
   if (newToken && oldToken && newToken !== oldToken && connected.value) {
+    cleanupAudio()
     room?.disconnect()
     connected.value = false
     await connect()
@@ -244,6 +279,7 @@ watch(() => props.token, async (newToken, oldToken) => {
 })
 
 onUnmounted(() => {
+  cleanupAudio()
   room?.disconnect()
 })
 </script>
