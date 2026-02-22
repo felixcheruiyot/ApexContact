@@ -200,7 +200,9 @@ async function connect() {
     room = new Room()
     await room.connect(props.livekitUrl, props.token)
 
-    if (canPublish.value) {
+    // Read publish permission from the token itself — more reliable than
+    // props.myRole which may not yet reflect a just-granted speaker role.
+    if (room.localParticipant.permissions?.canPublish) {
       await room.localParticipant.setMicrophoneEnabled(true)
     }
 

@@ -136,13 +136,17 @@ function handleChatEvent(evt: ChatEvent) {
     if (!speakerIds.value.includes(evt.user_id)) {
       speakerIds.value.push(evt.user_id)
     }
-    // If the current user was granted the mic, re-fetch their token so
-    // AudioRoom reconnects with canPublish=true
+    // If the current user was granted the mic, update role then re-fetch
+    // token so AudioRoom reconnects with canPublish=true
     if (evt.user_id === auth.user?.id) {
+      store.myRole = 'speaker'
       store.fetchToken(eventId).catch(() => {})
     }
   } else if (evt.type === 'speaker_revoked' && evt.user_id) {
     speakerIds.value = speakerIds.value.filter(id => id !== evt.user_id)
+    if (evt.user_id === auth.user?.id) {
+      store.myRole = 'listener'
+    }
   }
 }
 
