@@ -5,16 +5,35 @@
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <div>
         <label class="block text-text-muted text-sm mb-2">Event Title</label>
-        <input v-model="form.title" type="text" placeholder="e.g. World Boxing Championship 2026" class="input" required />
+        <input v-model="form.title" type="text" placeholder="e.g. Nairobi Career Masterclass 2026" class="input" required />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-text-muted text-sm mb-2">Sport Type</label>
+          <label class="block text-text-muted text-sm mb-2">Category</label>
           <select v-model="form.sport_type" class="input appearance-none" required>
-            <option value="">Select sport</option>
-            <option value="boxing">Boxing</option>
-            <option value="racing">Car Racing</option>
+            <option value="">Select a category</option>
+            <optgroup label="Sports">
+              <option value="boxing">🥊 Boxing</option>
+              <option value="racing">🏎️ Motorsports & Racing</option>
+              <option value="fitness">💪 Fitness & Wellness</option>
+            </optgroup>
+            <optgroup label="Knowledge & Consulting">
+              <option value="mentoring">🏫 Mentoring & Coaching</option>
+              <option value="education">📚 Education & Workshops</option>
+              <option value="legal">⚖️ Legal Consultations</option>
+              <option value="visa">🌍 Visa & Immigration</option>
+              <option value="business">💼 Business & Finance</option>
+            </optgroup>
+            <optgroup label="Entertainment">
+              <option value="music">🎵 Music & Performances</option>
+              <option value="gaming">🎮 Gaming & Esports</option>
+              <option value="cooking">🍳 Cooking & Lifestyle</option>
+              <option value="community">🙏 Faith & Community</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="other">📌 Other</option>
+            </optgroup>
           </select>
         </div>
         <div>

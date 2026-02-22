@@ -11,7 +11,7 @@
       <div class="absolute top-3 left-3 flex items-center gap-2">
         <span v-if="lobby.status === 'live'" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent-orange text-white text-xs font-bold uppercase tracking-wider">
           <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-          Live Commentary
+          Live Room
         </span>
         <span v-else-if="lobby.status === 'scheduled'" class="badge-upcoming">
           Upcoming
@@ -44,7 +44,7 @@
       <!-- Commentary type badge -->
       <div class="flex items-center gap-2 mb-2">
         <span class="text-accent-orange text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
-          🎙 Commentary
+          🎙 Live Room
         </span>
       </div>
       <h3 class="text-white font-semibold text-sm leading-tight line-clamp-2 mb-1 group-hover:text-accent-orange

@@ -59,9 +59,9 @@
           <NavItem to="/dashboard/create" icon="plus" label="Create Event" />
           <NavItem to="/dashboard/revenue" icon="bar-chart" label="Revenue" />
           <div class="pt-2 pb-1 px-2">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted/60">Commentary</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted/60">Live Rooms</p>
           </div>
-          <NavItem to="/commentary/create" icon="mic" label="Host a Lobby" />
+          <NavItem to="/commentary/create" icon="mic" label="Start a Live Room" />
         </template>
         <template v-else-if="auth.user?.role === 'broadcaster'">
           <NavItem to="/dashboard" :exact="true" icon="grid" label="Overview" />
@@ -198,7 +198,7 @@ const pageTitle = computed(() => {
   if (p.startsWith('/dashboard/edit')) return 'Edit Event'
   if (p.startsWith('/dashboard/analytics')) return 'Event Analytics'
   if (p.startsWith('/dashboard/revenue')) return 'Revenue & Analytics'
-  if (p.startsWith('/dashboard/commentary')) return 'Host a Commentary'
+  if (p.startsWith('/dashboard/commentary')) return 'Start a Live Room'
   if (p.startsWith('/profile')) return 'My Profile'
   return sectionLabel.value
 })

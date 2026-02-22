@@ -30,7 +30,7 @@
               {{ event.sport_type }}
             </span>
             <span class="bg-accent-orange/20 text-accent-orange text-xs px-2 py-1 rounded-full font-medium">
-              🎙 Commentary
+              🎙 Live Room
             </span>
           </div>
           <h1 class="text-white text-2xl md:text-3xl font-bold font-display leading-tight">
