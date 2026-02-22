@@ -109,6 +109,9 @@ onMounted(async () => {
   if (!store.current) {
     await store.fetchDetail(eventId)
   }
+  // Restore role + nickname from backend (handles page refresh / new deploy
+  // where the Pinia store resets to its defaults).
+  await store.checkMe(eventId)
   // Fetch LiveKit token
   try {
     await store.fetchToken(eventId)
