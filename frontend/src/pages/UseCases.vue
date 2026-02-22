@@ -347,7 +347,7 @@ const testimonials = [
     avatarBg: 'rgba(255,179,0,0.2)',
     avatarColor: '#FFB300',
     icon: '⚖️',
-    quote: 'Hosting my monthly "Know Your Rights" session on Live Streamify has brought legal awareness to hundreds of Kenyans who couldn't afford an in-person consultation.',
+    quote: "Hosting my monthly \"Know Your Rights\" session on Live Streamify has brought legal awareness to hundreds of Kenyans who couldn't afford an in-person consultation.",
   },
   {
     name: 'DJ Karura',
@@ -356,7 +356,7 @@ const testimonials = [
     avatarBg: 'rgba(156,39,176,0.2)',
     avatarColor: '#CE93D8',
     icon: '🎵',
-    quote: 'I hosted my first live concert with 800 virtual attendees from 12 countries. Setup took 15 minutes. The platform just works — I\'ll never go back to relying on venue bookings alone.',
+    quote: "I hosted my first live concert with 800 virtual attendees from 12 countries. Setup took 15 minutes. The platform just works — I'll never go back to relying on venue bookings alone.",
   },
 ]
 </script>
