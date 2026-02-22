@@ -68,7 +68,7 @@
           <!-- Host: grant/revoke mic button (not for self) -->
           <template v-if="isHost && p.identity !== myUserId">
             <button
-              v-if="speakerIds.includes(p.identity)"
+              v-if="(speakerIds ?? []).includes(p.identity)"
               @click="$emit('revokeMic', p.identity)"
               class="px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
             >
