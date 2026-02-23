@@ -50,7 +50,7 @@ How it all works end-to-end
 
   docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/006_merge_roles.sql
 
-  docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/007_sport_types.sql
+  docker exec -i livestreamify-postgres-1 psql -U apex -d livestreamify < backend/migrations/009_withdrawals.sql
 
 
 # References

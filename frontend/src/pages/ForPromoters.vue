@@ -1,309 +1,505 @@
 <template>
-  <div>
-    <!-- Hero -->
-    <section class="relative overflow-hidden min-h-[70vh] flex items-center">
-      <!-- Background -->
-      <div class="absolute inset-0 bg-gradient-to-br from-bg via-bg to-accent-red/10" />
-      <div class="absolute inset-0"
-        style="background-image: radial-gradient(circle at 70% 50%, rgba(232,0,45,0.08) 0%, transparent 60%);" />
+  <div class="bg-bg text-white">
 
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div class="animate-fade-in">
-          <p class="text-accent-red font-semibold text-sm uppercase tracking-widest mb-4">For Event Hosts</p>
-          <h1 class="font-display text-6xl md:text-7xl uppercase tracking-wide text-white leading-none mb-6">
-            Bring Your<br />
-            <span class="text-accent-red">Events</span><br />
-            Worldwide
+    <!-- ============================================================ -->
+    <!-- SECTION 1: HERO                                               -->
+    <!-- ============================================================ -->
+    <section class="relative min-h-screen flex items-center overflow-hidden">
+      <!-- Background image -->
+      <img
+        src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80"
+        alt="Creator speaking"
+        class="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      <!-- Dark overlays -->
+      <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent pointer-events-none" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+      <!-- Content: left side only -->
+      <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-16 py-24 w-full">
+        <div class="max-w-xl">
+          <!-- Pill label -->
+          <div class="inline-flex items-center bg-accent-red/10 border border-accent-red/30 text-accent-red text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
+            💰 EARN FROM YOUR KNOWLEDGE
+          </div>
+
+          <!-- H1 -->
+          <h1 class="font-display text-6xl md:text-7xl uppercase text-white leading-none tracking-wide mb-6">
+            Turn Your Expertise<br />
+            Into Income.<br />
+            <span class="text-accent-red">Live.</span>
           </h1>
-          <p class="text-text-muted text-lg leading-relaxed mb-8 max-w-lg">
-            Live Streamify gives experts, coaches, promoters, and creators a complete platform
-            to schedule, sell tickets, and stream live events — with zero technical setup and
-            real-time revenue in your account via M-Pesa.
+
+          <!-- Body text -->
+          <p class="text-white/80 text-lg leading-relaxed mb-8 max-w-lg">
+            Join 12,400 African creators earning from business, legal, fitness, education sessions —
+            paid directly to M-Pesa.
           </p>
-          <div class="flex items-center gap-4">
-            <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary text-base px-8 py-4">
-              Create an Event
+
+          <!-- Stats row -->
+          <div class="flex flex-wrap gap-4 mb-10">
+            <span
+              v-for="stat in heroStats"
+              :key="stat"
+              class="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold px-4 py-2 rounded-full"
+            >
+              {{ stat }}
+            </span>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex flex-wrap items-center gap-4">
+            <RouterLink
+              to="/register"
+              class="bg-white text-black font-bold text-base px-8 py-4 rounded-full hover:bg-white/90 transition-colors duration-200 shadow-lg"
+            >
+              Start Hosting Free
             </RouterLink>
-            <RouterLink v-else to="/register" class="btn-primary text-base px-8 py-4">
-              Get Started Free
-            </RouterLink>
-            <a href="mailto:promoters@livestreamify.com" class="btn-ghost text-base px-8 py-4">
-              Talk to Us
+            <a
+              href="#how-it-works"
+              class="border-2 border-white/40 text-white font-medium text-base px-6 py-4 rounded-full hover:border-white/70 transition-colors duration-200"
+            >
+              See How It Works ↓
             </a>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-2 gap-4">
-          <div v-for="stat in stats" :key="stat.label"
-            class="card p-6 flex flex-col justify-between">
-            <p class="font-display text-5xl text-accent-red mb-2">{{ stat.value }}</p>
-            <p class="text-white font-semibold text-sm">{{ stat.label }}</p>
-            <p class="text-text-muted text-xs mt-1">{{ stat.sub }}</p>
-          </div>
+    <!-- ============================================================ -->
+    <!-- SECTION 2: TRUST STRIP                                        -->
+    <!-- ============================================================ -->
+    <section class="bg-bg-surface border-y border-white/5 py-8">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <div class="flex flex-wrap items-center gap-4 justify-center md:justify-start">
+          <span class="text-text-muted text-sm font-medium shrink-0 mr-2">
+            Trusted by creators from:
+          </span>
+          <span
+            v-for="city in cities"
+            :key="city.name"
+            class="inline-flex items-center gap-1.5 bg-bg-elevated border border-white/10 text-white text-sm font-medium px-4 py-2 rounded-full"
+          >
+            <span>{{ city.flag }}</span>
+            {{ city.name }}
+          </span>
         </div>
       </div>
     </section>
 
-    <!-- How it works -->
-    <section class="bg-bg-surface border-y border-white/5 py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-14">
-          <p class="text-accent-red text-sm font-semibold uppercase tracking-widest mb-3">Simple Process</p>
-          <h2 class="font-display text-4xl md:text-5xl uppercase tracking-wide text-white">
-            Live in 4 Steps
+    <!-- ============================================================ -->
+    <!-- SECTION 3: CREATOR SUCCESS STORIES                           -->
+    <!-- ============================================================ -->
+    <section class="py-24">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <!-- Heading -->
+        <div class="mb-14">
+          <p class="text-accent-red text-sm font-bold uppercase tracking-widest mb-3">Social Proof</p>
+          <h2 class="font-display text-4xl md:text-5xl uppercase text-white leading-none">
+            Creators already winning
           </h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div v-for="(step, i) in steps" :key="i" class="relative">
-            <!-- Connector line -->
-            <div v-if="i < steps.length - 1"
-              class="hidden md:block absolute top-8 left-1/2 w-full h-px bg-gradient-to-r from-accent-red/50 to-transparent z-0" />
-            <div class="card p-6 relative z-10 text-center">
-              <div class="w-14 h-14 rounded-full bg-accent-red/10 border border-accent-red/30
-                          flex items-center justify-center mx-auto mb-4">
-                <span class="font-display text-2xl text-accent-red">{{ i + 1 }}</span>
+        <!-- 3-column grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Card 1 -->
+          <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1531746790-b0aa4f4b7bce?auto=format&fit=crop&w=600&q=80"
+                alt="Amara Kioni"
+                class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
+              />
+              <div>
+                <p class="text-white font-bold text-base leading-tight">Amara Kioni</p>
+                <p class="text-text-muted text-sm mt-0.5">Immigration &amp; Visa Consultant</p>
               </div>
-              <h3 class="text-white font-bold text-sm mb-2">{{ step.title }}</h3>
-              <p class="text-text-muted text-xs leading-relaxed">{{ step.desc }}</p>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Revenue & Pricing -->
-    <section class="py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <p class="text-accent-red text-sm font-semibold uppercase tracking-widest mb-3">Revenue Split</p>
-            <h2 class="font-display text-4xl md:text-5xl uppercase tracking-wide text-white mb-6">
-              You Keep<br /><span class="text-accent-red">70%</span> of Every Ticket
-            </h2>
-            <p class="text-text-muted leading-relaxed mb-6">
-              No hidden fees, no monthly subscriptions. Live Streamify takes a
-              <strong class="text-white">30% platform fee</strong> per ticket sold to cover streaming
-              infrastructure, payment processing (M-Pesa), content protection, and customer support.
-            </p>
-            <p class="text-text-muted leading-relaxed mb-8">
-              Revenue is tracked in real time and visible in your host dashboard. Payouts
-              are processed within 48 hours of event completion.
-            </p>
-
-            <div class="space-y-3">
-              <div v-for="item in revenueItems" :key="item.label"
-                class="flex items-center justify-between py-3 border-b border-white/5">
-                <span class="text-text-muted text-sm">{{ item.label }}</span>
-                <span :class="item.highlight ? 'text-accent-red font-bold' : 'text-white font-semibold'" class="text-sm">
-                  {{ item.value }}
+            <blockquote class="text-white/80 text-sm leading-relaxed flex-1">
+              "I made KES 85,000 from one live Q&amp;A session. 400 people paid to watch me explain UK visa applications."
+            </blockquote>
+            <div class="pt-4 border-t border-white/10">
+              <div class="flex flex-wrap gap-2">
+                <span class="bg-status-success/10 border border-status-success/20 text-status-success text-xs font-semibold px-3 py-1 rounded-full">
+                  KES 85,000 / session
+                </span>
+                <span class="bg-white/5 border border-white/10 text-text-muted text-xs px-3 py-1 rounded-full">
+                  18 sessions
                 </span>
               </div>
             </div>
           </div>
 
-          <!-- Earnings calculator -->
-          <div class="card p-8">
-            <h3 class="text-white font-bold text-lg mb-6">Earnings Calculator</h3>
-            <div class="space-y-5">
+          <!-- Card 2 -->
+          <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
+                alt="David Mwangi"
+                class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
+              />
               <div>
-                <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">
-                  Ticket Price (KES)
-                </label>
-                <input v-model.number="calc.price" type="range" min="100" max="5000" step="50"
-                  class="w-full accent-red-500" />
-                <div class="flex justify-between text-text-muted text-xs mt-1">
-                  <span>KES 100</span>
-                  <span class="text-white font-semibold">KES {{ calc.price.toLocaleString() }}</span>
-                  <span>KES 5,000</span>
-                </div>
+                <p class="text-white font-bold text-base leading-tight">David Mwangi</p>
+                <p class="text-text-muted text-sm mt-0.5">Sales Trainer, Nairobi</p>
               </div>
+            </div>
+            <blockquote class="text-white/80 text-sm leading-relaxed flex-1">
+              "My live sales masterclass has an audience of 2,400 repeat viewers. M-Pesa payouts hit in minutes."
+            </blockquote>
+            <div class="pt-4 border-t border-white/10">
+              <div class="flex flex-wrap gap-2">
+                <span class="bg-status-success/10 border border-status-success/20 text-status-success text-xs font-semibold px-3 py-1 rounded-full">
+                  KES 340,000 total
+                </span>
+                <span class="bg-white/5 border border-white/10 text-text-muted text-xs px-3 py-1 rounded-full">
+                  2,400 viewers
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
+            <div class="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=600&q=80"
+                alt="Zara Hassan"
+                class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
+              />
               <div>
-                <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">
+                <p class="text-white font-bold text-base leading-tight">Zara Hassan</p>
+                <p class="text-text-muted text-sm mt-0.5">Fitness Coach, Kampala</p>
+              </div>
+            </div>
+            <blockquote class="text-white/80 text-sm leading-relaxed flex-1">
+              "I run weekly fitness sessions. 300 subscribers per session, consistent income every week."
+            </blockquote>
+            <div class="pt-4 border-t border-white/10">
+              <div class="flex flex-wrap gap-2">
+                <span class="bg-status-success/10 border border-status-success/20 text-status-success text-xs font-semibold px-3 py-1 rounded-full">
+                  300 viewers/week
+                </span>
+                <span class="bg-white/5 border border-white/10 text-text-muted text-xs px-3 py-1 rounded-full">
+                  52 sessions
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 4: REVENUE CALCULATOR                                 -->
+    <!-- ============================================================ -->
+    <section class="py-24 bg-bg-surface border-y border-white/5">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <!-- Heading -->
+        <div class="text-center mb-14">
+          <p class="text-accent-red text-sm font-bold uppercase tracking-widest mb-3">Earnings</p>
+          <h2 class="font-display text-4xl md:text-5xl uppercase text-white leading-none">
+            Calculate your earnings
+          </h2>
+          <p class="text-text-muted text-base mt-4 max-w-md mx-auto">
+            70% of every ticket goes straight to you
+          </p>
+        </div>
+
+        <!-- Calculator card -->
+        <div class="bg-bg-elevated rounded-3xl p-8 md:p-10 max-w-2xl mx-auto border border-white/5">
+          <div class="space-y-8">
+            <!-- Slider 1: Ticket Price -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <label class="text-text-muted text-xs uppercase tracking-widest font-semibold">
+                  Ticket Price
+                </label>
+                <span class="font-display text-3xl text-white leading-none">
+                  KES {{ calc.price.toLocaleString() }}
+                </span>
+              </div>
+              <input
+                v-model.number="calc.price"
+                type="range"
+                min="100"
+                max="5000"
+                step="50"
+                class="w-full h-2 rounded-full appearance-none bg-white/10 cursor-pointer slider-accent"
+                style="accent-color: #E8002D;"
+              />
+              <div class="flex justify-between text-text-muted text-xs mt-2">
+                <span>KES 100</span>
+                <span>KES 5,000</span>
+              </div>
+            </div>
+
+            <!-- Slider 2: Expected Viewers -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <label class="text-text-muted text-xs uppercase tracking-widest font-semibold">
                   Expected Viewers
                 </label>
-                <input v-model.number="calc.viewers" type="range" min="10" max="10000" step="10"
-                  class="w-full accent-red-500" />
-                <div class="flex justify-between text-text-muted text-xs mt-1">
-                  <span>10</span>
-                  <span class="text-white font-semibold">{{ calc.viewers.toLocaleString() }} viewers</span>
-                  <span>10,000</span>
-                </div>
+                <span class="font-display text-3xl text-white leading-none">
+                  {{ calc.viewers.toLocaleString() }}
+                </span>
+              </div>
+              <input
+                v-model.number="calc.viewers"
+                type="range"
+                min="10"
+                max="10000"
+                step="10"
+                class="w-full h-2 rounded-full appearance-none bg-white/10 cursor-pointer"
+                style="accent-color: #E8002D;"
+              />
+              <div class="flex justify-between text-text-muted text-xs mt-2">
+                <span>10 viewers</span>
+                <span>10,000 viewers</span>
               </div>
             </div>
-
-            <div class="mt-8 pt-6 border-t border-white/10 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-text-muted text-sm">Gross revenue</span>
-                <span class="text-white font-semibold">KES {{ grossRevenue.toLocaleString() }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-text-muted text-sm">Platform fee (30%)</span>
-                <span class="text-text-muted">− KES {{ platformFee.toLocaleString() }}</span>
-              </div>
-              <div class="flex items-center justify-between pt-3 border-t border-white/10">
-                <span class="text-white font-bold">Your earnings</span>
-                <span class="text-accent-red font-bold text-2xl">KES {{ yourEarnings.toLocaleString() }}</span>
-              </div>
-            </div>
-
-            <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary w-full mt-6 text-center block">
-              Start Earning →
-            </RouterLink>
-            <RouterLink v-else to="/register" class="btn-primary w-full mt-6 text-center block">
-              Start Earning →
-            </RouterLink>
           </div>
+
+          <!-- Results -->
+          <div class="mt-8 pt-8 border-t border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-text-muted text-sm">Gross revenue</span>
+              <span class="text-white font-semibold">KES {{ grossRevenue.toLocaleString() }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-text-muted text-sm">Platform fee (30%)</span>
+              <span class="text-text-muted text-sm">− KES {{ platformFee.toLocaleString() }}</span>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/10">
+              <div>
+                <span class="text-white font-bold text-base">Your Cut</span>
+              </div>
+              <span class="font-display text-4xl text-status-success leading-none">
+                KES {{ yourEarnings.toLocaleString() }}
+              </span>
+            </div>
+          </div>
+
+          <!-- M-Pesa note -->
+          <p class="text-text-muted text-xs text-center mt-6 flex items-center justify-center gap-1.5">
+            <span>📱</span>
+            Paid directly to your M-Pesa within 24h
+          </p>
+
+          <!-- CTA -->
+          <RouterLink
+            to="/register"
+            class="mt-8 bg-accent-red hover:bg-accent-red-hover text-white font-bold text-base px-6 py-4 rounded-full w-full block text-center transition-colors duration-200"
+          >
+            Start Earning →
+          </RouterLink>
         </div>
       </div>
     </section>
 
-    <!-- Features -->
-    <section class="bg-bg-surface border-y border-white/5 py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-14">
-          <p class="text-accent-red text-sm font-semibold uppercase tracking-widest mb-3">Everything Included</p>
-          <h2 class="font-display text-4xl md:text-5xl uppercase tracking-wide text-white">
-            Your Complete Toolkit
+    <!-- ============================================================ -->
+    <!-- SECTION 5: HOW PAYOUTS WORK                                   -->
+    <!-- ============================================================ -->
+    <section id="how-it-works" class="py-24">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <!-- Heading -->
+        <div class="text-center mb-16">
+          <p class="text-accent-red text-sm font-bold uppercase tracking-widest mb-3">Payouts</p>
+          <h2 class="font-display text-4xl md:text-5xl uppercase text-white leading-none">
+            Simple, transparent payouts
           </h2>
-          <p class="text-text-muted text-base mt-3 max-w-xl mx-auto">
-            Everything you need to host sports events, mentorship sessions, workshops, concerts, and more.
+          <p class="text-text-muted text-sm mt-4">
+            &lt; 24 hours end-to-end
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="feature in features" :key="feature.title"
-            class="card p-6 group hover:border hover:border-accent-red/30 transition-all">
-            <component :is="feature.icon" class="w-8 h-8 mb-4 text-accent-red" />
-            <h3 class="text-white font-bold mb-2">{{ feature.title }}</h3>
-            <p class="text-text-muted text-sm leading-relaxed">{{ feature.desc }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Anti-piracy trust section -->
-    <section class="py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="card p-10 md:p-14 text-center max-w-3xl mx-auto">
-          <Shield class="w-16 h-16 mx-auto mb-6 text-accent-red" />
-          <h2 class="font-display text-4xl uppercase tracking-wide text-white mb-4">
-            Your Content is Protected
-          </h2>
-          <p class="text-text-muted leading-relaxed mb-8">
-            Every ticket generates a unique, single-use stream token. Tokens are bound to the
-            viewer's device fingerprint and IP address. Sharing links is technically impossible —
-            the moment a second device opens the stream, both sessions are terminated and the
-            incident is flagged for review.
-          </p>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div v-for="shield in shields" :key="shield" class="bg-bg-elevated rounded-lg px-4 py-3">
-              <p class="text-white text-xs font-semibold">{{ shield }}</p>
+        <!-- 3 steps horizontal -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+          <div
+            v-for="(step, i) in payoutSteps"
+            :key="step.title"
+            class="relative flex flex-col items-center text-center px-8"
+          >
+            <!-- Step number circle -->
+            <div class="w-16 h-16 rounded-full bg-accent-red/10 border-2 border-accent-red/40 flex items-center justify-center mb-5 shrink-0 z-10 relative">
+              <span class="font-display text-2xl text-accent-red">{{ i + 1 }}</span>
             </div>
+
+            <!-- Arrow connector (between steps) -->
+            <div
+              v-if="i < payoutSteps.length - 1"
+              class="hidden md:block absolute top-8 left-[calc(50%+2rem)] right-0 h-px"
+              style="background: linear-gradient(to right, rgba(232,0,45,0.5), transparent);"
+            />
+
+            <!-- Icon -->
+            <div class="text-3xl mb-4">{{ step.icon }}</div>
+
+            <!-- Step title -->
+            <h3 class="text-white font-bold text-base mb-2">{{ step.title }}</h3>
+            <p class="text-text-muted text-sm leading-relaxed max-w-[200px]">{{ step.desc }}</p>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- CTA -->
-    <section class="bg-accent-red py-20">
-      <div class="max-w-3xl mx-auto px-4 text-center">
-        <h2 class="font-display text-5xl uppercase tracking-wide text-white mb-4">
-          Ready to Go Live?
-        </h2>
-        <p class="text-white/80 text-lg mb-8">
-          Create your host account in minutes. No upfront costs — you only pay when tickets sell.
+        <!-- Timeframe note -->
+        <p class="text-center text-text-muted text-sm mt-12">
+          End-to-end payout time:
+          <span class="text-status-success font-bold ml-1">Under 24 hours</span>
         </p>
-        <div class="flex items-center justify-center gap-4 flex-wrap">
-          <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create"
-            class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg hover:bg-white/90 transition-colors text-base">
-            Create an Event
-          </RouterLink>
-          <RouterLink v-else to="/register"
-            class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg hover:bg-white/90 transition-colors text-base">
-            Create Host Account
-          </RouterLink>
-          <a href="mailto:hosts@livestreamify.com"
-            class="border-2 border-white/50 text-white font-bold px-8 py-4 rounded-lg
-                   hover:border-white transition-colors text-base">
-            Contact Sales
-          </a>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 6: PLATFORM FEATURES                                  -->
+    <!-- ============================================================ -->
+    <section class="py-24 bg-bg-surface border-y border-white/5">
+      <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <!-- Heading -->
+        <div class="mb-14">
+          <p class="text-accent-red text-sm font-bold uppercase tracking-widest mb-3">Platform</p>
+          <h2 class="font-display text-4xl md:text-5xl uppercase text-white leading-none">
+            Everything you need
+          </h2>
+          <p class="text-text-muted text-base mt-4 max-w-lg">
+            A complete toolkit for creators ready to monetize their knowledge.
+          </p>
+        </div>
+
+        <!-- 2-column grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div
+            v-for="feature in platformFeatures"
+            :key="feature.title"
+            class="bg-bg-elevated rounded-2xl p-6 flex gap-5 border border-white/5 hover:border-accent-red/20 transition-colors duration-200 group"
+          >
+            <!-- Icon -->
+            <div class="w-12 h-12 rounded-xl bg-accent-red/10 border border-accent-red/20 flex items-center justify-center shrink-0 group-hover:bg-accent-red/20 transition-colors duration-200">
+              <span class="text-2xl">{{ feature.icon }}</span>
+            </div>
+            <!-- Content -->
+            <div>
+              <h3 class="text-white font-bold text-base mb-1.5">{{ feature.title }}</h3>
+              <p class="text-text-muted text-sm leading-relaxed">{{ feature.desc }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 7: CTA                                                -->
+    <!-- ============================================================ -->
+    <section class="py-24 relative overflow-hidden">
+      <!-- Red gradient background -->
+      <div class="absolute inset-0" style="background: linear-gradient(135deg, #E8002D 0%, #C0001F 50%, #8B0000 100%);" />
+      <!-- Subtle texture overlay -->
+      <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 40%);" />
+
+      <div class="relative z-10 max-w-3xl mx-auto px-6 text-center">
+        <h2 class="font-display text-5xl md:text-6xl uppercase text-white leading-none mb-4">
+          Ready to go live?
+        </h2>
+        <p class="text-white/80 text-lg mb-10 max-w-xl mx-auto">
+          Start for free. No credit card. No technical setup.
+        </p>
+        <RouterLink
+          to="/register"
+          class="inline-block bg-white text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-white/90 transition-colors duration-200 shadow-xl shadow-black/30"
+        >
+          Create Your Host Account
+        </RouterLink>
+
+        <!-- Trust indicators below CTA -->
+        <div class="flex flex-wrap items-center justify-center gap-6 mt-10 text-white/60 text-sm">
+          <span class="flex items-center gap-1.5">
+            <span class="text-white/80">✓</span> No monthly fees
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="text-white/80">✓</span> M-Pesa payouts
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="text-white/80">✓</span> Go live in minutes
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="text-white/80">✓</span> 70% revenue share
+          </span>
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { Calendar, Tv, Smartphone, BarChart2, DollarSign, Shield } from 'lucide-vue-next'
 
-const auth = useAuthStore()
-
-const stats = [
-  { value: '70%', label: 'Revenue Share', sub: 'You keep 70% of every ticket sold' },
-  { value: 'HLS', label: 'Low-Latency Streaming', sub: '2-second fragments, global delivery' },
-  { value: 'M-Pesa', label: 'Payment Method', sub: 'Instant STK Push, no card required' },
-  { value: '0 KES', label: 'Setup Cost', sub: 'No monthly fees — pay-per-event model' },
+// Hero stats strip
+const heroStats = [
+  'KES 4.2M+ Paid',
+  '70% Revenue Share',
+  'Zero Setup Cost',
 ]
 
-const steps = [
-  { title: 'Create Your Account', desc: 'Register as a host — free, instant, no credit card required.' },
-  { title: 'Schedule Your Event', desc: 'Add event details, set your ticket price (or make it free), and upload a banner image.' },
-  { title: 'Go Live', desc: 'Stream from OBS, a phone, or any encoder. Copy your stream key and start broadcasting.' },
-  { title: 'Get Paid', desc: 'Attendees pay via M-Pesa. Revenue tracked live, paid out within 48 hours.' },
+// City trust strip
+const cities = [
+  { name: 'Nairobi', flag: '🇰🇪' },
+  { name: 'Lagos', flag: '🇳🇬' },
+  { name: 'Kampala', flag: '🇺🇬' },
+  { name: 'Accra', flag: '🇬🇭' },
+  { name: 'Dar es Salaam', flag: '🇹🇿' },
 ]
 
-const revenueItems = [
-  { label: 'You receive', value: '70% of ticket sales', highlight: true },
-  { label: 'Platform fee', value: '30%', highlight: false },
-  { label: 'Payment processing', value: 'Included in platform fee', highlight: false },
-  { label: 'Streaming infrastructure', value: 'Included in platform fee', highlight: false },
-  { label: 'Fraud & piracy protection', value: 'Included in platform fee', highlight: false },
-  { label: 'Payout timeline', value: '48 hrs after event ends', highlight: false },
-]
-
-const features = [
+// Payout steps
+const payoutSteps = [
   {
-    icon: Calendar,
-    title: 'Event Scheduling',
-    desc: 'Create events with custom pricing, descriptions, and banner images. Schedule weeks in advance.',
+    icon: '🎟️',
+    title: 'Ticket Sold',
+    desc: 'A viewer pays via M-Pesa STK Push and gets instant access.',
   },
   {
-    icon: Tv,
-    title: 'HLS Live Streaming',
-    desc: 'Stream from any encoder (OBS, vMix, Wirecast). We handle the HLS conversion and delivery.',
+    icon: '✅',
+    title: 'Payment Confirmed',
+    desc: 'IntaSend confirms the payment and credits the platform.',
   },
   {
-    icon: Smartphone,
-    title: 'M-Pesa Payments',
-    desc: 'Viewers pay via M-Pesa STK Push — the most popular payment method in East Africa.',
-  },
-  {
-    icon: BarChart2,
-    title: 'Real-Time Analytics',
-    desc: 'Live viewer counts, peak attendance, total revenue, and ticket sales — all in your dashboard.',
-  },
-  {
-    icon: DollarSign,
-    title: 'Revenue Dashboard',
-    desc: 'Track earnings per event. See your 70% share in real time as tickets are purchased.',
-  },
-  {
-    icon: Shield,
-    title: 'Anti-Piracy Built In',
-    desc: 'Unique tokens, IP locking, device fingerprinting, and VPN detection protect every stream.',
+    icon: '📱',
+    title: 'M-Pesa Sent',
+    desc: 'Your 70% share is sent directly to your M-Pesa account.',
   },
 ]
 
-const shields = [
-  'Device Fingerprinting',
-  'IP Address Lock',
-  'VPN Detection',
-  'Single-Session Tokens',
+// Platform features
+const platformFeatures = [
+  {
+    icon: '📺',
+    title: 'HD Live Streaming',
+    desc: 'Stream from OBS, your phone, or any encoder. We handle HLS conversion and global delivery automatically.',
+  },
+  {
+    icon: '📱',
+    title: 'M-Pesa Instant Payouts',
+    desc: 'Viewers pay via M-Pesa STK Push. Your earnings land in your M-Pesa within 24 hours — no bank account needed.',
+  },
+  {
+    icon: '🛡️',
+    title: 'Device Anti-Piracy',
+    desc: 'Unique stream tokens, device fingerprinting, and IP locking ensure only paying viewers can watch.',
+  },
+  {
+    icon: '📊',
+    title: 'Real-time Analytics',
+    desc: 'Live viewer counts, peak attendance, ticket sales, and revenue — all visible in your host dashboard.',
+  },
+  {
+    icon: '🎯',
+    title: 'Custom Ticket Pricing',
+    desc: 'Set any price from KES 0 (free events) to KES 100,000. Full pricing control is in your hands.',
+  },
+  {
+    icon: '💬',
+    title: '24/7 Support',
+    desc: 'WhatsApp, email, and in-app support. Our team is online during your events to make sure everything runs smoothly.',
+  },
 ]
 
 // Earnings calculator
