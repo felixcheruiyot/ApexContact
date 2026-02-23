@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -36,13 +35,10 @@ type Config struct {
 	LiveKitAPIKey    string
 	LiveKitAPISecret string
 
-	// SMTP
-	SMTPHost     string
-	SMTPPort     int
-	SMTPUsername string
-	SMTPPassword string
-	SMTPFrom     string
-	SMTPFromName string
+	// Postmark
+	PostmarkServerToken string
+	EmailFrom           string
+	EmailFromName       string
 
 	// App
 	AppEnv      string
@@ -60,24 +56,21 @@ func Load() (*Config, error) {
 		RedisAddr:          getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:      getEnv("REDIS_PASSWORD", ""),
 		JWTSecret:          getEnv("JWT_SECRET", ""),
-		IntaSendPublicKey:  getEnv("INTASEND_PUBLIC_KEY", ""),
-		IntaSendPrivateKey: getEnv("INTASEND_PRIVATE_KEY", ""),
-		IntaSendBaseURL:    getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),
-		MediaServerURL:     getEnv("MEDIA_SERVER_URL", "http://media-server:8888"),
-		MediaServerKey:     getEnv("MEDIA_SERVER_KEY", ""),
-		LiveKitURL:         getEnv("LIVEKIT_URL", "wss://livekit:7880"),
-		LiveKitPublicURL:   getEnv("LIVEKIT_PUBLIC_URL", ""),
-		LiveKitAPIKey:      getEnv("LIVEKIT_API_KEY", "devkey"),
-		LiveKitAPISecret:   getEnv("LIVEKIT_API_SECRET", "devsecret0000000000000000000000"),
-		SMTPHost:           getEnv("SMTP_HOST", "smtp.gmail.com"),
-		SMTPPort:           getEnvInt("SMTP_PORT", 587),
-		SMTPUsername:       getEnv("SMTP_USERNAME", ""),
-		SMTPPassword:       getEnv("SMTP_PASSWORD", ""),
-		SMTPFrom:           getEnv("SMTP_FROM", ""),
-		SMTPFromName:       getEnv("SMTP_FROM_NAME", "Live Streamify"),
-		AppEnv:             getEnv("APP_ENV", "development"),
-		AppURL:             getEnv("APP_URL", "http://localhost:3000"),
-		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
+		IntaSendPublicKey:   getEnv("INTASEND_PUBLIC_KEY", ""),
+		IntaSendPrivateKey:  getEnv("INTASEND_PRIVATE_KEY", ""),
+		IntaSendBaseURL:     getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),
+		MediaServerURL:      getEnv("MEDIA_SERVER_URL", "http://media-server:8888"),
+		MediaServerKey:      getEnv("MEDIA_SERVER_KEY", ""),
+		LiveKitURL:          getEnv("LIVEKIT_URL", "wss://livekit:7880"),
+		LiveKitPublicURL:    getEnv("LIVEKIT_PUBLIC_URL", ""),
+		LiveKitAPIKey:       getEnv("LIVEKIT_API_KEY", "devkey"),
+		LiveKitAPISecret:    getEnv("LIVEKIT_API_SECRET", "devsecret0000000000000000000000"),
+		PostmarkServerToken: getEnv("POSTMARK_SERVER_TOKEN", ""),
+		EmailFrom:           getEnv("EMAIL_FROM", ""),
+		EmailFromName:       getEnv("EMAIL_FROM_NAME", "Live Streamify"),
+		AppEnv:              getEnv("APP_ENV", "development"),
+		AppURL:              getEnv("APP_URL", "http://localhost:3000"),
+		FrontendURL:         getEnv("FRONTEND_URL", "http://localhost:3000"),
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -108,14 +101,3 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func getEnvInt(key string, fallback int) int {
-	v := os.Getenv(key)
-	if v == "" {
-		return fallback
-	}
-	n, err := strconv.Atoi(v)
-	if err != nil {
-		return fallback
-	}
-	return n
-}
