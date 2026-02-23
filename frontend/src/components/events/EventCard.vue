@@ -41,8 +41,8 @@
       <!-- Top-right: event_type badge -->
       <div class="absolute top-3 right-3">
         <span class="inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full border border-white/10">
-          <span v-if="event.event_type === 'video'">🎥</span>
-          <span v-else>🎙️</span>
+          <Video v-if="event.event_type === 'video'" class="w-3 h-3 shrink-0" />
+          <Mic v-else class="w-3 h-3 shrink-0" />
           {{ event.event_type === 'video' ? 'Video' : 'Audio' }}
         </span>
       </div>
@@ -118,6 +118,7 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { format } from 'date-fns'
+import { Video, Mic } from 'lucide-vue-next'
 import type { Event } from '@/types'
 
 const props = defineProps<{ event: Event }>()

@@ -41,7 +41,8 @@
 
         <!-- Event type badge -->
         <span class="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm border border-white/10 text-white text-xs px-3 py-1 rounded-full">
-          <span>{{ event.event_type === 'video' ? '🎥' : '🎙️' }}</span>
+          <Video v-if="event.event_type === 'video'" class="w-3.5 h-3.5" />
+          <Mic v-else class="w-3.5 h-3.5" />
           {{ event.event_type === 'video' ? 'Video' : 'Audio' }}
         </span>
       </div>
@@ -59,15 +60,15 @@
       <!-- Meta row -->
       <div class="text-text-muted text-sm flex flex-wrap gap-x-6 gap-y-2 mt-6 items-center">
         <span class="flex items-center gap-1.5">
-          <span>📅</span>
+          <Calendar class="w-4 h-4 shrink-0" />
           {{ formattedDate }}
         </span>
         <span class="flex items-center gap-1.5">
-          <span>💰</span>
+          <DollarSign class="w-4 h-4 shrink-0" />
           {{ event.price === 0 ? 'Free' : `${event.currency} ${event.price.toLocaleString()}` }}
         </span>
         <span class="flex items-center gap-1.5">
-          <span>🏷️</span>
+          <Tag class="w-4 h-4 shrink-0" />
           <span class="capitalize">{{ event.sport_type }}</span>
         </span>
       </div>
@@ -79,7 +80,7 @@
           v-if="event.status === 'live' && hasToken"
           class="inline-flex items-center gap-2 bg-accent-red hover:bg-accent-red-hover text-white font-bold text-lg px-8 py-4 rounded-full transition-colors duration-200 shadow-lg shadow-accent-red/30"
         >
-          <span>▶</span>
+          <Play class="w-5 h-5 fill-current" />
           Watch Live
         </button>
 
@@ -98,7 +99,7 @@
             @click="onBuyTicket"
             class="inline-flex items-center gap-2 bg-accent-red hover:bg-accent-red-hover text-white font-bold text-base px-8 py-4 rounded-full transition-colors duration-200 shadow-lg shadow-accent-red/30"
           >
-            🎟 Reserve Your Spot · {{ event.currency }} {{ event.price.toLocaleString() }}
+            <Ticket class="w-5 h-5 shrink-0" /> Reserve Your Spot · {{ event.currency }} {{ event.price.toLocaleString() }}
           </button>
           <button
             class="inline-flex items-center gap-2 border-2 border-white/30 hover:border-white/60 text-white font-medium text-base px-6 py-4 rounded-full transition-colors duration-200 backdrop-blur-sm"
@@ -140,6 +141,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { format } from 'date-fns'
+import { Video, Mic, Calendar, DollarSign, Tag, Play, Ticket } from 'lucide-vue-next'
 import type { Event } from '@/types'
 
 const props = defineProps<{
