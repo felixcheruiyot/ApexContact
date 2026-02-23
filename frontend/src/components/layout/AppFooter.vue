@@ -15,7 +15,7 @@
             <span class="font-display text-xl text-white tracking-widest">STREAMIFY</span>
           </div>
           <p class="text-text-muted text-sm leading-relaxed max-w-xs">
-            The open platform for live knowledge and event monetisation. Host paid or free events — sports, mentoring, education, and more.
+            The open platform for live knowledge and mentorship. Host paid or free sessions — sales training, visa guidance, business coaching, and more.
           </p>
           <p class="text-text-muted text-xs mt-4">
             <a href="mailto:hello@livestreamify.com" class="hover:text-white transition-colors">hello@livestreamify.com</a>
@@ -37,11 +37,11 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Use Cases</h4>
           <ul class="space-y-2">
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🥊 Sports & Combat</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🎯 Sales & Negotiation</RouterLink></li>
             <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🏫 Mentoring & Coaching</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🌍 Visa & Immigration</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🌍 Visa & Migration</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">💼 Business & Finance</RouterLink></li>
             <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">📚 Education</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🎵 Music & Performances</RouterLink></li>
             <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">⚖️ Legal Consultations</RouterLink></li>
           </ul>
         </div>

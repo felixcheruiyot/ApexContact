@@ -12,7 +12,8 @@
       <section>
         <h2>1. Who We Are</h2>
         <p>
-          Live Streamify operates a live sports streaming platform for boxing and car racing events.
+          Live Streamify operates a live knowledge and mentorship platform for paid online sessions,
+          including sales training, visa guidance, business coaching, and professional development.
           We are the data controller for all personal information collected through our website
           and services. By using Live Streamify, you agree to the practices described in this policy.
         </p>

@@ -36,7 +36,7 @@ const emit = defineEmits<{
   (e: 'reaction', emoji: string): void
 }>()
 
-const emojis = ['🔥', '💯', '👊', '🥊', '🏎️', '😂', '🤯', '👀']
+const emojis = ['🔥', '💯', '👊', '🎯', '💡', '😂', '🤯', '👀']
 
 interface FloatingReaction {
   id: number

@@ -24,8 +24,8 @@
           Knowledge<br /><span class="text-accent-red">Goes Live</span>
         </h1>
         <p class="text-text-muted text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-          Host paid or free events online — sports, mentorship sessions, legal consultations,
-          music performances, and more. Get paid via M-Pesa, reach anyone, anywhere.
+          Host paid or free sessions online — sales training, mentorship, visa guidance,
+          business masterclasses, and more. Get paid via M-Pesa, reach anyone, anywhere.
         </p>
         <div class="flex items-center justify-center gap-4 flex-wrap">
           <RouterLink to="/register" class="btn-primary text-base px-8 py-4">Start for Free</RouterLink>
@@ -84,7 +84,7 @@
             What Will You Stream?
           </h2>
           <p class="text-text-muted text-base max-w-xl mx-auto">
-            From boxing rings to boardrooms — if you have an audience, we have a platform.
+            From living rooms to boardrooms — if you have knowledge, we have a platform.
           </p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
@@ -180,32 +180,32 @@ const featuredEvent = computed<Event | undefined>(() =>
 )
 
 const useCaseTeaser = [
-  { icon: '🥊', label: 'Sports' },
+  { icon: '🎯', label: 'Sales' },
   { icon: '🏫', label: 'Mentoring' },
-  { icon: '🌍', label: 'Visa Guides' },
-  { icon: '🎵', label: 'Music' },
+  { icon: '🌍', label: 'Visa & Migration' },
+  { icon: '💼', label: 'Business' },
   { icon: '⚖️', label: 'Legal' },
   { icon: '📚', label: 'Education' },
 ]
 
 const testimonials = [
   {
-    name: 'Sarah Mutua',
-    role: 'Boxing Promoter, Nairobi',
-    initials: 'SM',
-    quote: 'We sold 2,400 tickets for our championship fight. Revenue hit our account within 48 hours. Nothing else comes close for African promoters.',
+    name: 'Kevin Otieno',
+    role: 'Sales Trainer & Business Coach, Nairobi',
+    initials: 'KO',
+    quote: 'I run weekly live sales masterclasses — closing techniques, cold calling, objection handling. 400+ professionals attend every session and pay via M-Pesa in seconds.',
   },
   {
     name: 'Dr. James Odhiambo',
-    role: 'Career Mentor & Coach',
+    role: 'Career Mentor & Executive Coach',
     initials: 'JO',
-    quote: 'My mentorship sessions now reach students across East Africa. The M-Pesa integration means no one is left out — it just works.',
+    quote: 'My mentorship sessions now reach students across East Africa. The M-Pesa integration means no one is excluded — my income tripled in three months.',
   },
   {
     name: 'Aisha Kamau',
-    role: 'Immigration Consultant',
+    role: 'Immigration Consultant, Nairobi',
     initials: 'AK',
-    quote: 'I turned my visa application workshops into a recurring income stream. Clients attend live, ask questions, and pay with M-Pesa in seconds.',
+    quote: 'I turned my visa application workshops into a recurring income stream. Clients attend live, ask questions in real time, and pay with M-Pesa in under 20 seconds.',
   },
 ]
 

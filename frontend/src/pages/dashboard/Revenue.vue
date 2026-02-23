@@ -68,7 +68,7 @@
           <thead>
             <tr class="border-b border-white/5">
               <th class="text-left px-5 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Event</th>
-              <th class="text-left px-4 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Sport</th>
+              <th class="text-left px-4 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Category</th>
               <th class="text-left px-4 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Date</th>
               <th class="text-left px-4 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Status</th>
               <th class="text-right px-4 py-3 text-text-muted text-xs uppercase tracking-widest font-medium">Ticket Price</th>
@@ -95,8 +95,7 @@
               </td>
               <td class="px-4 py-3.5">
                 <span class="inline-flex items-center gap-1.5 text-xs">
-                  <span v-if="row.sport_type === 'boxing'" class="text-accent-red">🥊</span>
-                  <span v-else class="text-accent-orange">🏎️</span>
+                  <span>{{ categoryIcon(row.sport_type) }}</span>
                   <span class="text-text-muted capitalize">{{ row.sport_type }}</span>
                 </span>
               </td>
@@ -228,6 +227,15 @@ function statusClass(status: string) {
     case 'cancelled': return 'bg-red-500/10 border border-red-500/20 text-red-400'
     default: return 'bg-accent-orange/10 border border-accent-orange/20 text-accent-orange'
   }
+}
+
+function categoryIcon(type: string) {
+  const icons: Record<string, string> = {
+    sales: '🎯', mentoring: '🏫', business: '💼', education: '📚',
+    visa: '🌍', legal: '⚖️', fitness: '💪', music: '🎵',
+    gaming: '🎮', cooking: '🍳', community: '🙏', other: '📌',
+  }
+  return icons[type] ?? '📌'
 }
 
 function statusDot(status: string) {

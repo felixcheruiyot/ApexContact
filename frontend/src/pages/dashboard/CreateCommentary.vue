@@ -47,17 +47,14 @@
         <label class="form-label">Category *</label>
         <select v-model="form.sport_type" class="form-input appearance-none" required>
           <option value="">Select a category</option>
-          <optgroup label="Sports">
-            <option value="boxing">🥊 Boxing</option>
-            <option value="racing">🏎️ Motorsports & Racing</option>
-            <option value="fitness">💪 Fitness & Wellness</option>
-          </optgroup>
-          <optgroup label="Knowledge & Consulting">
+          <optgroup label="Knowledge & Skills">
+            <option value="sales">🎯 Sales & Negotiation</option>
             <option value="mentoring">🏫 Mentoring & Coaching</option>
-            <option value="education">📚 Education & Workshops</option>
-            <option value="legal">⚖️ Legal Consultations</option>
-            <option value="visa">🌍 Visa & Immigration</option>
             <option value="business">💼 Business & Finance</option>
+            <option value="education">📚 Education & Workshops</option>
+            <option value="visa">🌍 Visa & Migration</option>
+            <option value="legal">⚖️ Legal Consultations</option>
+            <option value="fitness">💪 Fitness & Wellness</option>
           </optgroup>
           <optgroup label="Entertainment">
             <option value="music">🎵 Music & Performances</option>

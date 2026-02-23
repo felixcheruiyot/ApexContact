@@ -11,7 +11,7 @@
           Use <span class="text-accent-red">Cases</span>
         </h1>
         <p class="text-text-muted text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
-          Whether you're a sports promoter, a mentor, a lawyer, or a musician — Live Streamify
+          Whether you're a sales trainer, a mentor, a lawyer, or a consultant — Live Streamify
           turns your expertise into a live revenue stream, accessible to anyone with a phone.
         </p>
         <div class="flex items-center justify-center gap-4 flex-wrap">
@@ -100,7 +100,7 @@
             What Our Hosts Say
           </h2>
           <p class="text-text-muted text-base mt-3 max-w-xl mx-auto">
-            From boxing promoters to immigration consultants — here's how Live Streamify is changing how experts earn.
+            From sales trainers to immigration consultants — here's how Live Streamify is changing how experts earn.
           </p>
         </div>
 
@@ -152,24 +152,24 @@ import { RouterLink } from 'vue-router'
 
 const useCases = [
   {
-    icon: '🥊',
-    title: 'Sports & Combat',
-    tag: 'Sports',
+    icon: '🎯',
+    title: 'Sales & Negotiation',
+    tag: 'High Demand',
     tagBg: 'rgba(232,0,45,0.15)',
     tagColor: '#E8002D',
     bg: 'rgba(232,0,45,0.1)',
-    desc: 'Stream boxing matches, wrestling events, mixed martial arts, and any combat sport. Sell pay-per-view tickets and keep 70% of every sale.',
-    examples: ['Championship boxing night', 'MMA title fight', 'Kickboxing tournament', 'Wrestling gala'],
+    desc: 'Sales trainers, closers, and business coaches can host live masterclasses on prospecting, cold calling, objection handling, and deal closing — the skills every professional needs.',
+    examples: ['Cold calling & outreach bootcamp', 'Closing high-ticket deals', 'Objection handling workshop', 'B2B sales masterclass'],
   },
   {
-    icon: '🏎️',
-    title: 'Motorsports & Racing',
-    tag: 'Sports',
-    tagBg: 'rgba(232,0,45,0.15)',
-    tagColor: '#E8002D',
-    bg: 'rgba(232,0,45,0.1)',
-    desc: 'Bring rally events, circuit races, and off-road competitions to global audiences. Multi-camera streams, live commentary, and ticket sales in one place.',
-    examples: ['Rally championship round', 'Circuit sprint event', 'Karting showdown', 'Drag racing night'],
+    icon: '🚀',
+    title: 'Personal Development',
+    tag: 'Growth',
+    tagBg: 'rgba(255,107,0,0.15)',
+    tagColor: '#FF6B00',
+    bg: 'rgba(255,107,0,0.1)',
+    desc: 'Life coaches, productivity experts, and motivational speakers can host live sessions on mindset, goal-setting, time management, and building a successful career.',
+    examples: ['Morning mindset masterclass', 'Goal-setting workshop', 'Confidence & public speaking', 'Productivity system deep-dive'],
   },
   {
     icon: '🏫',
@@ -282,7 +282,7 @@ const personas = [
   {
     icon: '📣',
     title: 'Event Organisers',
-    desc: 'Sports promoters, entertainment producers, and community organisers hosting ticketed live events.',
+    desc: 'Conference producers, community leaders, and event hosts running ticketed live sessions online.',
   },
   {
     icon: '🎓',
@@ -305,13 +305,13 @@ const platformStats = [
 
 const testimonials = [
   {
-    name: 'Sarah Mutua',
-    role: 'Boxing Promoter, Nairobi',
-    initials: 'SM',
+    name: 'Kevin Otieno',
+    role: 'Sales Trainer & Business Coach, Nairobi',
+    initials: 'KO',
     avatarBg: 'rgba(232,0,45,0.2)',
     avatarColor: '#E8002D',
-    icon: '🥊',
-    quote: 'We sold 2,400 tickets for our championship fight. Revenue was in our account within 48 hours. Nothing else comes close for promoters on this continent.',
+    icon: '🎯',
+    quote: 'I run weekly live sales masterclasses — closing techniques, cold calling, objection handling. 400+ professionals attend every session. Revenue lands in my M-Pesa before I even go live.',
   },
   {
     name: 'Dr. James Odhiambo',
@@ -329,34 +329,34 @@ const testimonials = [
     avatarBg: 'rgba(0,200,83,0.2)',
     avatarColor: '#00C853',
     icon: '🌍',
-    quote: 'I turned my visa application workshops into a recurring income stream. Clients attend live, ask questions in real time, and pay with M-Pesa in under 20 seconds.',
+    quote: 'I turned my visa application workshops into a recurring income stream. Clients attend live, ask real questions, and pay with M-Pesa in under 20 seconds. I now run three cohorts a month.',
   },
   {
-    name: 'Coach Marcus Titus',
-    role: 'Fitness Trainer & Wellness Coach',
-    initials: 'MT',
-    avatarBg: 'rgba(0,200,83,0.2)',
-    avatarColor: '#00C853',
-    icon: '💪',
-    quote: 'My online workout sessions have over 300 regular subscribers. The platform is incredibly simple — I just set a price, go live, and M-Pesa handles the rest.',
+    name: 'Grace Wanjiku',
+    role: 'Business Strategist & Entrepreneur, Mombasa',
+    initials: 'GW',
+    avatarBg: 'rgba(255,179,0,0.2)',
+    avatarColor: '#FFB300',
+    icon: '💼',
+    quote: 'My live "Start & Scale" business bootcamp sold out in 48 hours. Participants from Uganda, Tanzania, and Nigeria joined. The platform made it feel like we were all in the same room.',
   },
   {
     name: 'Adv. Beatrice Njoroge',
     role: 'Advocate, High Court of Kenya',
     initials: 'BN',
-    avatarBg: 'rgba(255,179,0,0.2)',
-    avatarColor: '#FFB300',
+    avatarBg: 'rgba(0,200,83,0.2)',
+    avatarColor: '#00C853',
     icon: '⚖️',
     quote: "Hosting my monthly \"Know Your Rights\" session on Live Streamify has brought legal awareness to hundreds of Kenyans who couldn't afford an in-person consultation.",
   },
   {
-    name: 'DJ Karura',
-    role: 'Afrobeats Producer & Performer',
-    initials: 'DK',
+    name: 'Brian Mwangi',
+    role: 'Personal Development Coach & Speaker',
+    initials: 'BM',
     avatarBg: 'rgba(156,39,176,0.2)',
     avatarColor: '#CE93D8',
-    icon: '🎵',
-    quote: "I hosted my first live concert with 800 virtual attendees from 12 countries. Setup took 15 minutes. The platform just works — I'll never go back to relying on venue bookings alone.",
+    icon: '🚀',
+    quote: "My live mindset and productivity workshops reach 600+ people weekly. I replaced my 9-to-5 income within 90 days. This platform is the real deal for African knowledge creators.",
   },
 ]
 </script>

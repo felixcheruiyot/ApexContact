@@ -50,9 +50,19 @@
         class="input text-sm py-2 px-3 w-full sm:w-60"
       />
       <select v-model="filterSport" class="input text-sm py-2 px-3 w-full sm:w-auto">
-        <option value="">All sports</option>
-        <option value="boxing">Boxing</option>
-        <option value="racing">Racing</option>
+        <option value="">All categories</option>
+        <option value="sales">Sales & Negotiation</option>
+        <option value="mentoring">Mentoring & Coaching</option>
+        <option value="business">Business & Finance</option>
+        <option value="education">Education & Workshops</option>
+        <option value="visa">Visa & Migration</option>
+        <option value="legal">Legal Consultations</option>
+        <option value="fitness">Fitness & Wellness</option>
+        <option value="music">Music & Performances</option>
+        <option value="gaming">Gaming & Esports</option>
+        <option value="cooking">Cooking & Lifestyle</option>
+        <option value="community">Faith & Community</option>
+        <option value="other">Other</option>
       </select>
     </div>
 
@@ -226,10 +236,20 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Sport</label>
+                <label class="block text-text-muted text-xs uppercase tracking-wider mb-1.5">Category</label>
                 <select v-model="form.sport_type" class="input w-full">
-                  <option value="boxing">Boxing</option>
-                  <option value="racing">Racing</option>
+                  <option value="sales">Sales & Negotiation</option>
+                  <option value="mentoring">Mentoring & Coaching</option>
+                  <option value="business">Business & Finance</option>
+                  <option value="education">Education & Workshops</option>
+                  <option value="visa">Visa & Migration</option>
+                  <option value="legal">Legal Consultations</option>
+                  <option value="fitness">Fitness & Wellness</option>
+                  <option value="music">Music & Performances</option>
+                  <option value="gaming">Gaming & Esports</option>
+                  <option value="cooking">Cooking & Lifestyle</option>
+                  <option value="community">Faith & Community</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
               <div>
@@ -330,7 +350,7 @@ interface EditForm {
 const form = ref<EditForm>({
   title: '',
   description: '',
-  sport_type: 'boxing',
+  sport_type: 'mentoring',
   scheduled_at: '',
   price: 0,
   currency: 'KES',
