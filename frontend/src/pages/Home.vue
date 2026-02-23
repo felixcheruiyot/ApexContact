@@ -211,7 +211,7 @@
                    rounded-2xl p-6 cursor-pointer transition-all duration-200 hover:bg-bg-elevated/80
                    hover:-translate-y-1 text-center"
           >
-            <div class="text-4xl mb-3">{{ cat.emoji }}</div>
+            <component :is="cat.icon" class="w-8 h-8 mx-auto mb-3 text-text-muted group-hover:text-accent-red transition-colors duration-200" />
             <p class="text-white font-semibold text-sm mb-1">{{ cat.name }}</p>
             <p class="text-text-muted text-xs">{{ cat.sessions }}+ sessions</p>
           </div>
@@ -445,6 +445,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, h } from 'vue'
 import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { TrendingUp, Scale, Dumbbell, Music, BookOpen, ChefHat, Briefcase, Globe } from 'lucide-vue-next'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
 import { useCommentaryStore } from '@/stores/commentary'
@@ -490,14 +491,14 @@ void openPayment
 // ---- STATIC DATA ----
 
 const categories = [
-  { emoji: '📊', name: 'Business & Finance', sessions: 340 },
-  { emoji: '⚖️', name: 'Legal & Visa', sessions: 128 },
-  { emoji: '💪', name: 'Fitness & Wellness', sessions: 215 },
-  { emoji: '🎵', name: 'Music & Arts', sessions: 97 },
-  { emoji: '📚', name: 'Education', sessions: 402 },
-  { emoji: '🍳', name: 'Cooking', sessions: 81 },
-  { emoji: '💼', name: 'Sales', sessions: 189 },
-  { emoji: '🌍', name: 'Community', sessions: 143 },
+  { icon: TrendingUp, name: 'Business & Finance', sessions: 340 },
+  { icon: Scale, name: 'Legal & Visa', sessions: 128 },
+  { icon: Dumbbell, name: 'Fitness & Wellness', sessions: 215 },
+  { icon: Music, name: 'Music & Arts', sessions: 97 },
+  { icon: BookOpen, name: 'Education', sessions: 402 },
+  { icon: ChefHat, name: 'Cooking', sessions: 81 },
+  { icon: Briefcase, name: 'Sales', sessions: 189 },
+  { icon: Globe, name: 'Community', sessions: 143 },
 ]
 
 // Inline SVG icon components for How It Works

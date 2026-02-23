@@ -19,8 +19,9 @@
       <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-16 py-24 w-full">
         <div class="max-w-xl">
           <!-- Pill label -->
-          <div class="inline-flex items-center bg-accent-red/10 border border-accent-red/30 text-accent-red text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-            💰 EARN FROM YOUR KNOWLEDGE
+          <div class="inline-flex items-center gap-2 bg-accent-red/10 border border-accent-red/30 text-accent-red text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
+            <TrendingUp class="w-3.5 h-3.5 shrink-0" />
+            EARN FROM YOUR KNOWLEDGE
           </div>
 
           <!-- H1 -->
@@ -78,9 +79,8 @@
           <span
             v-for="city in cities"
             :key="city.name"
-            class="inline-flex items-center gap-1.5 bg-bg-elevated border border-white/10 text-white text-sm font-medium px-4 py-2 rounded-full"
+            class="inline-flex items-center bg-bg-elevated border border-white/10 text-white text-sm font-medium px-4 py-2 rounded-full"
           >
-            <span>{{ city.flag }}</span>
             {{ city.name }}
           </span>
         </div>
@@ -281,7 +281,7 @@
 
           <!-- M-Pesa note -->
           <p class="text-text-muted text-xs text-center mt-6 flex items-center justify-center gap-1.5">
-            <span>📱</span>
+            <Smartphone class="w-4 h-4 shrink-0" />
             Paid directly to your M-Pesa within 24h
           </p>
 
@@ -332,7 +332,9 @@
             />
 
             <!-- Icon -->
-            <div class="text-3xl mb-4">{{ step.icon }}</div>
+            <div class="mb-4 text-accent-red">
+              <component :is="step.icon" class="w-8 h-8 mx-auto" />
+            </div>
 
             <!-- Step title -->
             <h3 class="text-white font-bold text-base mb-2">{{ step.title }}</h3>
@@ -373,7 +375,7 @@
           >
             <!-- Icon -->
             <div class="w-12 h-12 rounded-xl bg-accent-red/10 border border-accent-red/20 flex items-center justify-center shrink-0 group-hover:bg-accent-red/20 transition-colors duration-200">
-              <span class="text-2xl">{{ feature.icon }}</span>
+              <component :is="feature.icon" class="w-6 h-6 text-accent-red" />
             </div>
             <!-- Content -->
             <div>
@@ -411,16 +413,16 @@
         <!-- Trust indicators below CTA -->
         <div class="flex flex-wrap items-center justify-center gap-6 mt-10 text-white/60 text-sm">
           <span class="flex items-center gap-1.5">
-            <span class="text-white/80">✓</span> No monthly fees
+            <Check class="w-4 h-4 text-white/80 shrink-0" /> No monthly fees
           </span>
           <span class="flex items-center gap-1.5">
-            <span class="text-white/80">✓</span> M-Pesa payouts
+            <Check class="w-4 h-4 text-white/80 shrink-0" /> M-Pesa payouts
           </span>
           <span class="flex items-center gap-1.5">
-            <span class="text-white/80">✓</span> Go live in minutes
+            <Check class="w-4 h-4 text-white/80 shrink-0" /> Go live in minutes
           </span>
           <span class="flex items-center gap-1.5">
-            <span class="text-white/80">✓</span> 70% revenue share
+            <Check class="w-4 h-4 text-white/80 shrink-0" /> 70% revenue share
           </span>
         </div>
       </div>
@@ -432,6 +434,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Ticket, CheckCircle, Smartphone, Monitor, Shield, BarChart2, Target, MessageCircle, Check } from 'lucide-vue-next'
 
 // Hero stats strip
 const heroStats = [
@@ -442,27 +445,27 @@ const heroStats = [
 
 // City trust strip
 const cities = [
-  { name: 'Nairobi', flag: '🇰🇪' },
-  { name: 'Lagos', flag: '🇳🇬' },
-  { name: 'Kampala', flag: '🇺🇬' },
-  { name: 'Accra', flag: '🇬🇭' },
-  { name: 'Dar es Salaam', flag: '🇹🇿' },
+  { name: 'Nairobi' },
+  { name: 'Lagos' },
+  { name: 'Kampala' },
+  { name: 'Accra' },
+  { name: 'Dar es Salaam' },
 ]
 
 // Payout steps
 const payoutSteps = [
   {
-    icon: '🎟️',
+    icon: Ticket,
     title: 'Ticket Sold',
     desc: 'A viewer pays via M-Pesa STK Push and gets instant access.',
   },
   {
-    icon: '✅',
+    icon: CheckCircle,
     title: 'Payment Confirmed',
     desc: 'IntaSend confirms the payment and credits the platform.',
   },
   {
-    icon: '📱',
+    icon: Smartphone,
     title: 'M-Pesa Sent',
     desc: 'Your 70% share is sent directly to your M-Pesa account.',
   },
@@ -471,32 +474,32 @@ const payoutSteps = [
 // Platform features
 const platformFeatures = [
   {
-    icon: '📺',
+    icon: Monitor,
     title: 'HD Live Streaming',
     desc: 'Stream from OBS, your phone, or any encoder. We handle HLS conversion and global delivery automatically.',
   },
   {
-    icon: '📱',
+    icon: Smartphone,
     title: 'M-Pesa Instant Payouts',
     desc: 'Viewers pay via M-Pesa STK Push. Your earnings land in your M-Pesa within 24 hours — no bank account needed.',
   },
   {
-    icon: '🛡️',
+    icon: Shield,
     title: 'Device Anti-Piracy',
     desc: 'Unique stream tokens, device fingerprinting, and IP locking ensure only paying viewers can watch.',
   },
   {
-    icon: '📊',
+    icon: BarChart2,
     title: 'Real-time Analytics',
     desc: 'Live viewer counts, peak attendance, ticket sales, and revenue — all visible in your host dashboard.',
   },
   {
-    icon: '🎯',
+    icon: Target,
     title: 'Custom Ticket Pricing',
     desc: 'Set any price from KES 0 (free events) to KES 100,000. Full pricing control is in your hands.',
   },
   {
-    icon: '💬',
+    icon: MessageCircle,
     title: '24/7 Support',
     desc: 'WhatsApp, email, and in-app support. Our team is online during your events to make sure everything runs smoothly.',
   },
