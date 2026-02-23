@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Event Starts Soon — Live Streamify</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0A0A0F;font-family:'Inter',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0A0A0F;">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#141418;border-radius:12px;overflow:hidden;">
+
+          <!-- Header bar -->
+          <tr>
+            <td style="background-color:#E8002D;padding:20px 40px;">
+              <p style="margin:0;font-size:22px;font-weight:700;letter-spacing:3px;color:#FFFFFF;text-transform:uppercase;">LIVE STREAMIFY</p>
+            </td>
+          </tr>
+
+          <!-- Countdown badge -->
+          <tr>
+            <td style="padding:32px 40px 0;text-align:center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+                <tr>
+                  <td style="background-color:#1E1E26;border:2px solid #E8002D;border-radius:8px;padding:10px 24px;">
+                    <p style="margin:0;font-size:13px;font-weight:700;letter-spacing:2px;color:#E8002D;text-transform:uppercase;">Starting in 45 Minutes</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:24px 40px 40px;">
+              <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#FFFFFF;">{{.EventTitle}}</h1>
+              <p style="margin:0 0 24px;font-size:14px;color:#A0A0B0;">
+                <strong style="color:#FFFFFF;">Starts at:</strong> {{.StartTime}}
+              </p>
+              <p style="margin:0 0 8px;font-size:15px;color:#A0A0B0;line-height:1.6;">Hi {{.FullName}},</p>
+              <p style="margin:0 0 32px;font-size:15px;color:#A0A0B0;line-height:1.6;">
+                Your event is about to begin. Get ready — open the stream a few minutes early to avoid missing any of the action.
+              </p>
+
+              <!-- CTA button -->
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="border-radius:8px;background-color:#E8002D;">
+                    <a href="{{.EventURL}}"
+                       style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;letter-spacing:0.5px;">
+                      Watch Now
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:32px 0 0;font-size:13px;color:#A0A0B0;line-height:1.6;">
+                If you can't watch right now, your ticket remains valid until the event ends.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 40px;border-top:1px solid #1E1E26;">
+              <p style="margin:0;font-size:12px;color:#606070;text-align:center;">
+                &copy; 2026 Live Streamify &middot; Powered by M-Pesa
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

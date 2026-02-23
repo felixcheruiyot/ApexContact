@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -35,8 +36,17 @@ type Config struct {
 	LiveKitAPIKey    string
 	LiveKitAPISecret string
 
+	// SMTP
+	SMTPHost     string
+	SMTPPort     int
+	SMTPUsername string
+	SMTPPassword string
+	SMTPFrom     string
+	SMTPFromName string
+
 	// App
 	AppEnv      string
+	AppURL      string
 	FrontendURL string
 }
 
@@ -59,7 +69,14 @@ func Load() (*Config, error) {
 		LiveKitPublicURL:   getEnv("LIVEKIT_PUBLIC_URL", ""),
 		LiveKitAPIKey:      getEnv("LIVEKIT_API_KEY", "devkey"),
 		LiveKitAPISecret:   getEnv("LIVEKIT_API_SECRET", "devsecret0000000000000000000000"),
+		SMTPHost:           getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:           getEnvInt("SMTP_PORT", 587),
+		SMTPUsername:       getEnv("SMTP_USERNAME", ""),
+		SMTPPassword:       getEnv("SMTP_PASSWORD", ""),
+		SMTPFrom:           getEnv("SMTP_FROM", ""),
+		SMTPFromName:       getEnv("SMTP_FROM_NAME", "Live Streamify"),
 		AppEnv:             getEnv("APP_ENV", "development"),
+		AppURL:             getEnv("APP_URL", "http://localhost:3000"),
 		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
 	}
 
@@ -89,4 +106,16 @@ func getEnv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func getEnvInt(key string, fallback int) int {
+	v := os.Getenv(key)
+	if v == "" {
+		return fallback
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil {
+		return fallback
+	}
+	return n
 }

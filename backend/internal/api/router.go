@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -12,6 +14,8 @@ import (
 	"github.com/livestreamify/backend/internal/api/handlers"
 	"github.com/livestreamify/backend/internal/api/middleware"
 	"github.com/livestreamify/backend/internal/config"
+	"github.com/livestreamify/backend/internal/integrations/mailer"
+	"github.com/livestreamify/backend/internal/service"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -22,15 +26,30 @@ func NewApp(cfg *config.Config) (*fiber.App, func(), error) {
 		return nil, nil, err
 	}
 
+	m := mailer.NewSMTPMailer(cfg)
+	notifSvc, err := service.NewNotificationService(db, rdb, m, cfg.AppURL)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+
+	schedCtx, schedCancel := context.WithCancel(context.Background())
+	go service.StartReminderScheduler(schedCtx, db, notifSvc)
+
 	app := fiber.New(fiber.Config{
 		AppName:      "Live Streamify API v1",
 		ErrorHandler: errorHandler,
 	})
 
 	registerMiddleware(app, cfg)
-	registerRoutes(app, cfg, db, rdb)
+	registerRoutes(app, cfg, db, rdb, notifSvc)
 
-	return app, cleanup, nil
+	fullCleanup := func() {
+		schedCancel()
+		cleanup()
+	}
+
+	return app, fullCleanup, nil
 }
 
 func registerMiddleware(app *fiber.App, cfg *config.Config) {
@@ -46,8 +65,8 @@ func registerMiddleware(app *fiber.App, cfg *config.Config) {
 	}))
 }
 
-func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client) {
-	authHandler := handlers.NewAuthHandler(cfg, db, rdb)
+func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client, notifSvc *service.NotificationService) {
+	authHandler := handlers.NewAuthHandler(cfg, db, rdb, notifSvc)
 	eventHandler := handlers.NewEventHandler(cfg, db)
 	streamHandler := handlers.NewStreamHandler(cfg, db, rdb)
 	paymentHandler := handlers.NewPaymentHandler(cfg, db, rdb)
@@ -68,6 +87,8 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	auth.Post("/login", authHandler.Login)
 	auth.Post("/refresh", authHandler.Refresh)
 	auth.Post("/logout", middleware.RequireAuth(cfg), authHandler.Logout)
+	auth.Get("/verify-email", authHandler.VerifyEmail)
+	auth.Post("/resend-verification", middleware.RequireAuth(cfg), authHandler.ResendVerification)
 
 	// ── Events (public read, protected write) ──────────────────────────────────
 	events := v1.Group("/events")
