@@ -86,7 +86,7 @@
             <!-- Top-left tall -->
             <div class="relative rounded-2xl overflow-hidden h-72 group">
               <img
-                src="https://images.unsplash.com/photo-1531746790-b0aa4f4b7bce?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Creator Amara K."
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -100,7 +100,7 @@
             <!-- Top-right short -->
             <div class="relative rounded-2xl overflow-hidden h-48 group self-end">
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/1139743/pexels-photo-1139743.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Creator James O."
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -114,7 +114,7 @@
             <!-- Bottom-left short -->
             <div class="relative rounded-2xl overflow-hidden h-48 group self-start">
               <img
-                src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/3756879/pexels-photo-3756879.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Creator Fatima A."
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -128,7 +128,7 @@
             <!-- Bottom-right tall -->
             <div class="relative rounded-2xl overflow-hidden h-72 group">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/5717546/pexels-photo-5717546.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Creator Zara M."
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -230,7 +230,7 @@
           <div class="relative">
             <div class="aspect-square rounded-3xl overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80"
+                src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&q=80"
                 alt="David Mwangi — Business Strategy Coach"
                 class="w-full h-full object-cover"
               />
@@ -567,7 +567,7 @@ const testimonials = [
     role: 'Immigration Consultant',
     city: 'Nairobi',
     avatar:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=400&q=80',
     quote:
       'This platform changed how I monetize my expertise. I ran a live visa consultation and made KES 85,000 in one evening.',
   },
@@ -576,7 +576,7 @@ const testimonials = [
     role: 'Sales Trainer',
     city: 'Kampala',
     avatar:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      'https://images.pexels.com/photos/1139743/pexels-photo-1139743.jpeg?auto=compress&cs=tinysrgb&w=400&q=80',
     quote:
       'As a sales trainer, I needed a platform that Kenyans trust. Live Streamify pays via M-Pesa instantly. Game changer.',
   },
@@ -585,7 +585,7 @@ const testimonials = [
     role: 'Chef & Lifestyle Creator',
     city: 'Lagos',
     avatar:
-      'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=400&q=80',
+      'https://images.pexels.com/photos/3756879/pexels-photo-3756879.jpeg?auto=compress&cs=tinysrgb&w=400&q=80',
     quote:
       'I ran a live cooking masterclass for 800 people. The quality was flawless. My followers finally took me seriously.',
   },

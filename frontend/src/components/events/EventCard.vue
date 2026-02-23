@@ -7,7 +7,7 @@
     <!-- Image section -->
     <div class="relative aspect-video overflow-hidden">
       <img
-        :src="event.thumbnail_url || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80'"
+        :src="event.thumbnail_url || 'https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600&q=80'"
         :alt="event.title"
         class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
       />

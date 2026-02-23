@@ -4,7 +4,7 @@
     <div class="hidden lg:flex relative w-[45%] flex-shrink-0 overflow-hidden">
       <!-- Background image -->
       <img
-        src="https://images.unsplash.com/photo-1529912626516-e58b23f4b445?auto=format&fit=crop&w=1200&q=80"
+        src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&q=80"
         alt="Live Streamify — Africa's premier live knowledge platform"
         class="absolute inset-0 w-full h-full object-cover"
       />
@@ -54,7 +54,7 @@
           </p>
           <div class="flex items-center gap-2.5">
             <img
-              src="https://images.unsplash.com/photo-1531746790-b0aa4f4b7bce?auto=format&fit=crop&w=600&q=80"
+              src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
               alt="Amara Kioni"
               class="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
