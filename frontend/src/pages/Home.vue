@@ -19,18 +19,39 @@
       <div class="absolute inset-0"
         style="background-image: radial-gradient(circle at 70% 50%, rgba(232,0,45,0.06) 0%, transparent 60%);" />
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-        <p class="text-accent-red font-semibold text-sm uppercase tracking-widest mb-4">Live · Paid · Real-time</p>
-        <h1 class="font-display text-6xl md:text-8xl uppercase tracking-wide text-white leading-none mb-6">
-          Knowledge<br /><span class="text-accent-red">Goes Live</span>
-        </h1>
-        <p class="text-text-muted text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-          Host paid or free sessions online — sales training, mentorship, visa guidance,
-          business masterclasses, and more. Get paid via M-Pesa, reach anyone, anywhere.
-        </p>
-        <div class="flex items-center justify-center gap-4 flex-wrap">
-          <RouterLink to="/register" class="btn-primary text-base px-8 py-4">Start for Free</RouterLink>
-          <RouterLink to="/use-cases" class="btn-ghost text-base px-8 py-4">See Use Cases</RouterLink>
-        </div>
+
+        <!-- Authenticated welcome -->
+        <template v-if="auth.isAuthenticated">
+          <p class="text-accent-orange font-semibold text-sm uppercase tracking-widest mb-4">Welcome back</p>
+          <h1 class="font-display text-5xl md:text-7xl uppercase tracking-wide text-white leading-none mb-6">
+            Hey, <span class="text-accent-red">{{ firstName }}</span>
+          </h1>
+          <p class="text-text-muted text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
+            You're all set to host sessions, sell tickets, and reach your audience live.
+            Head to your dashboard to create an event or start a live room.
+          </p>
+          <div class="flex items-center justify-center gap-4 flex-wrap">
+            <RouterLink to="/dashboard/create" class="btn-primary text-base px-8 py-4">Host an Event</RouterLink>
+            <RouterLink to="/commentary/create" class="btn-ghost text-base px-8 py-4">🎙 Start a Live Room</RouterLink>
+          </div>
+        </template>
+
+        <!-- Public CTA -->
+        <template v-else>
+          <p class="text-accent-red font-semibold text-sm uppercase tracking-widest mb-4">Live · Paid · Real-time</p>
+          <h1 class="font-display text-6xl md:text-8xl uppercase tracking-wide text-white leading-none mb-6">
+            Knowledge<br /><span class="text-accent-red">Goes Live</span>
+          </h1>
+          <p class="text-text-muted text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
+            Host paid or free sessions online — sales training, mentorship, visa guidance,
+            business masterclasses, and more. Get paid via M-Pesa, reach anyone, anywhere.
+          </p>
+          <div class="flex items-center justify-center gap-4 flex-wrap">
+            <RouterLink to="/register" class="btn-primary text-base px-8 py-4">Start for Free</RouterLink>
+            <RouterLink to="/use-cases" class="btn-ghost text-base px-8 py-4">See Use Cases</RouterLink>
+          </div>
+        </template>
+
       </div>
     </div>
 
@@ -73,7 +94,8 @@
         <p class="text-5xl mb-4">🎬</p>
         <h3 class="text-white font-semibold text-xl mb-2">No events scheduled yet</h3>
         <p class="text-text-muted mb-6">Be the first to host an event on Live Streamify.</p>
-        <RouterLink to="/register" class="btn-primary text-sm px-6 py-3">Host an Event</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary text-sm px-6 py-3">Host an Event</RouterLink>
+        <RouterLink v-else to="/register" class="btn-primary text-sm px-6 py-3">Host an Event</RouterLink>
       </div>
 
       <!-- Use cases teaser -->
@@ -159,6 +181,8 @@ const router = useRouter()
 
 const showPaymentModal = ref(false)
 const selectedEvent = ref<Event | null>(null)
+
+const firstName = computed(() => auth.user?.full_name?.split(' ')[0] ?? 'there')
 
 function load() {
   const category = route.query.category as string | undefined

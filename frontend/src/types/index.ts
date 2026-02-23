@@ -1,4 +1,4 @@
-export type UserRole = 'viewer' | 'promoter' | 'broadcaster' | 'admin'
+export type UserRole = 'member' | 'admin'
 export type EventStatus = 'draft' | 'pending_review' | 'scheduled' | 'live' | 'completed' | 'cancelled' | 'declined'
 export type SportType =
   | 'sales'

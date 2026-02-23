@@ -9,11 +9,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
-  // Promoters, broadcasters, and admins can all access the dashboard
-  const isPromoter = computed(() =>
-    ['promoter', 'broadcaster', 'admin'].includes(user.value?.role ?? ''),
-  )
-  const isBroadcaster = computed(() => user.value?.role === 'broadcaster')
 
   async function login(email: string, password: string) {
     const res = await authApi.login({ email, password })
@@ -41,5 +36,5 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('ls_user')
   }
 
-  return { token, user, isAuthenticated, isAdmin, isPromoter, isBroadcaster, login, register, logout }
+  return { token, user, isAuthenticated, isAdmin, login, register, logout }
 })

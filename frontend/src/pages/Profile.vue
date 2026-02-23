@@ -30,7 +30,7 @@
           <p class="text-white font-semibold text-lg">{{ form.full_name || auth.user?.full_name }}</p>
           <p class="text-text-muted text-sm">{{ auth.user?.email }}</p>
           <span class="inline-block mt-1.5 text-xs font-medium px-2 py-0.5 rounded-full capitalize"
-            :class="roleBadgeClass">{{ auth.user?.role }}</span>
+            :class="roleBadgeClass">{{ auth.isAdmin ? 'Admin' : 'Member' }}</span>
         </div>
       </div>
 
@@ -149,14 +149,9 @@ const initials = computed(() =>
     .toUpperCase() || '?',
 )
 
-const roleBadgeClass = computed(() => {
-  switch (auth.user?.role) {
-    case 'admin': return 'bg-accent-red/20 text-accent-red'
-    case 'promoter': return 'bg-accent-orange/20 text-accent-orange'
-    case 'broadcaster': return 'bg-purple-500/20 text-purple-400'
-    default: return 'bg-white/10 text-text-muted'
-  }
-})
+const roleBadgeClass = computed(() =>
+  auth.isAdmin ? 'bg-accent-red/20 text-accent-red' : 'bg-accent-orange/20 text-accent-orange',
+)
 
 async function loadProfile() {
   loading.value = true

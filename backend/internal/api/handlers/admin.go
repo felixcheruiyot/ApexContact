@@ -98,7 +98,7 @@ func (h *AdminHandler) UpdateUserRole(c *fiber.Ctx) error {
 	}
 
 	switch req.Role {
-	case domain.RoleViewer, domain.RolePromoter, domain.RoleBroadcaster, domain.RoleAdmin:
+	case domain.RoleMember, domain.RoleAdmin:
 		// valid
 	default:
 		return fiber.NewError(fiber.StatusBadRequest, "invalid role")

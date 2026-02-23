@@ -37,9 +37,7 @@
 
       <select v-model="roleFilter" class="input text-sm w-auto pr-8">
         <option value="">All roles</option>
-        <option value="viewer">Viewer</option>
-        <option value="promoter">Promoter</option>
-        <option value="broadcaster">Broadcaster</option>
+        <option value="member">Member</option>
         <option value="admin">Admin</option>
       </select>
 
@@ -175,9 +173,7 @@
 
           <label class="block text-text-muted text-xs uppercase tracking-wider mb-2">New Role</label>
           <select v-model="selectedRole" class="input w-full mb-5">
-            <option value="viewer">Viewer</option>
-            <option value="promoter">Promoter</option>
-            <option value="broadcaster">Broadcaster</option>
+            <option value="member">Member</option>
             <option value="admin">Admin</option>
           </select>
 
@@ -270,7 +266,7 @@ const acting = ref(false)
 
 // Role editing
 const roleTarget = ref<User | null>(null)
-const selectedRole = ref<UserRole>('viewer')
+const selectedRole = ref<UserRole>('member')
 const roleError = ref<string | null>(null)
 
 const filteredUsers = computed(() => {
@@ -299,9 +295,7 @@ function formatDate(d: string) {
 
 function roleBadgeClass(role: UserRole) {
   return {
-    viewer: 'bg-blue-500/15 text-blue-400',
-    promoter: 'bg-accent-orange/15 text-accent-orange',
-    broadcaster: 'bg-purple-500/15 text-purple-400',
+    member: 'bg-accent-orange/15 text-accent-orange',
     admin: 'bg-accent-red/15 text-accent-red',
   }[role]
 }

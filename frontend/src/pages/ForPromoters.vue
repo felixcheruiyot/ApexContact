@@ -21,7 +21,10 @@
             real-time revenue in your account via M-Pesa.
           </p>
           <div class="flex items-center gap-4">
-            <RouterLink to="/register" class="btn-primary text-base px-8 py-4">
+            <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary text-base px-8 py-4">
+              Create an Event
+            </RouterLink>
+            <RouterLink v-else to="/register" class="btn-primary text-base px-8 py-4">
               Get Started Free
             </RouterLink>
             <a href="mailto:promoters@livestreamify.com" class="btn-ghost text-base px-8 py-4">
@@ -145,7 +148,10 @@
               </div>
             </div>
 
-            <RouterLink to="/register" class="btn-primary w-full mt-6 text-center block">
+            <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary w-full mt-6 text-center block">
+              Start Earning →
+            </RouterLink>
+            <RouterLink v-else to="/register" class="btn-primary w-full mt-6 text-center block">
               Start Earning →
             </RouterLink>
           </div>
@@ -210,8 +216,12 @@
           Create your host account in minutes. No upfront costs — you only pay when tickets sell.
         </p>
         <div class="flex items-center justify-center gap-4 flex-wrap">
-          <RouterLink to="/register" class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg
-                                            hover:bg-white/90 transition-colors text-base">
+          <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create"
+            class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg hover:bg-white/90 transition-colors text-base">
+            Create an Event
+          </RouterLink>
+          <RouterLink v-else to="/register"
+            class="bg-white text-accent-red font-bold px-8 py-4 rounded-lg hover:bg-white/90 transition-colors text-base">
             Create Host Account
           </RouterLink>
           <a href="mailto:hosts@livestreamify.com"
@@ -228,6 +238,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
 
 const stats = [
   { value: '70%', label: 'Revenue Share', sub: 'You keep 70% of every ticket sold' },

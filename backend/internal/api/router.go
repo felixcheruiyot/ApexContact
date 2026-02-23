@@ -73,8 +73,8 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	events := v1.Group("/events")
 	events.Get("/", eventHandler.List)
 	events.Get("/:id", eventHandler.Get)
-	events.Post("/", middleware.RequireAuth(cfg), middleware.RequireRole("promoter"), eventHandler.Create)
-	events.Put("/:id", middleware.RequireAuth(cfg), middleware.RequireRole("promoter"), eventHandler.Update)
+	events.Post("/", middleware.RequireAuth(cfg), middleware.RequireRole("member", "admin"), eventHandler.Create)
+	events.Put("/:id", middleware.RequireAuth(cfg), middleware.RequireRole("member", "admin"), eventHandler.Update)
 
 	// ── Streaming ──────────────────────────────────────────────────────────────
 	// Ingest callback first — no JWT (nginx-rtmp can't send auth headers).
@@ -90,7 +90,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	payments.Get("/status/:id", middleware.RequireAuth(cfg), paymentHandler.Status)
 
 	// ── Promoter dashboard ─────────────────────────────────────────────────────
-	promoter := v1.Group("/promoter", middleware.RequireAuth(cfg), middleware.RequireRole("promoter", "admin"))
+	promoter := v1.Group("/promoter", middleware.RequireAuth(cfg), middleware.RequireRole("member", "admin"))
 	promoter.Get("/events", promoterHandler.MyEvents)
 	promoter.Post("/events/:eventId/submit", promoterHandler.Submit)
 	promoter.Get("/stream-key/:eventId", promoterHandler.StreamKey)

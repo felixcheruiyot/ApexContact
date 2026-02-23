@@ -54,7 +54,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		PasswordHash: string(hash),
 		FullName:     req.FullName,
 		Phone:        req.Phone,
-		Role:         domain.RoleViewer,
+		Role:         domain.RoleMember,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}

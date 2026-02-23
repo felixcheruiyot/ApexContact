@@ -41,7 +41,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
             Admin Panel
           </RouterLink>
-          <RouterLink v-else-if="auth.isPromoter" to="/dashboard"
+          <RouterLink v-else to="/dashboard"
             class="text-text-muted hover:text-white text-sm font-medium transition-colors hidden sm:block">
             Dashboard
           </RouterLink>
@@ -60,7 +60,7 @@
                 <p class="text-white text-sm font-semibold truncate">{{ auth.user?.full_name }}</p>
                 <p class="text-text-muted text-xs truncate">{{ auth.user?.email }}</p>
                 <span class="inline-block mt-1 text-xs font-medium px-1.5 py-0.5 rounded capitalize"
-                  :class="roleBadgeClass">{{ auth.user?.role }}</span>
+                  :class="roleBadgeClass">{{ auth.isAdmin ? 'Admin' : 'Member' }}</span>
               </div>
               <RouterLink to="/profile"
                 class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-muted hover:text-white
@@ -160,7 +160,7 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
                 Admin Panel
               </RouterLink>
-              <RouterLink v-else-if="auth.isPromoter" to="/dashboard" @click="mobileMenuOpen = false"
+              <RouterLink v-else to="/dashboard" @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors">
                 Dashboard
               </RouterLink>
@@ -215,8 +215,7 @@ const initials = computed(() => {
 const roleBadgeClass = computed(() => {
   switch (auth.user?.role) {
     case 'admin': return 'bg-accent-red/20 text-accent-red'
-    case 'promoter': return 'bg-accent-orange/20 text-accent-orange'
-    case 'broadcaster': return 'bg-purple-500/20 text-purple-400'
+    case 'member': return 'bg-accent-orange/20 text-accent-orange'
     default: return 'bg-white/10 text-text-muted'
   }
 })

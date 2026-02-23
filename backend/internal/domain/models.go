@@ -10,10 +10,8 @@ import (
 type UserRole string
 
 const (
-	RoleViewer    UserRole = "viewer"
-	RolePromoter  UserRole = "promoter"
-	RoleBroadcaster UserRole = "broadcaster"
-	RoleAdmin     UserRole = "admin"
+	RoleMember UserRole = "member"
+	RoleAdmin  UserRole = "admin"
 )
 
 // EventStatus represents the lifecycle state of an event.

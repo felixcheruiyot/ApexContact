@@ -54,7 +54,7 @@
           <NavItem to="/admin/events" icon="film" label="Events" />
           <NavItem to="/admin/fraud" icon="shield" label="Fraud Monitor" />
         </template>
-        <template v-else-if="auth.user?.role === 'promoter'">
+        <template v-else>
           <NavItem to="/dashboard" :exact="true" icon="grid" label="My Events" />
           <NavItem to="/dashboard/create" icon="plus" label="Create Event" />
           <NavItem to="/dashboard/revenue" icon="bar-chart" label="Revenue" />
@@ -62,9 +62,6 @@
             <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted/60">Live Rooms</p>
           </div>
           <NavItem to="/commentary/create" icon="mic" label="Start a Live Room" />
-        </template>
-        <template v-else-if="auth.user?.role === 'broadcaster'">
-          <NavItem to="/dashboard" :exact="true" icon="grid" label="Overview" />
         </template>
       </nav>
 
@@ -79,7 +76,7 @@
           </div>
           <div class="min-w-0 flex-1">
             <p class="text-white text-sm font-medium truncate">{{ auth.user?.full_name }}</p>
-            <p class="text-xs capitalize truncate" :class="avatarTextClass">{{ auth.user?.role }}</p>
+            <p class="text-xs capitalize truncate" :class="avatarTextClass">{{ auth.isAdmin ? 'Admin' : 'Member' }}</p>
           </div>
         </div>
 
@@ -157,35 +154,19 @@ const initials = computed(() =>
     .toUpperCase() || '?',
 )
 
-const sectionLabel = computed(() => {
-  if (auth.isAdmin) return 'Admin Panel'
-  if (auth.user?.role === 'broadcaster') return 'Broadcaster'
-  return 'Dashboard'
-})
+const sectionLabel = computed(() => auth.isAdmin ? 'Admin Panel' : 'Dashboard')
 
-const sectionBadgeClass = computed(() => {
-  if (auth.isAdmin) return 'bg-accent-red/10 border border-accent-red/20 text-accent-red'
-  if (auth.user?.role === 'broadcaster') return 'bg-purple-500/10 border border-purple-500/20 text-purple-400'
-  return 'bg-accent-orange/10 border border-accent-orange/20 text-accent-orange'
-})
+const sectionBadgeClass = computed(() =>
+  auth.isAdmin
+    ? 'bg-accent-red/10 border border-accent-red/20 text-accent-red'
+    : 'bg-accent-orange/10 border border-accent-orange/20 text-accent-orange',
+)
 
-const sectionDotClass = computed(() => {
-  if (auth.isAdmin) return 'bg-accent-red'
-  if (auth.user?.role === 'broadcaster') return 'bg-purple-400'
-  return 'bg-accent-orange'
-})
+const sectionDotClass = computed(() => auth.isAdmin ? 'bg-accent-red' : 'bg-accent-orange')
 
-const avatarBgClass = computed(() => {
-  if (auth.isAdmin) return 'bg-accent-red/20'
-  if (auth.user?.role === 'broadcaster') return 'bg-purple-500/20'
-  return 'bg-accent-orange/20'
-})
+const avatarBgClass = computed(() => auth.isAdmin ? 'bg-accent-red/20' : 'bg-accent-orange/20')
 
-const avatarTextClass = computed(() => {
-  if (auth.isAdmin) return 'text-accent-red'
-  if (auth.user?.role === 'broadcaster') return 'text-purple-400'
-  return 'text-accent-orange'
-})
+const avatarTextClass = computed(() => auth.isAdmin ? 'text-accent-red' : 'text-accent-orange')
 
 const pageTitle = computed(() => {
   const p = route.path

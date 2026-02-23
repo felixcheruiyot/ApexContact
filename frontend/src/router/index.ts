@@ -57,11 +57,11 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
-    // ── Protected: Promoter / Broadcaster dashboard ───────────────────────────
+    // ── Protected: Member dashboard ───────────────────────────────────────────
     {
       path: '/dashboard',
       component: () => import('@/layouts/DashboardLayout.vue'),
-      meta: { requiresAuth: true, requiresRole: 'promoter' },
+      meta: { requiresAuth: true },
       children: [
         { path: '', name: 'dashboard', component: () => import('@/pages/dashboard/PromoterDashboard.vue') },
         { path: 'create', name: 'create-event', component: () => import('@/pages/dashboard/CreateEvent.vue') },
@@ -99,11 +99,6 @@ router.beforeEach((to, _from, next) => {
   }
 
   if (to.meta.requiresRole === 'admin' && !auth.isAdmin) {
-    return next({ name: 'home' })
-  }
-
-  // 'promoter' role guard: allows promoters, broadcasters, and admins
-  if (to.meta.requiresRole === 'promoter' && !auth.isPromoter) {
     return next({ name: 'home' })
   }
 
