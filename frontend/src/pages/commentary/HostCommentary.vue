@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
     <div class="mb-8">
-      <RouterLink to="/" class="text-text-muted hover:text-white text-sm transition-colors">← Back to home</RouterLink>
+      <RouterLink to="/" class="flex items-center gap-1.5 text-text-muted hover:text-white text-sm transition-colors"><ArrowLeft class="w-4 h-4" /> Back to home</RouterLink>
       <h1 class="text-2xl font-bold text-white mt-4">Start a Live Room</h1>
       <p class="text-text-muted mt-1 text-sm">
         Create an audio discussion room — no approval needed. Go live when you're ready.
@@ -51,22 +51,22 @@
         <select v-model="form.sport_type" class="form-input appearance-none" required>
           <option value="">Select a category</option>
           <optgroup label="Knowledge & Skills">
-            <option value="sales">🎯 Sales & Negotiation</option>
-            <option value="mentoring">🏫 Mentoring & Coaching</option>
-            <option value="business">💼 Business & Finance</option>
-            <option value="education">📚 Education & Workshops</option>
-            <option value="visa">🌍 Visa & Migration</option>
-            <option value="legal">⚖️ Legal Consultations</option>
-            <option value="fitness">💪 Fitness & Wellness</option>
+            <option value="sales">Sales & Negotiation</option>
+            <option value="mentoring">Mentoring & Coaching</option>
+            <option value="business">Business & Finance</option>
+            <option value="education">Education & Workshops</option>
+            <option value="visa">Visa & Migration</option>
+            <option value="legal">Legal Consultations</option>
+            <option value="fitness">Fitness & Wellness</option>
           </optgroup>
           <optgroup label="Entertainment">
-            <option value="music">🎵 Music & Performances</option>
-            <option value="gaming">🎮 Gaming & Esports</option>
-            <option value="cooking">🍳 Cooking & Lifestyle</option>
-            <option value="community">🙏 Faith & Community</option>
+            <option value="music">Music & Performances</option>
+            <option value="gaming">Gaming & Esports</option>
+            <option value="cooking">Cooking & Lifestyle</option>
+            <option value="community">Faith & Community</option>
           </optgroup>
           <optgroup label="Other">
-            <option value="other">📌 Other</option>
+            <option value="other">Other</option>
           </optgroup>
         </select>
       </div>
@@ -95,7 +95,8 @@
             class="form-input"
           />
           <span class="text-text-muted text-sm whitespace-nowrap shrink-0">
-            {{ form.price === 0 ? '✓ Free entry' : `Listeners pay KES ${form.price}` }}
+            <template v-if="form.price === 0"><Check class="w-4 h-4 inline" /> Free entry</template>
+            <template v-else>Listeners pay KES {{ form.price }}</template>
           </span>
         </div>
       </div>
@@ -135,7 +136,7 @@
         class="w-full py-3 rounded-xl bg-accent-orange text-white font-bold text-base
                disabled:opacity-40 hover:bg-orange-500 transition-colors"
       >
-        {{ submitting ? 'Creating…' : '🎙 Start Live Room' }}
+        <Mic v-if="!submitting" class="w-4 h-4" />{{ submitting ? 'Creating…' : 'Start Live Room' }}
       </button>
     </form>
   </div>
@@ -144,6 +145,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import { ArrowLeft, Check, Mic } from 'lucide-vue-next'
 import { commentaryApi } from '@/api/commentary'
 
 const router = useRouter()

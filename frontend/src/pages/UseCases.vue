@@ -34,9 +34,9 @@
         <div v-for="uc in useCases" :key="uc.title"
           class="card p-7 group hover:border hover:border-accent-red/30 transition-all duration-200 flex flex-col gap-4">
           <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               :style="`background: ${uc.bg}`">
-              {{ uc.icon }}
+              <component :is="uc.icon" class="w-6 h-6" :style="`color: ${uc.tagColor}`" />
             </div>
             <div>
               <h3 class="text-white font-bold text-base mb-1">{{ uc.title }}</h3>
@@ -72,7 +72,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div v-for="persona in personas" :key="persona.title"
             class="card p-6 text-center hover:border hover:border-accent-orange/30 transition-all">
-            <div class="text-4xl mb-4">{{ persona.icon }}</div>
+            <component :is="persona.icon" class="w-10 h-10 mx-auto mb-4 text-accent-orange" />
             <h3 class="text-white font-bold mb-2">{{ persona.title }}</h3>
             <p class="text-text-muted text-sm leading-relaxed">{{ persona.desc }}</p>
           </div>
@@ -111,7 +111,7 @@
             <div class="absolute top-4 right-6 font-display text-7xl text-white/5 select-none leading-none">"</div>
 
             <div class="flex gap-1">
-              <span v-for="n in 5" :key="n" class="text-accent-orange text-sm">★</span>
+              <Star v-for="n in 5" :key="n" class="w-4 h-4 text-accent-orange fill-current" />
             </div>
             <p class="text-text-muted text-sm leading-relaxed flex-1 relative z-10">"{{ t.quote }}"</p>
             <div class="flex items-center gap-3 border-t border-white/5 pt-5">
@@ -123,7 +123,7 @@
                 <p class="text-white text-sm font-semibold">{{ t.name }}</p>
                 <p class="text-text-muted text-xs">{{ t.role }}</p>
               </div>
-              <span class="ml-auto text-xl">{{ t.icon }}</span>
+              <component :is="t.icon" class="ml-auto w-5 h-5 text-text-muted" />
             </div>
           </div>
         </div>
@@ -149,10 +149,11 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Target, Rocket, GraduationCap, Globe, BookOpen, Music, Dumbbell, Scale, Briefcase, ChefHat, Gamepad2, Heart, Megaphone, Mic, Star } from 'lucide-vue-next'
 
 const useCases = [
   {
-    icon: '🎯',
+    icon: Target,
     title: 'Sales & Negotiation',
     tag: 'High Demand',
     tagBg: 'rgba(232,0,45,0.15)',
@@ -162,7 +163,7 @@ const useCases = [
     examples: ['Cold calling & outreach bootcamp', 'Closing high-ticket deals', 'Objection handling workshop', 'B2B sales masterclass'],
   },
   {
-    icon: '🚀',
+    icon: Rocket,
     title: 'Personal Development',
     tag: 'Growth',
     tagBg: 'rgba(255,107,0,0.15)',
@@ -172,7 +173,7 @@ const useCases = [
     examples: ['Morning mindset masterclass', 'Goal-setting workshop', 'Confidence & public speaking', 'Productivity system deep-dive'],
   },
   {
-    icon: '🏫',
+    icon: GraduationCap,
     title: 'Mentoring & Coaching',
     tag: 'Education',
     tagBg: 'rgba(255,107,0,0.15)',
@@ -182,7 +183,7 @@ const useCases = [
     examples: ['Career coaching masterclass', 'Business growth workshop', 'Leadership session', 'CV & interview prep'],
   },
   {
-    icon: '🌍',
+    icon: Globe,
     title: 'Visa & Immigration',
     tag: 'Consulting',
     tagBg: 'rgba(0,200,83,0.15)',
@@ -192,7 +193,7 @@ const useCases = [
     examples: ['UK student visa walkthrough', 'Canada PR application guide', 'Schengen visa tips', 'US B1/B2 Q&A session'],
   },
   {
-    icon: '📚',
+    icon: BookOpen,
     title: 'Education & Workshops',
     tag: 'Education',
     tagBg: 'rgba(255,107,0,0.15)',
@@ -202,7 +203,7 @@ const useCases = [
     examples: ['Python coding bootcamp', 'IELTS prep class', 'Financial literacy workshop', 'Graphic design masterclass'],
   },
   {
-    icon: '🎵',
+    icon: Music,
     title: 'Music & Performances',
     tag: 'Entertainment',
     tagBg: 'rgba(156,39,176,0.15)',
@@ -212,7 +213,7 @@ const useCases = [
     examples: ['Live Afrobeats concert', 'DJ set stream', 'Spoken word night', 'Gospel music event'],
   },
   {
-    icon: '💪',
+    icon: Dumbbell,
     title: 'Fitness & Wellness',
     tag: 'Health',
     tagBg: 'rgba(0,200,83,0.15)',
@@ -222,7 +223,7 @@ const useCases = [
     examples: ['Live HIIT class', 'Morning yoga session', 'Nutrition masterclass', 'Mental wellness talk'],
   },
   {
-    icon: '⚖️',
+    icon: Scale,
     title: 'Legal Consultations',
     tag: 'Consulting',
     tagBg: 'rgba(0,200,83,0.15)',
@@ -232,7 +233,7 @@ const useCases = [
     examples: ['Tenant rights Q&A', 'Business contracts explained', 'Family law workshop', 'Employment law masterclass'],
   },
   {
-    icon: '💼',
+    icon: Briefcase,
     title: 'Business & Finance',
     tag: 'Finance',
     tagBg: 'rgba(255,179,0,0.15)',
@@ -242,7 +243,7 @@ const useCases = [
     examples: ['Stock market masterclass', 'Forex trading workshop', 'Startup fundraising talk', 'SME growth seminar'],
   },
   {
-    icon: '🍳',
+    icon: ChefHat,
     title: 'Cooking & Lifestyle',
     tag: 'Lifestyle',
     tagBg: 'rgba(255,107,0,0.15)',
@@ -252,7 +253,7 @@ const useCases = [
     examples: ['African cuisine masterclass', 'Baking & confectionery', 'Healthy meal prep session', 'Home barista class'],
   },
   {
-    icon: '🎮',
+    icon: Gamepad2,
     title: 'Gaming & Esports',
     tag: 'Entertainment',
     tagBg: 'rgba(156,39,176,0.15)',
@@ -262,7 +263,7 @@ const useCases = [
     examples: ['FIFA tournament final', 'Mobile legends championship', 'Gaming hackathon stream', 'Retro gaming night'],
   },
   {
-    icon: '🙏',
+    icon: Heart,
     title: 'Faith & Community',
     tag: 'Community',
     tagBg: 'rgba(255,179,0,0.15)',
@@ -275,22 +276,22 @@ const useCases = [
 
 const personas = [
   {
-    icon: '🎯',
+    icon: Target,
     title: 'Experts & Professionals',
     desc: 'Lawyers, consultants, coaches, and advisors who want to monetise their knowledge at scale.',
   },
   {
-    icon: '📣',
+    icon: Megaphone,
     title: 'Event Organisers',
     desc: 'Conference producers, community leaders, and event hosts running ticketed live sessions online.',
   },
   {
-    icon: '🎓',
+    icon: GraduationCap,
     title: 'Educators & Trainers',
     desc: 'Teachers, trainers, and institutions delivering live courses and skill-building workshops.',
   },
   {
-    icon: '🎤',
+    icon: Mic,
     title: 'Creators & Performers',
     desc: 'Musicians, comedians, and content creators who want to sell virtual audience access.',
   },
@@ -310,7 +311,7 @@ const testimonials = [
     initials: 'KO',
     avatarBg: 'rgba(232,0,45,0.2)',
     avatarColor: '#E8002D',
-    icon: '🎯',
+    icon: Target,
     quote: 'I run weekly live sales masterclasses — closing techniques, cold calling, objection handling. 400+ professionals attend every session. Revenue lands in my M-Pesa before I even go live.',
   },
   {
@@ -319,7 +320,7 @@ const testimonials = [
     initials: 'JO',
     avatarBg: 'rgba(255,107,0,0.2)',
     avatarColor: '#FF6B00',
-    icon: '🏫',
+    icon: GraduationCap,
     quote: 'My mentorship sessions now reach students across East Africa. The M-Pesa integration means no one is excluded — everyone pays in seconds. My income tripled in three months.',
   },
   {
@@ -328,7 +329,7 @@ const testimonials = [
     initials: 'AK',
     avatarBg: 'rgba(0,200,83,0.2)',
     avatarColor: '#00C853',
-    icon: '🌍',
+    icon: Globe,
     quote: 'I turned my visa application workshops into a recurring income stream. Clients attend live, ask real questions, and pay with M-Pesa in under 20 seconds. I now run three cohorts a month.',
   },
   {
@@ -337,7 +338,7 @@ const testimonials = [
     initials: 'GW',
     avatarBg: 'rgba(255,179,0,0.2)',
     avatarColor: '#FFB300',
-    icon: '💼',
+    icon: Briefcase,
     quote: 'My live "Start & Scale" business bootcamp sold out in 48 hours. Participants from Uganda, Tanzania, and Nigeria joined. The platform made it feel like we were all in the same room.',
   },
   {
@@ -346,7 +347,7 @@ const testimonials = [
     initials: 'BN',
     avatarBg: 'rgba(0,200,83,0.2)',
     avatarColor: '#00C853',
-    icon: '⚖️',
+    icon: Scale,
     quote: "Hosting my monthly \"Know Your Rights\" session on Live Streamify has brought legal awareness to hundreds of Kenyans who couldn't afford an in-person consultation.",
   },
   {
@@ -355,7 +356,7 @@ const testimonials = [
     initials: 'BM',
     avatarBg: 'rgba(156,39,176,0.2)',
     avatarColor: '#CE93D8',
-    icon: '🚀',
+    icon: Rocket,
     quote: "My live mindset and productivity workshops reach 600+ people weekly. I replaced my 9-to-5 income within 90 days. This platform is the real deal for African knowledge creators.",
   },
 ]

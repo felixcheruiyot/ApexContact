@@ -150,7 +150,7 @@
 
     <!-- Empty state -->
     <div v-else class="card p-14 text-center">
-      <p class="text-3xl mb-3">🔍</p>
+      <Search class="w-10 h-10 mx-auto mb-3 text-text-muted" />
       <p class="text-white font-semibold mb-1">No users found</p>
       <p class="text-text-muted text-sm">Try adjusting your search or filter.</p>
     </div>
@@ -251,6 +251,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
+import { Search } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import type { User, UserRole } from '@/types'
 

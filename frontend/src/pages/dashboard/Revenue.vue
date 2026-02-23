@@ -95,7 +95,7 @@
               </td>
               <td class="px-4 py-3.5">
                 <span class="inline-flex items-center gap-1.5 text-xs">
-                  <span>{{ categoryIcon(row.sport_type) }}</span>
+                  <component :is="categoryIcon(row.sport_type)" class="w-4 h-4 text-text-muted" />
                   <span class="text-text-muted capitalize">{{ row.sport_type }}</span>
                 </span>
               </td>
@@ -154,6 +154,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Target, GraduationCap, Briefcase, BookOpen, Globe, Scale, Dumbbell, Music, Gamepad2, ChefHat, Heart, Pin } from 'lucide-vue-next'
 import { eventsApi } from '@/api/events'
 
 interface RevenueRow {
@@ -230,12 +231,12 @@ function statusClass(status: string) {
 }
 
 function categoryIcon(type: string) {
-  const icons: Record<string, string> = {
-    sales: '🎯', mentoring: '🏫', business: '💼', education: '📚',
-    visa: '🌍', legal: '⚖️', fitness: '💪', music: '🎵',
-    gaming: '🎮', cooking: '🍳', community: '🙏', other: '📌',
+  const icons: Record<string, unknown> = {
+    sales: Target, mentoring: GraduationCap, business: Briefcase, education: BookOpen,
+    visa: Globe, legal: Scale, fitness: Dumbbell, music: Music,
+    gaming: Gamepad2, cooking: ChefHat, community: Heart, other: Pin,
   }
-  return icons[type] ?? '📌'
+  return icons[type] ?? Pin
 }
 
 function statusDot(status: string) {

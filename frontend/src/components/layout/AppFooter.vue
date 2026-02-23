@@ -26,10 +26,10 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Explore</h4>
           <ul class="space-y-2">
-            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-white transition-colors">🔴 Live Now</RouterLink></li>
-            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-white transition-colors">📅 Upcoming Events</RouterLink></li>
-            <li><RouterLink to="/" class="text-text-muted text-sm hover:text-accent-orange transition-colors">🎙 Live Rooms</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">💡 Use Cases</RouterLink></li>
+            <li><RouterLink to="/" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><span class="w-2 h-2 rounded-full bg-accent-red inline-block" /> Live Now</RouterLink></li>
+            <li><RouterLink to="/" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Calendar class="w-3.5 h-3.5" /> Upcoming Events</RouterLink></li>
+            <li><RouterLink to="/" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-accent-orange transition-colors"><Mic class="w-3.5 h-3.5" /> Live Rooms</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Lightbulb class="w-3.5 h-3.5" /> Use Cases</RouterLink></li>
           </ul>
         </div>
 
@@ -37,12 +37,12 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-4">Use Cases</h4>
           <ul class="space-y-2">
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🎯 Sales & Negotiation</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🏫 Mentoring & Coaching</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">🌍 Visa & Migration</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">💼 Business & Finance</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">📚 Education</RouterLink></li>
-            <li><RouterLink to="/use-cases" class="text-text-muted text-sm hover:text-white transition-colors">⚖️ Legal Consultations</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Target class="w-3.5 h-3.5" /> Sales & Negotiation</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><GraduationCap class="w-3.5 h-3.5" /> Mentoring & Coaching</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Globe class="w-3.5 h-3.5" /> Visa & Migration</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Briefcase class="w-3.5 h-3.5" /> Business & Finance</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><BookOpen class="w-3.5 h-3.5" /> Education</RouterLink></li>
+            <li><RouterLink to="/use-cases" class="flex items-center gap-1.5 text-text-muted text-sm hover:text-white transition-colors"><Scale class="w-3.5 h-3.5" /> Legal Consultations</RouterLink></li>
           </ul>
         </div>
 
@@ -73,4 +73,5 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Calendar, Mic, Lightbulb, Target, GraduationCap, Globe, Briefcase, BookOpen, Scale } from 'lucide-vue-next'
 </script>

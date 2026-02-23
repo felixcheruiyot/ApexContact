@@ -44,7 +44,7 @@
       <!-- Commentary type badge -->
       <div class="flex items-center gap-2 mb-2">
         <span class="text-accent-orange text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
-          🎙 Live Room
+          <Mic class="w-3 h-3" /> Live Room
         </span>
       </div>
       <h3 class="text-white font-semibold text-sm leading-tight line-clamp-2 mb-1 group-hover:text-accent-orange
@@ -67,6 +67,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Mic } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import type { Event } from '@/types'
 

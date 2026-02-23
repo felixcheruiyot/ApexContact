@@ -11,7 +11,7 @@
     <!-- Error / Access denied -->
     <div v-else-if="error" class="flex items-center justify-center min-h-screen">
       <div class="text-center max-w-sm px-6">
-        <p class="text-5xl mb-4">🔒</p>
+        <Lock class="w-16 h-16 mx-auto mb-4 text-text-muted" />
         <h2 class="text-white font-bold text-xl mb-2">Access Denied</h2>
         <p class="text-text-muted text-sm mb-6">{{ error }}</p>
         <div class="flex flex-col gap-3">
@@ -85,6 +85,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink, useRouter } from 'vue-router'
+import { Lock } from 'lucide-vue-next'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
 import { paymentsApi } from '@/api/payments'

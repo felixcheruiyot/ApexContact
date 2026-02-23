@@ -147,7 +147,7 @@
     </div>
 
     <div v-else-if="!loading" class="card p-12 text-center">
-      <p class="text-3xl mb-3">🎬</p>
+      <Film class="w-10 h-10 mx-auto mb-3 text-text-muted" />
       <p class="text-text-muted text-sm">No events found.</p>
     </div>
 
@@ -305,6 +305,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
+import { Film } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import type { Event, EventStatus, SportType } from '@/types'
 

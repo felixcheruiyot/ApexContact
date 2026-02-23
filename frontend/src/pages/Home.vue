@@ -32,7 +32,7 @@
           </p>
           <div class="flex items-center justify-center gap-4 flex-wrap">
             <RouterLink to="/dashboard/create" class="btn-primary text-base px-8 py-4">Host an Event</RouterLink>
-            <RouterLink to="/commentary/create" class="btn-ghost text-base px-8 py-4">🎙 Start a Live Room</RouterLink>
+            <RouterLink to="/commentary/create" class="btn-ghost text-base px-8 py-4 flex items-center gap-2"><Mic class="w-5 h-5" /> Start a Live Room</RouterLink>
           </div>
         </template>
 
@@ -81,7 +81,7 @@
       <!-- Live Rooms (Commentary) -->
       <section v-if="allLobbies.length">
         <h2 class="section-heading mb-2 flex items-center gap-3">
-          <span class="text-accent-orange">🎙</span> Live Rooms
+          <Mic class="w-5 h-5 text-accent-orange" /> Live Rooms
         </h2>
         <p class="text-text-muted text-sm mb-6">Join live audio discussions and expert sessions</p>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -91,7 +91,7 @@
 
       <!-- Empty state -->
       <div v-if="!eventsStore.loading && !eventsStore.events.length && !allLobbies.length" class="text-center py-16">
-        <p class="text-5xl mb-4">🎬</p>
+        <Film class="w-16 h-16 mx-auto mb-4 text-text-muted" />
         <h3 class="text-white font-semibold text-xl mb-2">No events scheduled yet</h3>
         <p class="text-text-muted mb-6">Be the first to host an event on Live Streamify.</p>
         <RouterLink v-if="auth.isAuthenticated" to="/dashboard/create" class="btn-primary text-sm px-6 py-3">Host an Event</RouterLink>
@@ -112,7 +112,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
           <div v-for="uc in useCaseTeaser" :key="uc.label"
             class="bg-bg-elevated rounded-xl p-4 text-center hover:bg-white/5 transition-colors cursor-default">
-            <div class="text-2xl mb-2">{{ uc.icon }}</div>
+            <component :is="uc.icon" class="w-7 h-7 mx-auto mb-2 text-text-muted" />
             <p class="text-white text-xs font-semibold">{{ uc.label }}</p>
           </div>
         </div>
@@ -135,7 +135,7 @@
           <div v-for="t in testimonials" :key="t.name"
             class="card p-6 flex flex-col gap-4">
             <div class="flex gap-1">
-              <span v-for="n in 5" :key="n" class="text-accent-orange text-sm">★</span>
+              <Star v-for="n in 5" :key="n" class="w-4 h-4 text-accent-orange fill-current" />
             </div>
             <p class="text-text-muted text-sm leading-relaxed flex-1">"{{ t.quote }}"</p>
             <div class="flex items-center gap-3 border-t border-white/5 pt-4">
@@ -164,6 +164,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { Mic, Film, Star, Target, GraduationCap, Globe, Briefcase, Scale, BookOpen } from 'lucide-vue-next'
 import { useEventsStore } from '@/stores/events'
 import { useAuthStore } from '@/stores/auth'
 import { useCommentaryStore } from '@/stores/commentary'
@@ -204,12 +205,12 @@ const featuredEvent = computed<Event | undefined>(() =>
 )
 
 const useCaseTeaser = [
-  { icon: '🎯', label: 'Sales' },
-  { icon: '🏫', label: 'Mentoring' },
-  { icon: '🌍', label: 'Visa & Migration' },
-  { icon: '💼', label: 'Business' },
-  { icon: '⚖️', label: 'Legal' },
-  { icon: '📚', label: 'Education' },
+  { icon: Target, label: 'Sales' },
+  { icon: GraduationCap, label: 'Mentoring' },
+  { icon: Globe, label: 'Visa & Migration' },
+  { icon: Briefcase, label: 'Business' },
+  { icon: Scale, label: 'Legal' },
+  { icon: BookOpen, label: 'Education' },
 ]
 
 const testimonials = [

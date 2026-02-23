@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-8">
     <RouterLink to="/dashboard" class="text-text-muted hover:text-white text-sm flex items-center gap-2">
-      ← Back to Dashboard
+      <ArrowLeft class="w-4 h-4" /> Back to Dashboard
     </RouterLink>
 
     <div v-if="analytics">
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { ArrowLeft } from 'lucide-vue-next'
 import { eventsApi } from '@/api/events'
 
 const route = useRoute()

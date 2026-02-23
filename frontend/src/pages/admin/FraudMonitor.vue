@@ -116,7 +116,7 @@
         <p class="text-text-muted text-sm">No open fraud flags at this time.</p>
       </template>
       <template v-else>
-        <p class="text-3xl mb-3">📂</p>
+        <FolderOpen class="w-10 h-10 mx-auto mb-3 text-text-muted" />
         <p class="text-text-muted text-sm">No resolved flags to display.</p>
       </template>
     </div>
@@ -161,6 +161,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
+import { FolderOpen } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import type { FraudFlag } from '@/types'
 

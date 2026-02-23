@@ -2,8 +2,8 @@
   <div class="h-screen bg-bg-page flex flex-col overflow-hidden">
     <!-- Top bar -->
     <div class="flex items-center justify-between px-4 py-3 bg-bg-surface border-b border-white/5">
-      <RouterLink :to="`/commentary/${eventId}`" class="text-text-muted hover:text-white transition-colors">
-        ← Back
+      <RouterLink :to="`/commentary/${eventId}`" class="flex items-center gap-1.5 text-text-muted hover:text-white transition-colors">
+        <ArrowLeft class="w-4 h-4" /> Back
       </RouterLink>
       <div class="flex items-center gap-2">
         <span v-if="event" class="text-white font-semibold text-sm truncate max-w-[200px]">{{ event.title }}</span>
@@ -76,6 +76,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { ArrowLeft } from 'lucide-vue-next'
 import { useCommentaryStore } from '@/stores/commentary'
 import { useAuthStore } from '@/stores/auth'
 import { commentaryApi } from '@/api/commentary'

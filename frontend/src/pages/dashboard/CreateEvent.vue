@@ -14,22 +14,22 @@
           <select v-model="form.sport_type" class="input appearance-none" required>
             <option value="">Select a category</option>
             <optgroup label="Knowledge & Skills">
-              <option value="sales">🎯 Sales & Negotiation</option>
-              <option value="mentoring">🏫 Mentoring & Coaching</option>
-              <option value="business">💼 Business & Finance</option>
-              <option value="education">📚 Education & Workshops</option>
-              <option value="visa">🌍 Visa & Migration</option>
-              <option value="legal">⚖️ Legal Consultations</option>
-              <option value="fitness">💪 Fitness & Wellness</option>
+              <option value="sales">Sales & Negotiation</option>
+              <option value="mentoring">Mentoring & Coaching</option>
+              <option value="business">Business & Finance</option>
+              <option value="education">Education & Workshops</option>
+              <option value="visa">Visa & Migration</option>
+              <option value="legal">Legal Consultations</option>
+              <option value="fitness">Fitness & Wellness</option>
             </optgroup>
             <optgroup label="Entertainment">
-              <option value="music">🎵 Music & Performances</option>
-              <option value="gaming">🎮 Gaming & Esports</option>
-              <option value="cooking">🍳 Cooking & Lifestyle</option>
-              <option value="community">🙏 Faith & Community</option>
+              <option value="music">Music & Performances</option>
+              <option value="gaming">Gaming & Esports</option>
+              <option value="cooking">Cooking & Lifestyle</option>
+              <option value="community">Faith & Community</option>
             </optgroup>
             <optgroup label="Other">
-              <option value="other">📌 Other</option>
+              <option value="other">Other</option>
             </optgroup>
           </select>
         </div>

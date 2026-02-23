@@ -175,7 +175,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="feature in features" :key="feature.title"
             class="card p-6 group hover:border hover:border-accent-red/30 transition-all">
-            <div class="text-3xl mb-4">{{ feature.icon }}</div>
+            <component :is="feature.icon" class="w-8 h-8 mb-4 text-accent-red" />
             <h3 class="text-white font-bold mb-2">{{ feature.title }}</h3>
             <p class="text-text-muted text-sm leading-relaxed">{{ feature.desc }}</p>
           </div>
@@ -187,7 +187,7 @@
     <section class="py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="card p-10 md:p-14 text-center max-w-3xl mx-auto">
-          <div class="text-5xl mb-6">🛡️</div>
+          <Shield class="w-16 h-16 mx-auto mb-6 text-accent-red" />
           <h2 class="font-display text-4xl uppercase tracking-wide text-white mb-4">
             Your Content is Protected
           </h2>
@@ -239,6 +239,7 @@
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { Calendar, Tv, Smartphone, BarChart2, DollarSign, Shield } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 
@@ -267,32 +268,32 @@ const revenueItems = [
 
 const features = [
   {
-    icon: '📅',
+    icon: Calendar,
     title: 'Event Scheduling',
     desc: 'Create events with custom pricing, descriptions, and banner images. Schedule weeks in advance.',
   },
   {
-    icon: '📺',
+    icon: Tv,
     title: 'HLS Live Streaming',
     desc: 'Stream from any encoder (OBS, vMix, Wirecast). We handle the HLS conversion and delivery.',
   },
   {
-    icon: '📱',
+    icon: Smartphone,
     title: 'M-Pesa Payments',
     desc: 'Viewers pay via M-Pesa STK Push — the most popular payment method in East Africa.',
   },
   {
-    icon: '📊',
+    icon: BarChart2,
     title: 'Real-Time Analytics',
     desc: 'Live viewer counts, peak attendance, total revenue, and ticket sales — all in your dashboard.',
   },
   {
-    icon: '💰',
+    icon: DollarSign,
     title: 'Revenue Dashboard',
     desc: 'Track earnings per event. See your 70% share in real time as tickets are purchased.',
   },
   {
-    icon: '🛡️',
+    icon: Shield,
     title: 'Anti-Piracy Built In',
     desc: 'Unique tokens, IP locking, device fingerprinting, and VPN detection protect every stream.',
   },

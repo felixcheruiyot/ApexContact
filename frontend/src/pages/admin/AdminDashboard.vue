@@ -34,7 +34,7 @@
       <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
           <p class="text-text-muted text-xs uppercase tracking-wider">Total Users</p>
-          <span class="text-xl">👥</span>
+          <Users class="w-5 h-5 text-text-muted" />
         </div>
         <p class="text-white font-bold text-3xl">{{ stats.total_users.toLocaleString() }}</p>
       </div>
@@ -42,7 +42,7 @@
       <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
           <p class="text-text-muted text-xs uppercase tracking-wider">Total Events</p>
-          <span class="text-xl">🎬</span>
+          <Film class="w-5 h-5 text-text-muted" />
         </div>
         <p class="text-white font-bold text-3xl">{{ stats.total_events.toLocaleString() }}</p>
       </div>
@@ -58,7 +58,7 @@
       <div class="card p-5">
         <div class="flex items-center justify-between mb-3">
           <p class="text-text-muted text-xs uppercase tracking-wider">Revenue</p>
-          <span class="text-xl">💰</span>
+          <DollarSign class="w-5 h-5 text-text-muted" />
         </div>
         <p class="text-status-success font-bold text-2xl">
           KES {{ stats.total_revenue.toLocaleString() }}
@@ -68,7 +68,7 @@
       <div class="card p-5" :class="stats.fraud_flags_open > 0 ? 'border border-status-warning/30' : ''">
         <div class="flex items-center justify-between mb-3">
           <p class="text-text-muted text-xs uppercase tracking-wider">Open Flags</p>
-          <span class="text-xl">🛡️</span>
+          <Shield class="w-5 h-5 text-text-muted" />
         </div>
         <p :class="stats.fraud_flags_open > 0 ? 'text-status-warning' : 'text-white'" class="font-bold text-3xl">
           {{ stats.fraud_flags_open }}
@@ -127,7 +127,7 @@
       </div>
 
       <div v-else-if="!loading" class="card p-10 text-center">
-        <p class="text-3xl mb-3">📡</p>
+        <Radio class="w-10 h-10 mx-auto mb-3 text-text-muted" />
         <p class="text-text-muted text-sm">No events are live right now.</p>
       </div>
 
@@ -190,14 +190,14 @@
 
     <!-- Quick actions -->
     <div class="flex gap-3 pt-2 flex-wrap">
-      <RouterLink to="/admin/users" class="btn-ghost text-sm py-2 px-4">
-        👥 Manage Users
+      <RouterLink to="/admin/users" class="btn-ghost text-sm py-2 px-4 flex items-center gap-2">
+        <Users class="w-4 h-4" /> Manage Users
       </RouterLink>
-      <RouterLink to="/admin/events" class="btn-ghost text-sm py-2 px-4">
-        🎬 Manage Events
+      <RouterLink to="/admin/events" class="btn-ghost text-sm py-2 px-4 flex items-center gap-2">
+        <Film class="w-4 h-4" /> Manage Events
       </RouterLink>
       <RouterLink to="/admin/fraud" class="btn-primary text-sm py-2 px-4 flex items-center gap-2">
-        🛡️ Fraud Monitor
+        <Shield class="w-4 h-4" /> Fraud Monitor
         <span v-if="stats?.fraud_flags_open"
           class="bg-white/20 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
           {{ stats.fraud_flags_open }}
@@ -211,6 +211,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Users, Film, DollarSign, Shield, Radio } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { adminApi, type PlatformStats } from '@/api/admin'
 import type { FraudFlag, Event } from '@/types'

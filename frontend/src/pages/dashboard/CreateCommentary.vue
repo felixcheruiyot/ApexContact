@@ -48,22 +48,22 @@
         <select v-model="form.sport_type" class="form-input appearance-none" required>
           <option value="">Select a category</option>
           <optgroup label="Knowledge & Skills">
-            <option value="sales">🎯 Sales & Negotiation</option>
-            <option value="mentoring">🏫 Mentoring & Coaching</option>
-            <option value="business">💼 Business & Finance</option>
-            <option value="education">📚 Education & Workshops</option>
-            <option value="visa">🌍 Visa & Migration</option>
-            <option value="legal">⚖️ Legal Consultations</option>
-            <option value="fitness">💪 Fitness & Wellness</option>
+            <option value="sales">Sales & Negotiation</option>
+            <option value="mentoring">Mentoring & Coaching</option>
+            <option value="business">Business & Finance</option>
+            <option value="education">Education & Workshops</option>
+            <option value="visa">Visa & Migration</option>
+            <option value="legal">Legal Consultations</option>
+            <option value="fitness">Fitness & Wellness</option>
           </optgroup>
           <optgroup label="Entertainment">
-            <option value="music">🎵 Music & Performances</option>
-            <option value="gaming">🎮 Gaming & Esports</option>
-            <option value="cooking">🍳 Cooking & Lifestyle</option>
-            <option value="community">🙏 Faith & Community</option>
+            <option value="music">Music & Performances</option>
+            <option value="gaming">Gaming & Esports</option>
+            <option value="cooking">Cooking & Lifestyle</option>
+            <option value="community">Faith & Community</option>
           </optgroup>
           <optgroup label="Other">
-            <option value="other">📌 Other</option>
+            <option value="other">Other</option>
           </optgroup>
         </select>
       </div>
@@ -119,7 +119,7 @@
         class="w-full py-3 rounded-xl bg-accent-orange text-white font-bold text-base
                disabled:opacity-40 hover:bg-orange-500 transition-colors"
       >
-        {{ submitting ? 'Creating…' : '🎙 Start Live Room' }}
+        <Mic v-if="!submitting" class="w-4 h-4" />{{ submitting ? 'Creating…' : 'Start Live Room' }}
       </button>
     </form>
   </div>
@@ -128,6 +128,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Mic } from 'lucide-vue-next'
 import { commentaryApi } from '@/api/commentary'
 
 const router = useRouter()

@@ -25,7 +25,7 @@
         </RouterLink>
         <RouterLink to="/" class="flex items-center gap-1.5 text-text-muted hover:text-accent-orange transition-colors text-sm font-medium"
           :class="{ 'text-accent-orange': isCommentaryRoute }">
-          🎙 Live Rooms
+          <Mic class="w-4 h-4" /> Live Rooms
         </RouterLink>
         <RouterLink to="/promoters" class="text-text-muted hover:text-white transition-colors text-sm font-medium"
           active-class="text-white">
@@ -74,7 +74,7 @@
               <RouterLink to="/commentary/create"
                 class="flex items-center gap-2 px-4 py-2.5 text-sm text-accent-orange hover:text-orange-400
                        hover:bg-accent-orange/5 transition-colors">
-                <span class="text-base leading-none">🎙</span>
+                <Mic class="w-3.5 h-3.5" />
                 Host a Live Room
               </RouterLink>
               <button @click="handleLogout"
@@ -128,7 +128,7 @@
           <RouterLink to="/use-cases" @click="mobileMenuOpen = false"
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-white hover:bg-white/5 transition-colors"
             active-class="text-white bg-white/5">
-            💡 Use Cases
+            <Lightbulb class="w-4 h-4" /> Use Cases
           </RouterLink>
 
           <!-- Live Rooms section -->
@@ -136,7 +136,7 @@
             <p class="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-text-muted">Live Rooms</p>
             <RouterLink to="/" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-accent-orange hover:bg-accent-orange/5 transition-colors">
-              🎙 Browse Rooms
+              <Mic class="w-4 h-4" /> Browse Rooms
             </RouterLink>
             <RouterLink v-if="auth.isAuthenticated" to="/commentary/create" @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent-orange hover:bg-accent-orange/10 transition-colors">
@@ -192,8 +192,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-
 import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { Mic, Lightbulb } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()

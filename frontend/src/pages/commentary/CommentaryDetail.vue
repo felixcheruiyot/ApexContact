@@ -29,8 +29,8 @@
             <span class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full uppercase tracking-wider">
               {{ event.sport_type }}
             </span>
-            <span class="bg-accent-orange/20 text-accent-orange text-xs px-2 py-1 rounded-full font-medium">
-              🎙 Live Room
+            <span class="bg-accent-orange/20 text-accent-orange text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+              <Mic class="w-3 h-3" /> Live Room
             </span>
           </div>
           <h1 class="text-white text-2xl md:text-3xl font-bold font-display leading-tight">
@@ -42,8 +42,8 @@
 
       <!-- Meta row -->
       <div class="flex flex-wrap items-center gap-6 mb-6 text-sm text-text-muted">
-        <span>📅 {{ formattedDate }}</span>
-        <span>👥 {{ store.participantCount }} joining</span>
+        <span class="flex items-center gap-1.5"><Calendar class="w-4 h-4" /> {{ formattedDate }}</span>
+        <span class="flex items-center gap-1.5"><Users class="w-4 h-4" /> {{ store.participantCount }} joining</span>
         <span class="font-bold" :class="event.price === 0 ? 'text-success' : 'text-accent-orange'">
           {{ event.price === 0 ? 'Free' : `${event.currency} ${event.price.toLocaleString()}` }}
         </span>
@@ -66,7 +66,7 @@
             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
                    font-bold text-base hover:bg-orange-500 transition-colors disabled:opacity-50"
           >
-            {{ starting ? 'Starting…' : '▶ Start Room' }}
+            <Play v-if="!starting" class="w-4 h-4" />{{ starting ? 'Starting…' : 'Start Room' }}
           </button>
 
           <!-- Go to live room + End Room -->
@@ -76,7 +76,7 @@
               class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
                      font-bold text-base hover:bg-orange-500 transition-colors"
             >
-              🎙 Enter Your Room
+              <Mic class="w-4 h-4" /> Enter Your Room
             </RouterLink>
             <button
               @click="handleEnd"
@@ -107,13 +107,13 @@
             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
                    font-bold text-base hover:bg-orange-500 transition-colors"
           >
-            🎙 Enter Room
+            <Mic class="w-4 h-4" /> Enter Room
           </RouterLink>
 
           <!-- Already joined, waiting for host -->
           <div v-else-if="hasJoined && event.status === 'scheduled'"
             class="flex items-center gap-3 px-4 py-3 rounded-xl bg-success/10 border border-success/20">
-            <span class="text-success text-lg">✓</span>
+            <Check class="w-5 h-5 text-success" />
             <div>
               <p class="text-success font-semibold text-sm">You're in as <strong>{{ store.myNickname }}</strong></p>
               <p class="text-text-muted text-xs">Waiting for the host to start the room.</p>
@@ -127,7 +127,7 @@
             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-success text-white
                    font-bold text-base hover:bg-green-600 transition-colors"
           >
-            🎙 Join Free
+            <Mic class="w-4 h-4" /> Join Free
           </button>
 
           <!-- Not yet joined — paid -->
@@ -137,7 +137,7 @@
             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white
                    font-bold text-base hover:bg-orange-500 transition-colors"
           >
-            🎫 Buy Access · {{ event.currency }} {{ event.price.toLocaleString() }}
+            <Ticket class="w-4 h-4" /> Buy Access · {{ event.currency }} {{ event.price.toLocaleString() }}
           </button>
         </template>
 
@@ -182,6 +182,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { Mic, Calendar, Users, Play, Check, Ticket } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { useCommentaryStore } from '@/stores/commentary'
 import { useAuthStore } from '@/stores/auth'
