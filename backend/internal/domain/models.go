@@ -31,9 +31,29 @@ const (
 type SportType string
 
 const (
-	SportBoxing  SportType = "boxing"
-	SportRacing  SportType = "racing"
+	SportSales     SportType = "sales"
+	SportMentoring SportType = "mentoring"
+	SportEducation SportType = "education"
+	SportBusiness  SportType = "business"
+	SportLegal     SportType = "legal"
+	SportFitness   SportType = "fitness"
+	SportVisa      SportType = "visa"
+	SportMusic     SportType = "music"
+	SportGaming    SportType = "gaming"
+	SportCooking   SportType = "cooking"
+	SportCommunity SportType = "community"
+	SportOther     SportType = "other"
 )
+
+var validSportTypes = map[string]bool{
+	"sales": true, "mentoring": true, "education": true, "business": true,
+	"legal": true, "fitness": true, "visa": true, "music": true,
+	"gaming": true, "cooking": true, "community": true, "other": true,
+}
+
+func IsValidSportType(s string) bool {
+	return validSportTypes[s]
+}
 
 // EventType differentiates video streams from audio commentary lobbies.
 type EventType string

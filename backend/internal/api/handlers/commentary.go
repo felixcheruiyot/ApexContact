@@ -162,8 +162,8 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 	if strings.TrimSpace(req.Title) == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "title is required")
 	}
-	if req.SportType != "boxing" && req.SportType != "racing" {
-		return fiber.NewError(fiber.StatusBadRequest, "sport_type must be boxing or racing")
+	if !domain.IsValidSportType(req.SportType) {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid sport_type")
 	}
 
 	// JavaScript toISOString() includes milliseconds (RFC3339Nano), try both formats.
