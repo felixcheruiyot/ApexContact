@@ -7,7 +7,7 @@
     <section class="relative min-h-screen flex items-center overflow-hidden">
       <!-- Background image -->
       <img
-        src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1200&q=80"
+        src="https://images.pexels.com/photos/3184340/pexels-photo-3184340.jpeg?auto=compress&cs=tinysrgb&w=1260&q=80"
         alt="Creator speaking"
         class="absolute inset-0 w-full h-full object-cover object-center"
       />
@@ -106,7 +106,7 @@
           <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
             <div class="flex items-center gap-4">
               <img
-                src="https://images.unsplash.com/photo-1531746790-b0aa4f4b7bce?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Amara Kioni"
                 class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
               />
@@ -134,7 +134,7 @@
           <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
             <div class="flex items-center gap-4">
               <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/1139743/pexels-photo-1139743.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="David Mwangi"
                 class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
               />
@@ -162,7 +162,7 @@
           <div class="bg-bg-elevated rounded-2xl p-6 flex flex-col gap-5 border border-white/5 hover:border-white/15 transition-colors duration-200">
             <div class="flex items-center gap-4">
               <img
-                src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=600&q=80"
+                src="https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
                 alt="Zara Hassan"
                 class="w-16 h-16 rounded-full object-cover ring-2 ring-accent-red/30 shrink-0"
               />
