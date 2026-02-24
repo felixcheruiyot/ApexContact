@@ -162,22 +162,23 @@
         </template>
 
         <template v-else>
-          <!-- Sign in ghost pill -->
+          <!-- Sign in -->
           <RouterLink
             to="/login"
-            class="hidden sm:inline-flex items-center px-5 py-2 rounded-full border border-white/20
-                   hover:border-white/50 text-white text-sm font-medium transition-all duration-200
+            class="hidden sm:inline-flex items-center px-5 py-2 rounded-lg border border-white/20
+                   hover:border-white/40 text-white text-sm font-medium transition-all duration-200
                    hover:bg-white/5"
           >
             Sign in
           </RouterLink>
-          <!-- Get Started red pill -->
+          <!-- Try Free — primary action for new visitors -->
           <RouterLink
-            to="/register"
-            class="inline-flex items-center px-5 py-2 rounded-full bg-accent-red hover:bg-accent-red-hover
+            to="/try"
+            class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-accent-red hover:bg-accent-red-hover
                    text-white text-sm font-semibold transition-all duration-200 active:scale-95"
           >
-            Get Started
+            <span class="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
+            Try Free
           </RouterLink>
         </template>
 
@@ -281,21 +282,21 @@
             <!-- Unauthenticated mobile buttons -->
             <div class="pt-2 flex flex-col gap-2.5">
               <RouterLink
+                to="/try"
+                @click="mobileMenuOpen = false"
+                class="w-full text-center px-5 py-3 rounded-lg bg-accent-red hover:bg-accent-red-hover
+                       text-white text-sm font-semibold transition-all active:scale-95"
+              >
+                Try Free — No Account Needed
+              </RouterLink>
+              <RouterLink
                 to="/login"
                 @click="mobileMenuOpen = false"
-                class="w-full text-center px-5 py-3 rounded-full border border-white/20
-                       hover:border-white/50 text-white text-sm font-medium transition-all
+                class="w-full text-center px-5 py-3 rounded-lg border border-white/20
+                       hover:border-white/40 text-white text-sm font-medium transition-all
                        hover:bg-white/5"
               >
                 Sign in
-              </RouterLink>
-              <RouterLink
-                to="/register"
-                @click="mobileMenuOpen = false"
-                class="w-full text-center px-5 py-3 rounded-full bg-accent-red hover:bg-accent-red-hover
-                       text-white text-sm font-semibold transition-all active:scale-95"
-              >
-                Get Started
               </RouterLink>
             </div>
           </template>
