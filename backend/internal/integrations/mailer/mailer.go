@@ -2,10 +2,9 @@ package mailer
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
+	"mime"
+	"net/smtp"
 
 	"github.com/livestreamify/backend/internal/config"
 )
@@ -15,76 +14,43 @@ type Mailer interface {
 	Send(to, subject, htmlBody string) error
 }
 
-// PostmarkMailer delivers email via the Postmark HTTP API.
-type PostmarkMailer struct {
-	serverToken string
-	from        string
-	fromName    string
-	http        *http.Client
+// SMTPMailer delivers email via SMTP using net/smtp.
+type SMTPMailer struct {
+	host     string
+	port     int
+	username string
+	password string
+	from     string
+	fromName string
 }
 
-// NewPostmarkMailer creates a PostmarkMailer wired from config.
-func NewPostmarkMailer(cfg *config.Config) *PostmarkMailer {
-	return &PostmarkMailer{
-		serverToken: cfg.PostmarkServerToken,
-		from:        cfg.EmailFrom,
-		fromName:    cfg.EmailFromName,
-		http:        &http.Client{Timeout: 15 * time.Second},
+// NewSMTPMailer creates an SMTPMailer wired from config.
+func NewSMTPMailer(cfg *config.Config) *SMTPMailer {
+	return &SMTPMailer{
+		host:     cfg.SMTPHost,
+		port:     cfg.SMTPPort,
+		username: cfg.SMTPUsername,
+		password: cfg.SMTPPassword,
+		from:     cfg.SMTPFrom,
+		fromName: cfg.SMTPFromName,
 	}
 }
 
-type postmarkRequest struct {
-	From          string `json:"From"`
-	To            string `json:"To"`
-	Subject       string `json:"Subject"`
-	HtmlBody      string `json:"HtmlBody"`
-	MessageStream string `json:"MessageStream"`
-}
+// Send delivers an HTML email to the given address.
+func (m *SMTPMailer) Send(to, subject, htmlBody string) error {
+	addr := fmt.Sprintf("%s:%d", m.host, m.port)
+	auth := smtp.PlainAuth("", m.username, m.password, m.host)
 
-type postmarkError struct {
-	ErrorCode int    `json:"ErrorCode"`
-	Message   string `json:"Message"`
-}
+	fromHeader := mime.QEncoding.Encode("utf-8", m.fromName) + " <" + m.from + ">"
 
-// Send delivers an HTML email to the given address via Postmark.
-func (m *PostmarkMailer) Send(to, subject, htmlBody string) error {
-	from := m.from
-	if m.fromName != "" {
-		from = fmt.Sprintf("%s <%s>", m.fromName, m.from)
-	}
+	var buf bytes.Buffer
+	buf.WriteString("MIME-Version: 1.0\r\n")
+	buf.WriteString("Content-Type: text/html; charset=UTF-8\r\n")
+	buf.WriteString("From: " + fromHeader + "\r\n")
+	buf.WriteString("To: " + to + "\r\n")
+	buf.WriteString("Subject: " + mime.QEncoding.Encode("utf-8", subject) + "\r\n")
+	buf.WriteString("\r\n")
+	buf.WriteString(htmlBody)
 
-	payload := postmarkRequest{
-		From:          from,
-		To:            to,
-		Subject:       subject,
-		HtmlBody:      htmlBody,
-		MessageStream: "outbound",
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("postmark: marshal: %w", err)
-	}
-
-	req, err := http.NewRequest(http.MethodPost, "https://api.postmarkapp.com/email", bytes.NewReader(body))
-	if err != nil {
-		return fmt.Errorf("postmark: build request: %w", err)
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Postmark-Server-Token", m.serverToken)
-
-	resp, err := m.http.Do(req)
-	if err != nil {
-		return fmt.Errorf("postmark: http: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 400 {
-		var e postmarkError
-		json.NewDecoder(resp.Body).Decode(&e)
-		return fmt.Errorf("postmark: api error %d (code %d): %s", resp.StatusCode, e.ErrorCode, e.Message)
-	}
-
-	return nil
+	return smtp.SendMail(addr, auth, m.from, []string{to}, buf.Bytes())
 }

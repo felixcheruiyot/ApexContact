@@ -20,18 +20,14 @@ var verificationTmplRaw string
 //go:embed templates/reminder.html
 var reminderTmplRaw string
 
-//go:embed templates/withdrawal_otp.html
-var withdrawalOTPTmplRaw string
-
 // NotificationService sends transactional notifications and deduplicates via Redis.
 type NotificationService struct {
-	db                *pgxpool.Pool
-	rdb               *redis.Client
-	mailer            mailer.Mailer
-	verifyTmpl        *template.Template
-	reminderTmpl      *template.Template
-	withdrawalOTPTmpl *template.Template
-	appURL            string
+	db           *pgxpool.Pool
+	rdb          *redis.Client
+	mailer       mailer.Mailer
+	verifyTmpl   *template.Template
+	reminderTmpl *template.Template
+	appURL       string
 }
 
 // NewNotificationService parses email templates and returns a ready service.
@@ -44,18 +40,13 @@ func NewNotificationService(db *pgxpool.Pool, rdb *redis.Client, m mailer.Mailer
 	if err != nil {
 		return nil, fmt.Errorf("parse reminder template: %w", err)
 	}
-	wt, err := template.New("withdrawal_otp.html").Parse(withdrawalOTPTmplRaw)
-	if err != nil {
-		return nil, fmt.Errorf("parse withdrawal OTP template: %w", err)
-	}
 	return &NotificationService{
-		db:                db,
-		rdb:               rdb,
-		mailer:            m,
-		verifyTmpl:        vt,
-		reminderTmpl:      rt,
-		withdrawalOTPTmpl: wt,
-		appURL:            appURL,
+		db:           db,
+		rdb:          rdb,
+		mailer:       m,
+		verifyTmpl:   vt,
+		reminderTmpl: rt,
+		appURL:       appURL,
 	}, nil
 }
 
@@ -109,34 +100,6 @@ func (s *NotificationService) SendEventReminder(ctx context.Context, user *domai
 	}
 
 	return s.markSent(ctx, userID, "event_reminder", eventID)
-}
-
-// SendWithdrawalOTP renders and sends the withdrawal OTP email.
-func (s *NotificationService) SendWithdrawalOTP(ctx context.Context, user *domain.User, otp, amount, currency string) error {
-	data := struct {
-		FullName string
-		OTP      string
-		Amount   string
-		Currency string
-	}{
-		FullName: user.FullName,
-		OTP:      otp,
-		Amount:   amount,
-		Currency: currency,
-	}
-
-	var buf bytes.Buffer
-	if err := s.withdrawalOTPTmpl.Execute(&buf, data); err != nil {
-		return fmt.Errorf("render withdrawal OTP email: %w", err)
-	}
-
-	return s.mailer.Send(user.Email, "Withdrawal Verification Code — Live Streamify", buf.String())
-}
-
-// SendRaw sends an arbitrary HTML email. Used for service-level notifications
-// where no template is required (e.g. withdrawal failure alerts).
-func (s *NotificationService) SendRaw(to, subject, htmlBody string) error {
-	return s.mailer.Send(to, subject, htmlBody)
 }
 
 // hasBeenSent checks the Redis dedup key to prevent double-sends.

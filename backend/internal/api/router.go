@@ -14,7 +14,6 @@ import (
 	"github.com/livestreamify/backend/internal/api/handlers"
 	"github.com/livestreamify/backend/internal/api/middleware"
 	"github.com/livestreamify/backend/internal/config"
-	"github.com/livestreamify/backend/internal/integrations/intasend"
 	"github.com/livestreamify/backend/internal/integrations/mailer"
 	"github.com/livestreamify/backend/internal/service"
 	"github.com/redis/go-redis/v9"
@@ -27,15 +26,12 @@ func NewApp(cfg *config.Config) (*fiber.App, func(), error) {
 		return nil, nil, err
 	}
 
-	m := mailer.NewPostmarkMailer(cfg)
+	m := mailer.NewSMTPMailer(cfg)
 	notifSvc, err := service.NewNotificationService(db, rdb, m, cfg.AppURL)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-
-	is := intasend.New(cfg.IntaSendPrivateKey, cfg.IntaSendBaseURL)
-	withdrawalSvc := service.NewWithdrawalService(db, rdb, is, notifSvc)
 
 	schedCtx, schedCancel := context.WithCancel(context.Background())
 	go service.StartReminderScheduler(schedCtx, db, notifSvc)
@@ -46,7 +42,7 @@ func NewApp(cfg *config.Config) (*fiber.App, func(), error) {
 	})
 
 	registerMiddleware(app, cfg)
-	registerRoutes(app, cfg, db, rdb, notifSvc, withdrawalSvc)
+	registerRoutes(app, cfg, db, rdb, notifSvc)
 
 	fullCleanup := func() {
 		schedCancel()
@@ -69,7 +65,7 @@ func registerMiddleware(app *fiber.App, cfg *config.Config) {
 	}))
 }
 
-func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client, notifSvc *service.NotificationService, withdrawalSvc *service.WithdrawalService) {
+func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client, notifSvc *service.NotificationService) {
 	authHandler := handlers.NewAuthHandler(cfg, db, rdb, notifSvc)
 	eventHandler := handlers.NewEventHandler(cfg, db)
 	streamHandler := handlers.NewStreamHandler(cfg, db, rdb)
@@ -138,16 +134,6 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	admin.Post("/events/:id/request-edits", adminHandler.RequestEdits)
 	admin.Post("/events/:id/decline", adminHandler.DeclineEvent)
 	admin.Put("/users/:id/role", adminHandler.UpdateUserRole)
-
-	// ── Withdrawals ────────────────────────────────────────────────────────────
-	withdrawalHandler := handlers.NewWithdrawalHandler(db, withdrawalSvc)
-	withdrawals := v1.Group("/withdrawals", middleware.RequireAuth(cfg), middleware.RequireRole("member", "admin"))
-	withdrawals.Get("/balance", withdrawalHandler.Balance)
-	withdrawals.Get("/payout-account", withdrawalHandler.GetPayoutAccount)
-	withdrawals.Post("/payout-account", withdrawalHandler.SetPayoutAccount)
-	withdrawals.Post("/initiate", withdrawalHandler.Initiate)
-	withdrawals.Post("/confirm", withdrawalHandler.Confirm)
-	withdrawals.Get("/history", withdrawalHandler.History)
 
 	// ── Profile (any authenticated user) ───────────────────────────────────────
 	profile := v1.Group("/profile", middleware.RequireAuth(cfg))
