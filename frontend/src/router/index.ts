@@ -41,6 +41,13 @@ const router = createRouter({
       ],
     },
 
+    // ── Public: Try stream (no auth required) ─────────────────────────────────
+    {
+      path: '/try',
+      name: 'try-stream',
+      component: () => import('@/pages/TryStream.vue'),
+    },
+
     // ── Protected: Watch ──────────────────────────────────────────────────────
     {
       path: '/watch/:eventId',
