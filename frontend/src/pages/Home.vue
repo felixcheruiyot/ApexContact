@@ -150,7 +150,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-8">
           <h2 class="font-display text-3xl md:text-4xl uppercase tracking-wide text-white">
-            Upcoming
+            Scheduled
           </h2>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -233,7 +233,7 @@ onMounted(load)
 watch(() => route.query.category, load)
 
 const liveEvents = computed(() => eventsStore.events.filter((e) => e.status === 'live'))
-const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status === 'upcoming'))
+const upcomingEvents = computed(() => eventsStore.events.filter((e) => e.status === 'scheduled'))
 
 function openPayment(event: Event) {
   if (!auth.isAuthenticated) {
