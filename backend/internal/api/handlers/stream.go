@@ -202,17 +202,21 @@ func (h *StreamHandler) GuestRoom(c *fiber.Ctx) error {
 	roomName := "guest-room-" + uuid.New().String()[:8]
 	expiresAt := time.Now().Add(time.Duration(timeLimitSeconds) * time.Second)
 
+	// Keep viewer link valid for 24 h so recipients who open it later can still
+	// join (even if the host has already finished their 5-minute test broadcast).
+	const viewerLinkTTL = 24 * 60 * 60 * time.Second
+
 	// Store guestID → roomName in Redis for viewer lookup.
 	h.rdb.Set(context.Background(),
 		fmt.Sprintf("guest_room:%s", guestID),
 		roomName,
-		time.Duration(timeLimitSeconds+120)*time.Second,
+		viewerLinkTTL,
 	)
 	// Also store event_type so viewer page knows what to render.
 	h.rdb.Set(context.Background(),
 		fmt.Sprintf("guest_room_type:%s", guestID),
 		req.EventType,
-		time.Duration(timeLimitSeconds+120)*time.Second,
+		viewerLinkTTL,
 	)
 
 	// Issue a host (can publish) token.

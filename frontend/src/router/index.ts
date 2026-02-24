@@ -48,18 +48,20 @@ const router = createRouter({
       component: () => import('@/pages/TryStream.vue'),
     },
 
+    // ── Public: Guest LiveKit room viewer (audio / audio+video) ──────────────
+    // Must be defined BEFORE /guest/:guestId to avoid the dynamic segment
+    // swallowing the static 'room' segment in some router edge cases.
+    {
+      path: '/guest/room/:guestId',
+      name: 'guest-room-view',
+      component: () => import('@/pages/GuestRoomView.vue'),
+    },
+
     // ── Public: Guest stream viewer (shareable link) ───────────────────────────
     {
       path: '/guest/:guestId',
       name: 'guest-view',
       component: () => import('@/pages/GuestView.vue'),
-    },
-
-    // ── Public: Guest LiveKit room viewer (audio / audio+video) ──────────────
-    {
-      path: '/guest/room/:guestId',
-      name: 'guest-room-view',
-      component: () => import('@/pages/GuestRoomView.vue'),
     },
 
     // ── Protected: Watch ──────────────────────────────────────────────────────
@@ -110,6 +112,24 @@ const router = createRouter({
     // ── Catch-all ─────────────────────────────────────────────────────────────
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
+})
+
+// Recover from stale PWA chunk failures (common after new deployments).
+// When a lazy-loaded route chunk can't be fetched, Vue Router fails the
+// navigation and the catch-all would redirect to '/'. Instead, force a
+// full page reload so the service worker fetches fresh assets.
+router.onError((error, to) => {
+  const isChunkError =
+    error?.message?.includes('Failed to fetch dynamically imported module') ||
+    error?.message?.includes('error loading dynamically imported module') ||
+    error?.message?.includes('Importing a module script failed')
+  if (isChunkError) {
+    const reloadKey = `chunk-reload:${to.fullPath}`
+    if (!sessionStorage.getItem(reloadKey)) {
+      sessionStorage.setItem(reloadKey, '1')
+      window.location.href = to.fullPath
+    }
+  }
 })
 
 // Route guards
