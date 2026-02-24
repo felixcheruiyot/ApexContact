@@ -69,9 +69,8 @@
           <AudioRoom
             v-if="joined"
             :token="roomData.token"
-            :server-url="roomData.livekit_url"
-            :room-name="roomData.room_name"
-            :event-type="roomData.event_type"
+            :livekit-url="roomData.livekit_url"
+            my-role="listener"
             :is-host="false"
           />
 

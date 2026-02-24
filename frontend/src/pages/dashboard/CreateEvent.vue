@@ -343,7 +343,7 @@ async function handleSubmit() {
 
     if (type === 'commercial') {
       // OBS/RTMP → goes through standard events API (needs review)
-      const created = await eventsApi.create({
+      await eventsApi.create({
         title: form.value.title,
         description: form.value.description,
         teaser_hook: form.value.teaser_hook,
