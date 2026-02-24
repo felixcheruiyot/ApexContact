@@ -267,10 +267,22 @@
             to keep streaming.
           </div>
 
-          <!-- LiveKit room info -->
-          <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-10 h-10 rounded-lg bg-accent-orange/15 flex items-center justify-center">
+          <!-- AudioRoom embed (host view) -->
+          <div v-if="roomJoined" class="bg-bg-elevated border border-white/10 rounded-xl overflow-hidden">
+            <AudioRoom
+              :token="guestRoom!.token"
+              :livekit-url="guestRoom!.livekit_url"
+              my-role="host"
+              :is-host="true"
+              :show-video="selectedMode === 'audio_video'"
+              @leave="clearSession(); phase = 'expired'"
+            />
+          </div>
+
+          <!-- Pre-join prompt -->
+          <div v-else class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-accent-orange/15 flex items-center justify-center shrink-0">
                 <component :is="selectedMode === 'audio' ? Mic : Video" class="w-5 h-5 text-accent-orange" />
               </div>
               <div>
@@ -281,27 +293,17 @@
               </div>
             </div>
 
-            <div class="bg-bg border border-white/8 rounded-lg p-4">
-              <p class="text-text-muted text-xs uppercase tracking-wider mb-2 font-medium">Room name</p>
-              <code class="text-white text-sm font-mono">{{ guestRoom?.room_name }}</code>
-            </div>
-
-            <a
-              :href="guestRoom?.viewer_url"
-              target="_blank"
+            <button
+              @click="roomJoined = true"
               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent-orange hover:bg-orange-500
                      text-white text-sm font-semibold transition-all"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <component :is="selectedMode === 'audio' ? Mic : Video" class="w-4 h-4" />
               Open my room
-            </a>
+            </button>
 
             <p class="text-text-muted text-xs">
               Your browser will ask for microphone{{ selectedMode === 'audio_video' ? ' and camera' : '' }} permission.
-              The room opens in a new tab.
             </p>
           </div>
 
@@ -403,6 +405,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Mic, Video, Monitor } from 'lucide-vue-next'
 import { createGuestStream, createGuestRoom, type GuestStream, type GuestRoom } from '@/api/stream'
+import AudioRoom from '@/components/commentary/AudioRoom.vue'
 
 type Phase = 'pick' | 'active' | 'expired'
 type ModeType = 'audio_video' | 'audio' | 'commercial'
@@ -419,6 +422,7 @@ const guestRoom = ref<GuestRoom | null>(null)
 const secondsLeft = ref(0)
 const copied = ref<string | null>(null)
 const showKey = ref(false)
+const roomJoined = ref(false)
 
 let countdown: ReturnType<typeof setInterval> | null = null
 
@@ -559,6 +563,7 @@ function resetAndTryAgain() {
   streamTitle.value = ''
   error.value = ''
   secondsLeft.value = 0
+  roomJoined.value = false
   phase.value = 'pick'
 }
 
