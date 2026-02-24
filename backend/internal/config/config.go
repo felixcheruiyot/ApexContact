@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -37,13 +36,10 @@ type Config struct {
 	LiveKitAPIKey    string
 	LiveKitAPISecret string
 
-	// SMTP
-	SMTPHost     string
-	SMTPPort     int
-	SMTPUsername string
-	SMTPPassword string
-	SMTPFrom     string
-	SMTPFromName string
+	// Postmark
+	PostmarkServerToken string
+	EmailFrom           string
+	EmailFromName       string
 
 	// App
 	AppEnv      string
@@ -61,7 +57,6 @@ func Load() (*Config, error) {
 		RedisAddr:          getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:      getEnv("REDIS_PASSWORD", ""),
 		JWTSecret:          getEnv("JWT_SECRET", ""),
-
 		IntaSendPublicKey:   getEnv("INTASEND_PUBLIC_KEY", ""),
 		IntaSendPrivateKey:  getEnv("INTASEND_PRIVATE_KEY", ""),
 		IntaSendBaseURL:     getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),
@@ -108,14 +103,4 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func getEnvInt(key string, fallback int) int {
-	v := os.Getenv(key)
-	if v == "" {
-		return fallback
-	}
-	n, err := strconv.Atoi(v)
-	if err != nil {
-		return fallback
-	}
-	return n
-}
+
