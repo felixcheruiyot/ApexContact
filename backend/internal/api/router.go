@@ -90,6 +90,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	auth.Post("/logout", middleware.RequireAuth(cfg), authHandler.Logout)
 	auth.Get("/verify-email", authHandler.VerifyEmail)
 	auth.Post("/resend-verification", middleware.RequireAuth(cfg), authHandler.ResendVerification)
+	auth.Post("/google/callback", authHandler.GoogleCallback)
 
 	// ── Discover (public) ──────────────────────────────────────────────────────
 	v1.Get("/discover", eventHandler.Discover)

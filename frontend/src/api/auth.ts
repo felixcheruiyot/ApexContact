@@ -13,4 +13,8 @@ export const authApi = {
   logout() {
     return client.post('/auth/logout')
   },
+
+  googleCallback(data: { code: string; redirect_uri: string }) {
+    return client.post<ApiResponse<{ token: string; user: User }>>('/auth/google/callback', data)
+  },
 }

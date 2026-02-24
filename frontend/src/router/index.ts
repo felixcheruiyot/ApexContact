@@ -36,6 +36,13 @@ const router = createRouter({
       ],
     },
 
+    // OAuth callback — standalone (no AuthLayout chrome)
+    {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('@/pages/auth/OAuthCallback.vue'),
+    },
+
     // ── Public: Try stream (no auth required) ─────────────────────────────────
     {
       path: '/try',

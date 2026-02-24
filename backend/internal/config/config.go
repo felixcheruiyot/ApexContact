@@ -21,6 +21,10 @@ type Config struct {
 	// JWT
 	JWTSecret string
 
+	// Google OAuth
+	GoogleClientID     string
+	GoogleClientSecret string
+
 	// IntaSend
 	IntaSendPublicKey  string
 	IntaSendPrivateKey string
@@ -61,6 +65,8 @@ func Load() (*Config, error) {
 		RedisAddr:          getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:      getEnv("REDIS_PASSWORD", ""),
 		JWTSecret:          getEnv("JWT_SECRET", ""),
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 		IntaSendPublicKey:  getEnv("INTASEND_PUBLIC_KEY", ""),
 		IntaSendPrivateKey: getEnv("INTASEND_PRIVATE_KEY", ""),
 		IntaSendBaseURL:    getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),

@@ -58,3 +58,72 @@ How it all works end-to-end
 
 - https://www.geniussports.com/
 - https://sportradar.com/media-tech/data-content/
+
+
+What was implemented                                                                                                    
+                                                                                                                          
+  Flow (standard OAuth 2.0 Authorization Code)                                                                            
+                                                                                                                          
+  Login.vue → Google consent screen
+           ← /auth/callback?code=...
+  OAuthCallback.vue → POST /api/v1/auth/google/callback { code, redirect_uri }
+                    ← { token, user }  (our own JWT)
+           → store in localStorage, redirect home
+
+  Backend
+
+  ┌──────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │       File       │                                             Change                                              │
+  ├──────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ config/config.go │ Added GoogleClientID, GoogleClientSecret fields + getEnv calls                                  │
+  ├──────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ handlers/auth.go │ Added GoogleCallback handler + exchangeGoogleCode + fetchGoogleUserInfo helpers (stdlib only —  │
+  │                  │ no new deps)                                                                                    │
+  ├──────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ api/router.go    │ POST /api/v1/auth/google/callback                                                               │
+  ├──────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ .env.example     │ Documented GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET                                              │
+  └──────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  Upsert logic: First Google sign-in creates the account with password_hash = 'GOOGLE_OAUTH' (a non-bcrypt string —
+  email/password login will gracefully reject it). Subsequent sign-ins update email_verified = true and leave everything
+  else intact.
+
+  Frontend
+
+  ┌──────────────────────────────────┬─────────────────────────────────────────────────────────────────────┐
+  │               File               │                               Change                                │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ src/api/auth.ts                  │ googleCallback(code, redirect_uri)                                  │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ src/stores/auth.ts               │ loginWithGoogle(code, redirectUri)                                  │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ src/pages/auth/OAuthCallback.vue │ New — handles /auth/callback, reads ?code=, calls store, redirects  │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ src/router/index.ts              │ /auth/callback route (standalone, no AuthLayout chrome)             │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ src/pages/auth/Login.vue         │ Button enabled, signInWithGoogle() builds consent URL and redirects │
+  ├──────────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
+  │ frontend/.env.example            │ New — documents VITE_GOOGLE_CLIENT_ID                               │
+  └──────────────────────────────────┴─────────────────────────────────────────────────────────────────────┘
+
+  ---
+  Keys needed
+
+  Google Cloud Console (console.cloud.google.com)
+
+  1. APIs & Services → Credentials → Create → OAuth 2.0 Client ID → Web application
+  2. Authorised redirect URIs:
+    - http://localhost:3000/auth/callback (dev)
+    - https://yourdomain.com/auth/callback (prod)
+  3. Copy the Client ID and Client Secret
+
+  Backend .env
+
+  GOOGLE_CLIENT_ID=….apps.googleusercontent.com
+  GOOGLE_CLIENT_SECRET=GOCSPX-…
+
+  Frontend .env.local
+
+  VITE_GOOGLE_CLIENT_ID=….apps.googleusercontent.com   # same Client ID, safe to expose
+  The GOOGLE_CLIENT_SECRET never goes to the frontend.
