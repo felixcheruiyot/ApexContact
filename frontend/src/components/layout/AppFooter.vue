@@ -93,6 +93,7 @@ import { RouterLink } from 'vue-router'
 
 const exploreLinks = [
   { label: 'Home', to: '/' },
+  { label: 'Use Cases', to: '/use-cases' },
   { label: 'For Creators', to: '/promoters' },
   { label: 'Try Free Stream', to: '/try' },
   { label: 'Privacy Policy', to: '/privacy' },
