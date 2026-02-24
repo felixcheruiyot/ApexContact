@@ -209,29 +209,34 @@ function initials(identity: string) {
   return identity.slice(0, 2).toUpperCase()
 }
 
-// Attach a video track's stream to a <video> element
+// Attach a video track's stream to a <video> element.
+// Guards against reassigning srcObject when the same MediaStreamTrack is already
+// attached — this is the primary cause of the video flicker on re-renders.
 function attachVideo(el: HTMLVideoElement | null, identity: string) {
-  if (!el) return
-  if (!room) return
-  const isLocal = room.localParticipant.identity === identity
-  if (isLocal) {
+  if (!el || !room) return
+
+  let newTrack: MediaStreamTrack | undefined
+
+  if (room.localParticipant.identity === identity) {
     const pub = [...room.localParticipant.videoTrackPublications.values()].find(p => p.track)
-    if (pub?.track) {
-      const stream = new MediaStream([pub.track.mediaStreamTrack])
-      el.srcObject = stream
-    }
+    newTrack = pub?.track?.mediaStreamTrack
   } else {
-    room.remoteParticipants.forEach((p) => {
+    room.remoteParticipants.forEach(p => {
       if (p.identity === identity) {
         p.videoTrackPublications.forEach(pub => {
-          if (pub.track) {
-            const stream = new MediaStream([pub.track.mediaStreamTrack])
-            el.srcObject = stream
-          }
+          if (pub.track) newTrack = pub.track.mediaStreamTrack
         })
       }
     })
   }
+
+  if (!newTrack) return
+
+  // Already playing this exact track — skip to avoid flicker
+  const existing = el.srcObject as MediaStream | null
+  if (existing?.getTracks()[0] === newTrack) return
+
+  el.srcObject = new MediaStream([newTrack])
 }
 
 function buildParticipantList() {
@@ -295,10 +300,11 @@ async function connect() {
         el.setAttribute('playsinline', '')
         document.body.appendChild(el)
         audioElements.push(el)
-      }
-      buildParticipantList()
-      if (track.kind === Track.Kind.Video) {
-        nextTick(() => buildParticipantList())
+        buildParticipantList()
+      } else if (track.kind === Track.Kind.Video) {
+        // nextTick only — avoids the double-build (sync + tick) that caused two
+        // rapid re-renders and called attachVideo twice on the same element
+        nextTick(buildParticipantList)
       }
     })
 
@@ -309,7 +315,17 @@ async function connect() {
 
     room.on(RoomEvent.ParticipantConnected, buildParticipantList)
     room.on(RoomEvent.ParticipantDisconnected, buildParticipantList)
-    room.on(RoomEvent.ActiveSpeakersChanged, buildParticipantList)
+
+    // Mutate isSpeaking in-place instead of replacing the whole participants array.
+    // This prevents the video grid from re-rendering (and attachVideo from running)
+    // on every speaking tick (~100 ms during active audio).
+    room.on(RoomEvent.ActiveSpeakersChanged, (speakers) => {
+      const speakingIds = new Set(speakers.map((s: { identity: string }) => s.identity))
+      for (const p of participants.value) {
+        p.isSpeaking = speakingIds.has(p.identity)
+      }
+    })
+
     room.on(RoomEvent.TrackPublished, buildParticipantList)
     room.on(RoomEvent.TrackUnpublished, buildParticipantList)
     room.on(RoomEvent.LocalTrackPublished, buildParticipantList)

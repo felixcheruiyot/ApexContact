@@ -2,29 +2,33 @@
   <div class="min-h-screen bg-bg flex flex-col">
 
     <!-- Minimal header -->
-    <header class="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-      <RouterLink to="/" class="font-display text-xl tracking-widest text-white">
-        LIVE <span class="text-accent-red">·</span> STREAMIFY
+    <header class="border-b border-white/5 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+      <RouterLink to="/" class="flex items-center gap-2 shrink-0 group min-w-0">
+        <img src="@/assets/logo.svg" alt="Live Streamify" class="w-7 h-7 shrink-0" />
+        <span class="font-display text-lg sm:text-xl tracking-widest text-white group-hover:text-white transition-colors truncate">
+          LIVE <span class="text-accent-red">STREAMIFY</span>
+        </span>
       </RouterLink>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <RouterLink
           to="/login"
-          class="text-text-muted hover:text-white text-sm transition-colors"
+          class="text-text-muted hover:text-white text-sm transition-colors whitespace-nowrap"
         >
           Sign in
         </RouterLink>
         <RouterLink
           to="/register"
-          class="px-4 py-2 rounded-lg border border-white/20 hover:border-white/40
-                 text-white text-sm font-medium transition-all hover:bg-white/5"
+          class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-white/20 hover:border-white/40
+                 text-white text-xs sm:text-sm font-medium transition-all hover:bg-white/5 whitespace-nowrap"
         >
-          Create account
+          <span class="sm:hidden">Sign up</span>
+          <span class="hidden sm:inline">Create account</span>
         </RouterLink>
       </div>
     </header>
 
     <!-- Main content -->
-    <main class="flex-1 flex items-start justify-center px-4 pt-12 pb-20">
+    <main class="flex-1 flex items-start justify-center px-4 pt-8 sm:pt-12 pb-20">
       <div class="w-full max-w-2xl">
 
         <!-- ── PHASE: pick ──────────────────────────────────────────── -->
@@ -192,19 +196,21 @@
                   Stream Key
                 </label>
                 <div class="flex items-center gap-2">
-                  <code class="flex-1 bg-bg border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm font-mono truncate">
+                  <code class="flex-1 bg-bg border border-white/10 rounded-lg px-3 sm:px-4 py-2.5 text-white text-sm font-mono truncate min-w-0">
                     {{ showKey ? guestStream?.stream_key : '••••••••••••' }}
                   </code>
-                  <button @click="showKey = !showKey"
-                    class="shrink-0 px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
-                           text-text-muted hover:text-white text-xs font-medium transition-all">
-                    {{ showKey ? 'Hide' : 'Show' }}
-                  </button>
-                  <button @click="copy(guestStream?.stream_key ?? '', 'key')"
-                    class="shrink-0 px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
-                           text-text-muted hover:text-white text-xs font-medium transition-all">
-                    {{ copied === 'key' ? 'Copied!' : 'Copy' }}
-                  </button>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button @click="showKey = !showKey"
+                      class="px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
+                             text-text-muted hover:text-white text-xs font-medium transition-all whitespace-nowrap">
+                      {{ showKey ? 'Hide' : 'Show' }}
+                    </button>
+                    <button @click="copy(guestStream?.stream_key ?? '', 'key')"
+                      class="px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
+                             text-text-muted hover:text-white text-xs font-medium transition-all whitespace-nowrap">
+                      {{ copied === 'key' ? 'Copied!' : 'Copy' }}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -228,7 +234,7 @@
             </div>
           </div>
 
-          <button @click="phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
+          <button @click="clearSession(); phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
             End test stream
           </button>
         </div>
@@ -317,7 +323,7 @@
             </div>
           </div>
 
-          <button @click="phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
+          <button @click="clearSession(); phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
             End test room
           </button>
         </div>
@@ -393,13 +399,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Mic, Video, Monitor } from 'lucide-vue-next'
 import { createGuestStream, createGuestRoom, type GuestStream, type GuestRoom } from '@/api/stream'
 
 type Phase = 'pick' | 'active' | 'expired'
 type ModeType = 'audio_video' | 'audio' | 'commercial'
+
+const STORAGE_KEY = 'apex_guest_session'
 
 const phase = ref<Phase>('pick')
 const selectedMode = ref<ModeType>('audio_video')
@@ -459,6 +467,45 @@ const formattedTime = computed(() => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 })
 
+function saveSession() {
+  const expiresAt = guestStream.value?.expires_at ?? guestRoom.value?.expires_at
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    mode: selectedMode.value,
+    expires_at: expiresAt,
+    stream: guestStream.value,
+    room: guestRoom.value,
+  }))
+}
+
+function clearSession() {
+  localStorage.removeItem(STORAGE_KEY)
+}
+
+onMounted(() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return
+    const saved = JSON.parse(raw)
+    if (!saved.expires_at) return
+
+    const remaining = Math.floor((new Date(saved.expires_at).getTime() - Date.now()) / 1000)
+
+    if (remaining > 0) {
+      selectedMode.value = saved.mode
+      guestStream.value = saved.stream ?? null
+      guestRoom.value = saved.room ?? null
+      secondsLeft.value = remaining
+      phase.value = 'active'
+      startCountdown()
+    } else {
+      clearSession()
+      phase.value = 'expired'
+    }
+  } catch {
+    // ignore corrupt storage
+  }
+})
+
 async function startStream() {
   if (loading.value || !selectedMode.value) return
   loading.value = true
@@ -475,6 +522,7 @@ async function startStream() {
       secondsLeft.value = room.time_limit_seconds
     }
     phase.value = 'active'
+    saveSession()
     startCountdown()
   } catch (err: any) {
     const msg = err?.response?.data?.error
@@ -489,6 +537,7 @@ function startCountdown() {
   countdown = setInterval(() => {
     if (secondsLeft.value <= 1) {
       clearCountdown()
+      clearSession()
       phase.value = 'expired'
     } else {
       secondsLeft.value--
@@ -504,6 +553,7 @@ function clearCountdown() {
 }
 
 function resetAndTryAgain() {
+  clearSession()
   guestStream.value = null
   guestRoom.value = null
   streamTitle.value = ''

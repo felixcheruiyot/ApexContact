@@ -66,6 +66,7 @@ func Load() (*Config, error) {
 		IntaSendBaseURL:    getEnv("INTASEND_BASE_URL", "https://sandbox.intasend.com"),
 		MediaServerURL:     getEnv("MEDIA_SERVER_URL", "http://media-server:8888"),
 		MediaServerKey:     getEnv("MEDIA_SERVER_KEY", ""),
+		RTMPIngestURL:      getEnv("RTMP_INGEST_URL", "rtmp://localhost/live"),
 		LiveKitURL:         getEnv("LIVEKIT_URL", "wss://livekit:7880"),
 		LiveKitPublicURL:   getEnv("LIVEKIT_PUBLIC_URL", ""),
 		LiveKitAPIKey:      getEnv("LIVEKIT_API_KEY", "devkey"),
