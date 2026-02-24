@@ -109,9 +109,6 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-<<<<<<< HEAD
-
-=======
 func getEnvInt(key string, fallback int) int {
 	v := os.Getenv(key)
 	if v == "" {
@@ -123,4 +120,3 @@ func getEnvInt(key string, fallback int) int {
 	}
 	return n
 }
->>>>>>> parent of 86c3eab (Billing and other fixes)
