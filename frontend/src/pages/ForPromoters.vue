@@ -356,7 +356,7 @@ import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import {
   Ticket, CheckCircle, Smartphone, Monitor, Shield, BarChart2,
-  Target, Check, Broadcast, Wallet,
+  Target, Check, Radio, Wallet,
 } from 'lucide-vue-next'
 
 const steps = [
@@ -366,7 +366,7 @@ const steps = [
     desc: 'Set a title, date, ticket price, and get your RTMP stream key.',
   },
   {
-    icon: Broadcast,
+    icon: Radio,
     title: 'Go live',
     desc: 'Push from OBS, your phone, or any RTMP encoder. We handle HLS delivery.',
   },
