@@ -50,15 +50,15 @@
               </svg>
               Start a Free Test Stream
             </RouterLink>
-            <RouterLink
+            <a
               v-if="liveEvents.length"
-              to="/#live"
+              href="#live"
               class="inline-flex items-center gap-2 px-6 py-4 rounded-lg border border-white/20
                      hover:border-white/40 text-white text-base font-medium
                      transition-all duration-200 hover:bg-white/5"
             >
               Browse Live Events
-            </RouterLink>
+            </a>
           </div>
 
           <!-- Simple trust line — no fake numbers -->

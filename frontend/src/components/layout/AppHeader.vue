@@ -321,8 +321,6 @@ const dropdownRef = ref<HTMLElement | null>(null)
 
 const navLinks = [
   { to: '/', label: 'Home' },
-  { to: '/use-cases', label: 'Explore' },
-  { to: '/', label: 'Live Rooms' },
   { to: '/promoters', label: 'For Creators' },
 ]
 
