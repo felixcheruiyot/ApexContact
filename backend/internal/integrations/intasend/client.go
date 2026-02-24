@@ -100,3 +100,74 @@ func (c *Client) StkPush(phoneNumber string, amount float64, currency, apiRef st
 
 	return result.Invoice.InvoiceID, nil
 }
+
+type sendMoneyRequest struct {
+	Currency     string             `json:"currency"`
+	Transactions []sendMoneyTxn     `json:"transactions"`
+}
+
+type sendMoneyTxn struct {
+	Name      string  `json:"name"`
+	Account   string  `json:"account"`
+	Amount    float64 `json:"amount"`
+	Narrative string  `json:"narrative"`
+}
+
+type sendMoneyResponse struct {
+	Transactions []struct {
+		Status  string `json:"status"`
+		Tracking string `json:"tracking_id"`
+	} `json:"transactions"`
+}
+
+// SendMoney initiates an M-Pesa B2C payout to the given phone number / account.
+// Returns the IntaSend tracking ID on success.
+func (c *Client) SendMoney(accountName, accountNumber string, amount float64, currency, narrative string) (string, error) {
+	payload := sendMoneyRequest{
+		Currency: currency,
+		Transactions: []sendMoneyTxn{
+			{Name: accountName, Account: accountNumber, Amount: amount, Narrative: narrative},
+		},
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return "", fmt.Errorf("intasend SendMoney: marshal: %w", err)
+	}
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		c.baseURL+"/api/v1/send-money/mpesa/",
+		bytes.NewReader(body),
+	)
+	if err != nil {
+		return "", fmt.Errorf("intasend SendMoney: build request: %w", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+c.secretKey)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("intasend SendMoney: http: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		var e errorResponse
+		json.NewDecoder(resp.Body).Decode(&e)
+		return "", fmt.Errorf("intasend SendMoney: api error %d: %v", resp.StatusCode, e.Detail)
+	}
+
+	var result sendMoneyResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("intasend SendMoney: decode response: %w", err)
+	}
+
+	if len(result.Transactions) == 0 {
+		return "", fmt.Errorf("intasend SendMoney: empty transactions in response")
+	}
+
+	return result.Transactions[0].Tracking, nil
+}
