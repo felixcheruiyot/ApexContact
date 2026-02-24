@@ -55,11 +55,23 @@ func IsValidSportType(s string) bool {
 	return validSportTypes[s]
 }
 
-// EventType differentiates video streams from audio commentary lobbies.
+// EventType defines how an event is broadcast.
+//
+//   - video       — commercial OBS/RTMP stream → HLS delivery (one-to-many)
+//   - audio_video — interactive LiveKit room with camera + mic (two-way)
+//   - audio       — interactive LiveKit room with mic only (two-way)
+//
+// The legacy value "commentary" is treated as "audio_video" in all queries
+// during the migration window.
 type EventType string
 
 const (
 	EventTypeVideo      EventType = "video"
+	EventTypeAudioVideo EventType = "audio_video"
+	EventTypeAudio      EventType = "audio"
+
+	// EventTypeCommentary is the legacy name for audio_video; kept for
+	// backward-compat with any un-migrated rows or callers.
 	EventTypeCommentary EventType = "commentary"
 )
 

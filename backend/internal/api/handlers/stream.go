@@ -7,6 +7,7 @@ import (
 
 	"github.com/livestreamify/backend/internal/config"
 	"github.com/livestreamify/backend/internal/domain"
+	lk "github.com/livestreamify/backend/internal/integrations/livekit"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -180,6 +181,117 @@ func (h *StreamHandler) GuestStream(c *fiber.Ctx) error {
 			"time_limit_seconds": timeLimitSeconds,
 		},
 	})
+}
+
+// GuestRoom creates a time-limited anonymous LiveKit room for audio/audio+video streaming.
+// Returns a host token and a shareable viewer URL — no account needed.
+func (h *StreamHandler) GuestRoom(c *fiber.Ctx) error {
+	var req struct {
+		Title     string `json:"title"`
+		EventType string `json:"event_type"` // "audio" | "audio_video"
+	}
+	_ = c.BodyParser(&req)
+
+	if req.EventType != "audio" && req.EventType != "audio_video" {
+		req.EventType = "audio_video"
+	}
+
+	const timeLimitSeconds = 300 // 5 minutes
+
+	guestID := uuid.NewString()
+	roomName := "guest-room-" + uuid.New().String()[:8]
+	expiresAt := time.Now().Add(time.Duration(timeLimitSeconds) * time.Second)
+
+	// Store guestID → roomName in Redis for viewer lookup.
+	h.rdb.Set(context.Background(),
+		fmt.Sprintf("guest_room:%s", guestID),
+		roomName,
+		time.Duration(timeLimitSeconds+120)*time.Second,
+	)
+	// Also store event_type so viewer page knows what to render.
+	h.rdb.Set(context.Background(),
+		fmt.Sprintf("guest_room_type:%s", guestID),
+		req.EventType,
+		time.Duration(timeLimitSeconds+120)*time.Second,
+	)
+
+	// Issue a host (can publish) token.
+	hostToken, err := lk.GenerateToken(
+		h.cfg.LiveKitAPIKey,
+		h.cfg.LiveKitAPISecret,
+		roomName,
+		"guest-host-"+guestID,
+		true,  // canPublish
+		false, // isAdmin
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to generate room token")
+	}
+
+	livekitURL := h.cfg.LiveKitPublicURL
+	if livekitURL == "" {
+		livekitURL = h.cfg.LiveKitURL
+	}
+
+	viewerURL := fmt.Sprintf("%s/guest/room/%s", h.cfg.FrontendURL, guestID)
+
+	return c.Status(fiber.StatusCreated).JSON(domain.Response{
+		Data: fiber.Map{
+			"guest_id":           guestID,
+			"room_name":          roomName,
+			"event_type":         req.EventType,
+			"token":              hostToken,
+			"livekit_url":        livekitURL,
+			"viewer_url":         viewerURL,
+			"expires_at":         expiresAt.Format(time.RFC3339),
+			"time_limit_seconds": timeLimitSeconds,
+		},
+	})
+}
+
+// GuestRoomWatch issues a listener token for a guest LiveKit room.
+// Called by the shareable viewer URL (/guest/room/:guestId).
+func (h *StreamHandler) GuestRoomWatch(c *fiber.Ctx) error {
+	guestID := c.Params("guestId")
+	if guestID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "guest ID is required")
+	}
+
+	roomName, err := h.rdb.Get(context.Background(), fmt.Sprintf("guest_room:%s", guestID)).Result()
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "room not found or has expired")
+	}
+
+	eventType, _ := h.rdb.Get(context.Background(), fmt.Sprintf("guest_room_type:%s", guestID)).Result()
+	if eventType == "" {
+		eventType = "audio_video"
+	}
+
+	// Issue a unique listener token for this viewer.
+	listenerID := "viewer-" + uuid.NewString()[:8]
+	token, err := lk.GenerateToken(
+		h.cfg.LiveKitAPIKey,
+		h.cfg.LiveKitAPISecret,
+		roomName,
+		listenerID,
+		false, // canPublish (listener only)
+		false,
+	)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to generate viewer token")
+	}
+
+	livekitURL := h.cfg.LiveKitPublicURL
+	if livekitURL == "" {
+		livekitURL = h.cfg.LiveKitURL
+	}
+
+	return c.JSON(domain.Response{Data: fiber.Map{
+		"token":       token,
+		"room_name":   roomName,
+		"event_type":  eventType,
+		"livekit_url": livekitURL,
+	}})
 }
 
 // GuestWatch resolves a guest stream ID to its HLS URL. Called by the viewer page.

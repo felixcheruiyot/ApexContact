@@ -55,6 +55,13 @@ const router = createRouter({
       component: () => import('@/pages/GuestView.vue'),
     },
 
+    // ── Public: Guest LiveKit room viewer (audio / audio+video) ──────────────
+    {
+      path: '/guest/room/:guestId',
+      name: 'guest-room-view',
+      component: () => import('@/pages/GuestRoomView.vue'),
+    },
+
     // ── Protected: Watch ──────────────────────────────────────────────────────
     {
       path: '/watch/:eventId',
@@ -82,7 +89,8 @@ const router = createRouter({
         { path: 'edit/:eventId', name: 'edit-event', component: () => import('@/pages/dashboard/EditEvent.vue') },
         { path: 'analytics/:eventId', name: 'analytics', component: () => import('@/pages/dashboard/Analytics.vue') },
         { path: 'revenue', name: 'revenue', component: () => import('@/pages/dashboard/Revenue.vue') },
-        { path: 'commentary/create', name: 'create-commentary', component: () => import('@/pages/dashboard/CreateCommentary.vue') },
+        // Redirect legacy commentary/create to the unified event creation wizard
+        { path: 'commentary/create', redirect: '/dashboard/create' },
       ],
     },
 

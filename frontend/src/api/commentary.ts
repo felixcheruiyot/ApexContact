@@ -9,6 +9,7 @@ export interface CreateCommentaryData {
   scheduled_at: string
   price: number
   thumbnail_url: string
+  event_type?: 'audio_video' | 'audio'
 }
 
 export const commentaryApi = {

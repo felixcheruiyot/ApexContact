@@ -43,7 +43,7 @@ func (h *CommentaryHandler) List(c *fiber.Ctx) error {
 	sport := c.Query("sport", "")
 
 	args := []any{}
-	where := []string{"event_type = 'commentary'", "status != 'draft'", "status != 'cancelled'", "status != 'declined'"}
+	where := []string{"event_type IN ('audio_video','audio','commentary')", "status != 'draft'", "status != 'cancelled'", "status != 'declined'"}
 	idx := 1
 
 	if status != "" {
@@ -117,7 +117,7 @@ func (h *CommentaryHandler) Get(c *fiber.Ctx) error {
 		       status, price, currency, thumbnail_url, teaser_hook, event_type,
 		       review_note, created_at, updated_at
 		FROM events
-		WHERE id = $1 AND event_type = 'commentary'`, id).Scan(
+		WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id).Scan(
 		&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 		&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
 		&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt,
@@ -149,9 +149,12 @@ type createCommentaryRequest struct {
 	ScheduledAt  string  `json:"scheduled_at"`
 	Price        float64 `json:"price"`
 	ThumbnailURL string  `json:"thumbnail_url"`
+	// EventType may be "audio_video" or "audio"; defaults to "audio_video".
+	EventType string `json:"event_type"`
 }
 
-// Create lets any authenticated user create a commentary lobby immediately (no review).
+// Create lets any authenticated user create an interactive lobby immediately (no review).
+// Supports event_type "audio_video" (camera + mic) and "audio" (mic only).
 func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(string)
 
@@ -164,6 +167,15 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 	}
 	if !domain.IsValidSportType(req.SportType) {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid sport_type")
+	}
+
+	// Validate / default event_type.
+	eventType := req.EventType
+	if eventType == "" || eventType == "commentary" {
+		eventType = string(domain.EventTypeAudioVideo)
+	}
+	if eventType != string(domain.EventTypeAudioVideo) && eventType != string(domain.EventTypeAudio) {
+		return fiber.NewError(fiber.StatusBadRequest, "event_type must be audio_video or audio")
 	}
 
 	// JavaScript toISOString() includes milliseconds (RFC3339Nano), try both formats.
@@ -180,9 +192,9 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "invalid user id")
 	}
 
-	// Commentary lobbies skip review → go straight to scheduled.
-	// stream_key must be unique even though commentary doesn't use RTMP.
-	streamKey := "commentary-" + uuid.New().String()
+	// Interactive lobbies skip review → go straight to scheduled.
+	// stream_key must be unique even though LiveKit lobbies don't use RTMP.
+	streamKey := eventType + "-" + uuid.New().String()
 
 	var e domain.Event
 	err = h.db.QueryRow(context.Background(), `
@@ -190,12 +202,12 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		  (promoter_id, title, teaser_hook, description, sport_type, scheduled_at,
 		   status, price, currency, thumbnail_url, stream_key, hls_path,
 		   event_type, livekit_room, review_note)
-		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,$9,'','commentary','','')
+		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,$9,'', $10,'','')
 		RETURNING id, promoter_id, title, description, sport_type, scheduled_at,
 		          status, price, currency, thumbnail_url, teaser_hook, event_type,
 		          review_note, created_at, updated_at`,
 		promoterID, req.Title, req.TeaserHook, req.Description, req.SportType,
-		scheduledAt, req.Price, req.ThumbnailURL, streamKey,
+		scheduledAt, req.Price, req.ThumbnailURL, streamKey, eventType,
 	).Scan(
 		&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 		&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
@@ -221,7 +233,7 @@ func (h *CommentaryHandler) Start(c *fiber.Ctx) error {
 	// Verify ownership
 	var promoterID string
 	if err := h.db.QueryRow(context.Background(),
-		`SELECT promoter_id FROM events WHERE id = $1 AND event_type = 'commentary'`, id,
+		`SELECT promoter_id FROM events WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id,
 	).Scan(&promoterID); err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "lobby not found")
 	}
@@ -253,7 +265,7 @@ func (h *CommentaryHandler) End(c *fiber.Ctx) error {
 
 	var promoterID string
 	if err := h.db.QueryRow(context.Background(),
-		`SELECT promoter_id FROM events WHERE id = $1 AND event_type = 'commentary'`, id,
+		`SELECT promoter_id FROM events WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id,
 	).Scan(&promoterID); err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "lobby not found")
 	}
@@ -298,7 +310,7 @@ func (h *CommentaryHandler) Join(c *fiber.Ctx) error {
 	var eventStatus string
 	var promoterIDStr string
 	if err := h.db.QueryRow(context.Background(),
-		`SELECT price, status, promoter_id FROM events WHERE id = $1 AND event_type = 'commentary'`, id,
+		`SELECT price, status, promoter_id FROM events WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id,
 	).Scan(&price, &eventStatus, &promoterIDStr); err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "lobby not found")
 	}
@@ -426,7 +438,7 @@ func (h *CommentaryHandler) UpdateParticipant(c *fiber.Ctx) error {
 	// Only creator can change roles
 	var promoterIDStr string
 	if err := h.db.QueryRow(context.Background(),
-		`SELECT promoter_id FROM events WHERE id = $1 AND event_type = 'commentary'`, id,
+		`SELECT promoter_id FROM events WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id,
 	).Scan(&promoterIDStr); err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "lobby not found")
 	}

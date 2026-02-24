@@ -129,7 +129,7 @@
                   </RouterLink>
 
                   <RouterLink
-                    to="/commentary/create"
+                    to="/dashboard/create"
                     @click="dropdownOpen = false"
                     class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-accent-orange
                            hover:bg-accent-orange/10 transition-colors"

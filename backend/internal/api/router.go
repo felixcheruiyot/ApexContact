@@ -104,6 +104,8 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	// Guest stream — no auth required (try-before-signup flow). Must be before /:eventId.
 	stream.Post("/guest", streamHandler.GuestStream)
 	stream.Get("/guest/:guestId", streamHandler.GuestWatch)
+	stream.Post("/guest/room", streamHandler.GuestRoom)
+	stream.Get("/guest/room/:guestId", streamHandler.GuestRoomWatch)
 	stream.Post("/:eventId/subscribe", middleware.RequireAuth(cfg), streamHandler.Subscribe)
 	stream.Get("/:eventId/token", middleware.RequireAuth(cfg), middleware.AntiPiracy(rdb), streamHandler.GetToken)
 

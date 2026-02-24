@@ -27,19 +27,56 @@
     <main class="flex-1 flex items-start justify-center px-4 pt-12 pb-20">
       <div class="w-full max-w-2xl">
 
-        <!-- ── PHASE 1: Setup form ──────────────────────────────────── -->
-        <div v-if="phase === 'setup'" class="animate-fade-in space-y-8">
+        <!-- ── PHASE: pick ──────────────────────────────────────────── -->
+        <div v-if="phase === 'pick'" class="animate-fade-in space-y-8">
           <div>
             <h1 class="font-display text-5xl sm:text-6xl uppercase tracking-wide text-white leading-none mb-3">
-              Test Your Stream
+              How do you want<br />to stream?
             </h1>
             <p class="text-text-muted text-base leading-relaxed">
-              Get a real stream key and a shareable viewer link in seconds.
-              No account. No payment. 5 minutes free.
+              Pick a mode and we'll get you live in seconds. No account needed.
             </p>
           </div>
 
-          <div class="bg-bg-elevated border border-white/10 rounded-xl p-8 space-y-6">
+          <div class="space-y-3">
+            <button
+              v-for="mode in pickModes"
+              :key="mode.type"
+              @click="selectedMode = mode.type"
+              class="w-full text-left rounded-xl border p-5 transition-all duration-200 group"
+              :class="selectedMode === mode.type
+                ? 'border-accent-red bg-accent-red/5'
+                : 'border-white/10 bg-bg-elevated hover:border-white/25'"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
+                  :class="mode.iconBg"
+                >
+                  <component :is="mode.icon" class="w-5 h-5" :class="mode.iconColor" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-white font-semibold text-sm">{{ mode.label }}</span>
+                    <span class="text-xs font-semibold px-1.5 py-0.5 rounded" :class="mode.badgeClass">
+                      {{ mode.badge }}
+                    </span>
+                  </div>
+                  <p class="text-text-muted text-xs leading-relaxed">{{ mode.description }}</p>
+                </div>
+                <div
+                  class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                  :class="selectedMode === mode.type ? 'border-accent-red bg-accent-red' : 'border-white/20'"
+                >
+                  <svg v-if="selectedMode === mode.type" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="6" />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-5">
             <div>
               <label class="block text-white text-sm font-medium mb-2">
                 What will you be streaming about?
@@ -48,7 +85,7 @@
               <input
                 v-model="streamTitle"
                 type="text"
-                placeholder="e.g. Sales masterclass, Visa Q&A, Cooking demo…"
+                placeholder="e.g. Sales masterclass, Visa Q&A, Live music session…"
                 class="input"
                 :disabled="loading"
                 @keydown.enter="startStream"
@@ -66,7 +103,7 @@
 
             <button
               @click="startStream"
-              :disabled="loading"
+              :disabled="loading || !selectedMode"
               class="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-lg
                      bg-accent-red hover:bg-accent-red-hover text-white font-bold text-base
                      transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -75,15 +112,12 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
               </svg>
-              <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 10l4.553-2.276A1 1 0 0121 8.677v6.646a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
+              <component v-else :is="currentModeIcon" class="w-5 h-5" />
               {{ loading ? 'Setting up your stream…' : 'Start Test Stream' }}
             </button>
           </div>
 
-          <div class="flex items-center gap-6 text-text-muted text-sm">
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-text-muted text-sm">
             <span class="flex items-center gap-2">
               <svg class="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -94,7 +128,7 @@
               <svg class="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              Works with OBS
+              No account needed
             </span>
             <span class="flex items-center gap-2">
               <svg class="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,29 +139,21 @@
           </div>
         </div>
 
-        <!-- ── PHASE 2: Active stream ──────────────────────────────── -->
-        <div v-if="phase === 'active'" class="animate-fade-in space-y-6">
-
-          <!-- Timer + status bar -->
+        <!-- ── PHASE: active (OBS mode) ───────────────────────────── -->
+        <div v-if="phase === 'active' && selectedMode === 'commercial'" class="animate-fade-in space-y-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2.5">
               <span class="w-2 h-2 rounded-full bg-accent-red animate-pulse" />
-              <span class="text-white font-semibold text-sm uppercase tracking-wider">Test Stream Active</span>
+              <span class="text-white font-semibold text-sm uppercase tracking-wider">OBS Stream Active</span>
             </div>
-            <div
-              class="font-display text-2xl tracking-wider"
-              :class="secondsLeft < 120 ? 'text-status-warning' : 'text-white'"
-            >
+            <div class="font-display text-2xl tracking-wider" :class="secondsLeft < 120 ? 'text-status-warning' : 'text-white'">
               {{ formattedTime }}
             </div>
           </div>
 
-          <!-- Soft warning when 2 min left -->
-          <div
-            v-if="secondsLeft < 120 && secondsLeft > 0"
-            class="flex items-center gap-3 bg-status-warning/10 border border-status-warning/30
-                   rounded-lg px-4 py-3 text-status-warning text-sm"
-          >
+          <div v-if="secondsLeft < 120 && secondsLeft > 0"
+               class="flex items-center gap-3 bg-status-warning/10 border border-status-warning/30
+                      rounded-lg px-4 py-3 text-status-warning text-sm">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -139,13 +165,12 @@
             to keep streaming.
           </div>
 
-          <!-- Stream credentials (broadcaster) -->
+          <!-- RTMP credentials -->
           <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-4">
-            <h2 class="text-white font-bold text-base mb-1">Stream with OBS or any RTMP software</h2>
+            <h2 class="text-white font-bold text-base mb-1">Stream with OBS or any RTMP encoder</h2>
             <p class="text-text-muted text-sm mb-4">
               Open OBS → Settings → Stream → Select "Custom", then paste the values below.
             </p>
-
             <div class="space-y-3">
               <div>
                 <label class="text-text-muted text-xs font-medium uppercase tracking-wider mb-1.5 block">
@@ -155,16 +180,13 @@
                   <code class="flex-1 bg-bg border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm font-mono truncate">
                     {{ guestStream?.rtmp_url }}
                   </code>
-                  <button
-                    @click="copy(guestStream?.rtmp_url ?? '', 'rtmp')"
+                  <button @click="copy(guestStream?.rtmp_url ?? '', 'rtmp')"
                     class="shrink-0 px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
-                           text-text-muted hover:text-white text-xs font-medium transition-all"
-                  >
+                           text-text-muted hover:text-white text-xs font-medium transition-all">
                     {{ copied === 'rtmp' ? 'Copied!' : 'Copy' }}
                   </button>
                 </div>
               </div>
-
               <div>
                 <label class="text-text-muted text-xs font-medium uppercase tracking-wider mb-1.5 block">
                   Stream Key
@@ -173,18 +195,14 @@
                   <code class="flex-1 bg-bg border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm font-mono truncate">
                     {{ showKey ? guestStream?.stream_key : '••••••••••••' }}
                   </code>
-                  <button
-                    @click="showKey = !showKey"
+                  <button @click="showKey = !showKey"
                     class="shrink-0 px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
-                           text-text-muted hover:text-white text-xs font-medium transition-all"
-                  >
+                           text-text-muted hover:text-white text-xs font-medium transition-all">
                     {{ showKey ? 'Hide' : 'Show' }}
                   </button>
-                  <button
-                    @click="copy(guestStream?.stream_key ?? '', 'key')"
+                  <button @click="copy(guestStream?.stream_key ?? '', 'key')"
                     class="shrink-0 px-3 py-2.5 rounded-lg border border-white/15 hover:border-white/30
-                           text-text-muted hover:text-white text-xs font-medium transition-all"
-                  >
+                           text-text-muted hover:text-white text-xs font-medium transition-all">
                     {{ copied === 'key' ? 'Copied!' : 'Copy' }}
                   </button>
                 </div>
@@ -192,7 +210,7 @@
             </div>
           </div>
 
-          <!-- Viewer share link -->
+          <!-- Viewer link -->
           <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-3">
             <div>
               <h2 class="text-white font-bold text-base mb-1">Share with your audience</h2>
@@ -202,26 +220,109 @@
               <code class="flex-1 bg-bg border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm font-mono truncate">
                 {{ guestStream?.viewer_url }}
               </code>
-              <button
-                @click="copy(guestStream?.viewer_url ?? '', 'viewer')"
+              <button @click="copy(guestStream?.viewer_url ?? '', 'viewer')"
                 class="shrink-0 px-4 py-2.5 rounded-lg bg-accent-red hover:bg-accent-red-hover
-                       text-white text-xs font-semibold transition-all"
-              >
+                       text-white text-xs font-semibold transition-all">
                 {{ copied === 'viewer' ? 'Copied!' : 'Copy link' }}
               </button>
             </div>
           </div>
 
-          <!-- End test early -->
-          <button
-            @click="phase = 'expired'"
-            class="text-text-muted hover:text-white text-sm transition-colors underline"
-          >
+          <button @click="phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
             End test stream
           </button>
         </div>
 
-        <!-- ── PHASE 3: Expired / upsell ──────────────────────────── -->
+        <!-- ── PHASE: active (audio / audio_video mode) ───────────── -->
+        <div v-if="phase === 'active' && (selectedMode === 'audio' || selectedMode === 'audio_video')" class="animate-fade-in space-y-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-accent-orange animate-pulse" />
+              <span class="text-white font-semibold text-sm uppercase tracking-wider">
+                {{ selectedMode === 'audio' ? 'Audio Room Active' : 'Audio + Video Room Active' }}
+              </span>
+            </div>
+            <div class="font-display text-2xl tracking-wider" :class="secondsLeft < 120 ? 'text-status-warning' : 'text-white'">
+              {{ formattedTime }}
+            </div>
+          </div>
+
+          <div v-if="secondsLeft < 120 && secondsLeft > 0"
+               class="flex items-center gap-3 bg-status-warning/10 border border-status-warning/30
+                      rounded-lg px-4 py-3 text-status-warning text-sm">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Less than 2 minutes left.
+            <RouterLink to="/register" class="font-semibold underline hover:no-underline ml-1">
+              Create a free account
+            </RouterLink>
+            to keep streaming.
+          </div>
+
+          <!-- LiveKit room info -->
+          <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-lg bg-accent-orange/15 flex items-center justify-center">
+                <component :is="selectedMode === 'audio' ? Mic : Video" class="w-5 h-5 text-accent-orange" />
+              </div>
+              <div>
+                <h2 class="text-white font-bold text-base">Your live room is ready</h2>
+                <p class="text-text-muted text-xs">
+                  {{ selectedMode === 'audio' ? 'Mic-only interactive session' : 'Camera + mic interactive session' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-bg border border-white/8 rounded-lg p-4">
+              <p class="text-text-muted text-xs uppercase tracking-wider mb-2 font-medium">Room name</p>
+              <code class="text-white text-sm font-mono">{{ guestRoom?.room_name }}</code>
+            </div>
+
+            <a
+              :href="guestRoom?.viewer_url"
+              target="_blank"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent-orange hover:bg-orange-500
+                     text-white text-sm font-semibold transition-all"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Open my room
+            </a>
+
+            <p class="text-text-muted text-xs">
+              Your browser will ask for microphone{{ selectedMode === 'audio_video' ? ' and camera' : '' }} permission.
+              The room opens in a new tab.
+            </p>
+          </div>
+
+          <!-- Viewer share link -->
+          <div class="bg-bg-elevated border border-white/10 rounded-xl p-6 space-y-3">
+            <div>
+              <h2 class="text-white font-bold text-base mb-1">Share with your audience</h2>
+              <p class="text-text-muted text-sm">They join as listeners — no account needed.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-bg border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm font-mono truncate">
+                {{ guestRoom?.viewer_url }}
+              </code>
+              <button @click="copy(guestRoom?.viewer_url ?? '', 'viewer')"
+                class="shrink-0 px-4 py-2.5 rounded-lg bg-accent-red hover:bg-accent-red-hover
+                       text-white text-xs font-semibold transition-all">
+                {{ copied === 'viewer' ? 'Copied!' : 'Copy link' }}
+              </button>
+            </div>
+          </div>
+
+          <button @click="phase = 'expired'" class="text-text-muted hover:text-white text-sm transition-colors underline">
+            End test room
+          </button>
+        </div>
+
+        <!-- ── PHASE: expired ─────────────────────────────────────── -->
         <div v-if="phase === 'expired'" class="animate-fade-in space-y-8">
           <div>
             <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-text-muted
@@ -232,7 +333,7 @@
               Did it work?
             </h1>
             <p class="text-text-muted text-base leading-relaxed max-w-md">
-              If you could stream and your audience could watch, the platform works for you.
+              If your stream ran and your audience could watch, the platform works for you.
               Create a free account to go live without limits and start charging.
             </p>
           </div>
@@ -261,7 +362,7 @@
                 <svg class="w-5 h-5 text-status-success shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <span class="text-white">Anti-piracy — no sharing stream links outside your paid audience</span>
+                <span class="text-white">Anti-piracy — only paid audience can watch</span>
               </div>
             </div>
 
@@ -294,20 +395,63 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { createGuestStream, type GuestStream } from '@/api/stream'
+import { Mic, Video, Monitor } from 'lucide-vue-next'
+import { createGuestStream, createGuestRoom, type GuestStream, type GuestRoom } from '@/api/stream'
 
-type Phase = 'setup' | 'active' | 'expired'
+type Phase = 'pick' | 'active' | 'expired'
+type ModeType = 'audio_video' | 'audio' | 'commercial'
 
-const phase = ref<Phase>('setup')
+const phase = ref<Phase>('pick')
+const selectedMode = ref<ModeType>('audio_video')
 const streamTitle = ref('')
 const loading = ref(false)
 const error = ref('')
 const guestStream = ref<GuestStream | null>(null)
+const guestRoom = ref<GuestRoom | null>(null)
 const secondsLeft = ref(0)
 const copied = ref<string | null>(null)
 const showKey = ref(false)
 
 let countdown: ReturnType<typeof setInterval> | null = null
+
+const pickModes = [
+  {
+    type: 'audio_video' as ModeType,
+    label: 'Phone / PC — Audio + Video',
+    badge: 'Interactive',
+    badgeClass: 'bg-accent-orange/20 text-accent-orange',
+    description: 'Stream from your browser or phone camera. Viewers join as listeners in a live interactive room.',
+    icon: Video,
+    iconBg: 'bg-accent-orange/15',
+    iconColor: 'text-accent-orange',
+  },
+  {
+    type: 'audio' as ModeType,
+    label: 'Phone / PC — Audio Only',
+    badge: 'Audio room',
+    badgeClass: 'bg-accent-red/20 text-accent-red',
+    description: 'Mic-only session — like a podcast room. No camera needed. Great for discussions and panels.',
+    icon: Mic,
+    iconBg: 'bg-accent-red/15',
+    iconColor: 'text-accent-red',
+  },
+  {
+    type: 'commercial' as ModeType,
+    label: 'OBS / RTMP Encoder',
+    badge: 'Professional',
+    badgeClass: 'bg-white/10 text-text-muted',
+    description: 'Use OBS Studio or any RTMP encoder. High-quality one-to-many broadcast, watched via HLS.',
+    icon: Monitor,
+    iconBg: 'bg-white/10',
+    iconColor: 'text-text-muted',
+  },
+]
+
+const currentModeIcon = computed(() => {
+  if (selectedMode.value === 'audio') return Mic
+  if (selectedMode.value === 'audio_video') return Video
+  return Monitor
+})
 
 const formattedTime = computed(() => {
   const m = Math.floor(secondsLeft.value / 60)
@@ -316,14 +460,20 @@ const formattedTime = computed(() => {
 })
 
 async function startStream() {
-  if (loading.value) return
+  if (loading.value || !selectedMode.value) return
   loading.value = true
   error.value = ''
 
   try {
-    const stream = await createGuestStream(streamTitle.value || undefined)
-    guestStream.value = stream
-    secondsLeft.value = stream.time_limit_seconds
+    if (selectedMode.value === 'commercial') {
+      const stream = await createGuestStream(streamTitle.value || undefined)
+      guestStream.value = stream
+      secondsLeft.value = stream.time_limit_seconds
+    } else {
+      const room = await createGuestRoom(selectedMode.value, streamTitle.value || undefined)
+      guestRoom.value = room
+      secondsLeft.value = room.time_limit_seconds
+    }
     phase.value = 'active'
     startCountdown()
   } catch (err: any) {
@@ -355,10 +505,11 @@ function clearCountdown() {
 
 function resetAndTryAgain() {
   guestStream.value = null
+  guestRoom.value = null
   streamTitle.value = ''
   error.value = ''
   secondsLeft.value = 0
-  phase.value = 'setup'
+  phase.value = 'pick'
 }
 
 async function copy(text: string, key: string) {

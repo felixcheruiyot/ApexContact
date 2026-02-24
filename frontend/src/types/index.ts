@@ -14,7 +14,7 @@ export type SportType =
   | 'community'
   | 'other'
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled'
-export type EventType = 'video' | 'commentary'
+export type EventType = 'video' | 'audio_video' | 'audio' | 'commentary'
 export type LobbyRole = 'host' | 'speaker' | 'listener'
 
 export interface User {
