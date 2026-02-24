@@ -194,7 +194,6 @@ const emit = defineEmits<{
 
 let room: Room | null = null
 const audioElements: HTMLAudioElement[] = []
-const videoElements = new Map<string, HTMLVideoElement>()
 
 const joined = ref(false)
 const connected = ref(false)
