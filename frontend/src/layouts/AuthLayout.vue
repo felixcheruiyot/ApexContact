@@ -24,42 +24,27 @@
           <!-- Red underline accent -->
           <div class="mt-1.5 h-0.5 w-16 bg-accent-red rounded-full" />
           <p class="mt-3 text-white/70 text-sm leading-relaxed">
-            Africa's premier live knowledge platform
+            Go live. Get paid. No setup needed.
           </p>
         </div>
 
-        <!-- Social proof pills -->
+        <!-- Feature bullets -->
         <div class="flex flex-col gap-2.5">
           <span class="inline-flex items-center gap-2 self-start bg-white/10 backdrop-blur-sm
                        rounded-full px-4 py-2 text-white/90 text-sm font-medium">
             <span class="text-status-success">&#10003;</span>
-            12,400+ Active Creators
+            Stream live — no equipment required
           </span>
           <span class="inline-flex items-center gap-2 self-start bg-white/10 backdrop-blur-sm
                        rounded-full px-4 py-2 text-white/90 text-sm font-medium">
             <span class="text-status-success">&#10003;</span>
-            M-Pesa Payouts in Minutes
+            M-Pesa payouts, 70% goes to you
           </span>
           <span class="inline-flex items-center gap-2 self-start bg-white/10 backdrop-blur-sm
                        rounded-full px-4 py-2 text-white/90 text-sm font-medium">
             <span class="text-status-success">&#10003;</span>
-            Zero Setup Cost
+            Free to start — pay nothing upfront
           </span>
-        </div>
-
-        <!-- Quote card -->
-        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-          <p class="text-white/80 text-sm leading-relaxed italic mb-3">
-            "I earned KES 85,000 from one live session. Incredible platform."
-          </p>
-          <div class="flex items-center gap-2.5">
-            <img
-              src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=600&q=80"
-              alt="Amara Kioni"
-              class="w-8 h-8 rounded-full object-cover flex-shrink-0"
-            />
-            <span class="text-white/60 text-xs">Amara Kioni &middot; Consultant</span>
-          </div>
         </div>
       </div>
     </div>

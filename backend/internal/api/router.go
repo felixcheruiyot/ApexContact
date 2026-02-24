@@ -73,6 +73,7 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	adminHandler := handlers.NewAdminHandler(cfg, db, rdb)
 	promoterHandler := handlers.NewPromoterHandler(cfg, db)
 	profileHandler := handlers.NewProfileHandler(cfg, db)
+	withdrawalHandler := handlers.NewWithdrawalHandler(cfg, db, rdb, notifSvc)
 
 	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -89,6 +90,9 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	auth.Post("/logout", middleware.RequireAuth(cfg), authHandler.Logout)
 	auth.Get("/verify-email", authHandler.VerifyEmail)
 	auth.Post("/resend-verification", middleware.RequireAuth(cfg), authHandler.ResendVerification)
+
+	// ── Discover (public) ──────────────────────────────────────────────────────
+	v1.Get("/discover", eventHandler.Discover)
 
 	// ── Events (public read, protected write) ──────────────────────────────────
 	events := v1.Group("/events")
@@ -141,6 +145,13 @@ func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *r
 	profile := v1.Group("/profile", middleware.RequireAuth(cfg))
 	profile.Get("/", profileHandler.Get)
 	profile.Put("/", profileHandler.Update)
+	profile.Get("/subscriptions", profileHandler.MySubscriptions)
+	profile.Get("/balance", withdrawalHandler.Balance)
+	profile.Get("/payout-account", withdrawalHandler.GetPayoutAccount)
+	profile.Post("/payout-account", withdrawalHandler.SetPayoutAccount)
+	profile.Get("/withdrawals", withdrawalHandler.History)
+	profile.Post("/withdrawals", withdrawalHandler.Initiate)
+	profile.Post("/withdrawals/:id/confirm", withdrawalHandler.Confirm)
 
 	// ── Commentary lobbies ─────────────────────────────────────────────────────
 	commentaryHandler := handlers.NewCommentaryHandler(cfg, db, rdb)

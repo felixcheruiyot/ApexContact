@@ -44,6 +44,7 @@ export interface Event {
   review_note?: string
   event_type: EventType
   teaser_hook: string
+  is_public: boolean
   created_at: string
 }
 

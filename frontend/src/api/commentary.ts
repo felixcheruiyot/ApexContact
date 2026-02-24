@@ -10,6 +10,7 @@ export interface CreateCommentaryData {
   price: number
   thumbnail_url: string
   event_type?: 'audio_video' | 'audio'
+  is_public?: boolean
 }
 
 export const commentaryApi = {

@@ -11,14 +11,9 @@ const router = createRouter({
       component: () => import('@/layouts/DefaultLayout.vue'),
       children: [
         { path: '', name: 'home', component: () => import('@/pages/Home.vue') },
+        { path: 'discover', name: 'discover', component: () => import('@/pages/Discover.vue') },
         { path: 'events/:id', name: 'event-detail', component: () => import('@/pages/EventDetail.vue') },
         { path: 'commentary/:id', name: 'commentary-detail', component: () => import('@/pages/commentary/CommentaryDetail.vue') },
-        {
-          path: 'commentary/create',
-          name: 'host-commentary',
-          component: () => import('@/pages/commentary/HostCommentary.vue'),
-          meta: { requiresAuth: true },
-        },
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
         { path: 'use-cases', name: 'use-cases', component: () => import('@/pages/UseCases.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
@@ -91,6 +86,8 @@ const router = createRouter({
         { path: 'edit/:eventId', name: 'edit-event', component: () => import('@/pages/dashboard/EditEvent.vue') },
         { path: 'analytics/:eventId', name: 'analytics', component: () => import('@/pages/dashboard/Analytics.vue') },
         { path: 'revenue', name: 'revenue', component: () => import('@/pages/dashboard/Revenue.vue') },
+        { path: 'streams', name: 'my-streams', component: () => import('@/pages/dashboard/MyStreams.vue') },
+        { path: 'withdrawal', name: 'withdrawal', component: () => import('@/pages/dashboard/Withdrawal.vue') },
         // Redirect legacy commentary/create to the unified event creation wizard
         { path: 'commentary/create', redirect: '/dashboard/create' },
       ],

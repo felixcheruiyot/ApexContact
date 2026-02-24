@@ -3,10 +3,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-1.5 shrink-0 group">
-        <span class="font-display text-2xl tracking-widest text-white group-hover:text-white transition-colors">LIVE</span>
-        <span class="w-2 h-2 rounded-full bg-accent-red animate-pulse shrink-0 mx-0.5" />
-        <span class="font-display text-2xl tracking-widest text-white group-hover:text-white transition-colors">STREAMIFY</span>
+      <RouterLink to="/" class="flex items-center gap-2 shrink-0 group">
+        <img src="@/assets/logo.svg" alt="Live Streamify" class="w-7 h-7 shrink-0" />
+        <span class="font-display text-xl tracking-widest text-white group-hover:text-white transition-colors">LIVE <span class="text-accent-red">STREAMIFY</span></span>
       </RouterLink>
 
       <!-- Desktop nav -->
@@ -136,9 +135,9 @@
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        d="M12 4v16m8-8H4" />
                     </svg>
-                    Host a Live Room
+                    Create Event
                   </RouterLink>
                 </div>
 
@@ -261,12 +260,12 @@
             </RouterLink>
 
             <RouterLink
-              to="/commentary/create"
+              to="/dashboard/create"
               @click="mobileMenuOpen = false"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                      text-accent-orange hover:bg-accent-orange/10 transition-colors"
             >
-              Host a Live Room
+              Create Event
             </RouterLink>
 
             <button
@@ -321,6 +320,7 @@ const dropdownRef = ref<HTMLElement | null>(null)
 
 const navLinks = [
   { to: '/', label: 'Home' },
+  { to: '/discover', label: 'Discover' },
   { to: '/use-cases', label: 'Use Cases' },
   { to: '/promoters', label: 'For Creators' },
 ]

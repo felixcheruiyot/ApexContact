@@ -32,7 +32,7 @@
           <thead>
             <tr class="border-b border-white/5">
               <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Event</th>
-              <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Sport</th>
+              <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Category</th>
               <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Date</th>
               <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Status</th>
               <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-4">Price</th>

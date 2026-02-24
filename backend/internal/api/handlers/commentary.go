@@ -69,7 +69,7 @@ func (h *CommentaryHandler) List(c *fiber.Ctx) error {
 	q := fmt.Sprintf(`
 		SELECT id, promoter_id, title, description, sport_type, scheduled_at,
 		       status, price, currency, thumbnail_url, teaser_hook, event_type,
-		       review_note, created_at, updated_at
+		       review_note, is_public, created_at, updated_at
 		FROM events
 		WHERE %s
 		ORDER BY
@@ -89,7 +89,7 @@ func (h *CommentaryHandler) List(c *fiber.Ctx) error {
 		if err := rows.Scan(
 			&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 			&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
-			&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt,
+			&e.ReviewNote, &e.IsPublic, &e.CreatedAt, &e.UpdatedAt,
 		); err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "failed to scan lobby")
 		}
@@ -115,12 +115,12 @@ func (h *CommentaryHandler) Get(c *fiber.Ctx) error {
 	err = h.db.QueryRow(context.Background(), `
 		SELECT id, promoter_id, title, description, sport_type, scheduled_at,
 		       status, price, currency, thumbnail_url, teaser_hook, event_type,
-		       review_note, created_at, updated_at
+		       review_note, is_public, created_at, updated_at
 		FROM events
 		WHERE id = $1 AND event_type IN ('audio_video','audio','commentary')`, id).Scan(
 		&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 		&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
-		&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt,
+		&e.ReviewNote, &e.IsPublic, &e.CreatedAt, &e.UpdatedAt,
 	)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "lobby not found")
@@ -149,6 +149,7 @@ type createCommentaryRequest struct {
 	ScheduledAt  string  `json:"scheduled_at"`
 	Price        float64 `json:"price"`
 	ThumbnailURL string  `json:"thumbnail_url"`
+	IsPublic     bool    `json:"is_public"`
 	// EventType may be "audio_video" or "audio"; defaults to "audio_video".
 	EventType string `json:"event_type"`
 }
@@ -201,17 +202,17 @@ func (h *CommentaryHandler) Create(c *fiber.Ctx) error {
 		INSERT INTO events
 		  (promoter_id, title, teaser_hook, description, sport_type, scheduled_at,
 		   status, price, currency, thumbnail_url, stream_key, hls_path,
-		   event_type, livekit_room, review_note)
-		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,$9,'', $10,'','')
+		   event_type, livekit_room, review_note, is_public)
+		VALUES ($1,$2,$3,$4,$5,$6,'scheduled',$7,'KES',$8,$9,'', $10,'','',$11)
 		RETURNING id, promoter_id, title, description, sport_type, scheduled_at,
 		          status, price, currency, thumbnail_url, teaser_hook, event_type,
-		          review_note, created_at, updated_at`,
+		          review_note, is_public, created_at, updated_at`,
 		promoterID, req.Title, req.TeaserHook, req.Description, req.SportType,
-		scheduledAt, req.Price, req.ThumbnailURL, streamKey, eventType,
+		scheduledAt, req.Price, req.ThumbnailURL, streamKey, eventType, req.IsPublic,
 	).Scan(
 		&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType, &e.ScheduledAt,
 		&e.Status, &e.Price, &e.Currency, &e.ThumbnailURL, &e.TeaserHook, &e.EventType,
-		&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt,
+		&e.ReviewNote, &e.IsPublic, &e.CreatedAt, &e.UpdatedAt,
 	)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to create lobby: "+err.Error())

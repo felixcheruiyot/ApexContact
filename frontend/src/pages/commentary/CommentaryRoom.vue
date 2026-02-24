@@ -36,6 +36,7 @@
           :isHost="isHost"
           :myUserId="auth.user?.id"
           :speakerIds="speakerIds"
+          :showVideo="event?.event_type === 'audio_video'"
           @leave="leave"
           @raiseHand="raiseHand"
           @grantMic="grantMic"

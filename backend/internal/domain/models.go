@@ -131,6 +131,7 @@ type Event struct {
 	EventType    EventType   `json:"event_type" db:"event_type"`
 	LiveKitRoom  string      `json:"-" db:"livekit_room"`
 	TeaserHook   string      `json:"teaser_hook" db:"teaser_hook"`
+	IsPublic     bool        `json:"is_public" db:"is_public"`
 	CreatedAt    time.Time   `json:"created_at" db:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at" db:"updated_at"`
 }

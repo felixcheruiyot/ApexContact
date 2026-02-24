@@ -89,6 +89,23 @@
         </div>
       </div>
 
+      <!-- Visibility -->
+      <div class="flex items-center justify-between p-4 rounded-lg bg-bg-surface border border-white/5">
+        <div>
+          <p class="text-white text-sm font-medium">Make this event public</p>
+          <p class="text-text-muted text-xs mt-0.5">Public events appear on the Discover page. Private events are only accessible via direct link.</p>
+        </div>
+        <button
+          type="button"
+          @click="form.is_public = !form.is_public"
+          class="relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none"
+          :class="form.is_public ? 'bg-accent-red' : 'bg-white/10'"
+        >
+          <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
+            :class="form.is_public ? 'translate-x-5' : 'translate-x-0'" />
+        </button>
+      </div>
+
       <div v-if="errorMsg" class="bg-status-error/10 border border-status-error/30 text-status-error
                                    text-sm rounded-lg px-4 py-3">
         {{ errorMsg }}
@@ -127,6 +144,7 @@ const form = ref<{
   price: number
   currency: string
   thumbnail_url: string
+  is_public: boolean
 }>({
   title: '',
   description: '',
@@ -135,6 +153,7 @@ const form = ref<{
   price: 0,
   currency: 'KES',
   thumbnail_url: '',
+  is_public: false,
 })
 
 const statusTextClass = computed(() => {
@@ -167,6 +186,7 @@ onMounted(async () => {
         price: event.value.price,
         currency: event.value.currency,
         thumbnail_url: event.value.thumbnail_url,
+        is_public: event.value.is_public,
       }
     }
   } catch {
@@ -185,6 +205,7 @@ async function handleSubmit() {
       ...form.value,
       sport_type: form.value.sport_type as SportType,
       scheduled_at: new Date(form.value.scheduled_at).toISOString(),
+      is_public: form.value.is_public,
     })
     router.push('/dashboard')
   } catch (e: any) {

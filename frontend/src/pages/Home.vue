@@ -38,31 +38,55 @@
 
           <!-- Primary CTA -->
           <div class="flex items-center flex-wrap gap-4 pt-2">
-            <RouterLink
-              to="/try"
-              class="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-accent-red
-                     hover:bg-accent-red-hover text-white font-bold text-base
-                     transition-all duration-200 active:scale-95 shadow-lg shadow-accent-red/20"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 10l4.553-2.276A1 1 0 0121 8.677v6.646a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Start a Free Test Stream
-            </RouterLink>
-            <a
-              v-if="liveEvents.length"
-              href="#live"
-              class="inline-flex items-center gap-2 px-6 py-4 rounded-lg border border-white/20
-                     hover:border-white/40 text-white text-base font-medium
-                     transition-all duration-200 hover:bg-white/5"
-            >
-              Browse Live Events
-            </a>
+            <template v-if="auth.isAuthenticated">
+              <RouterLink
+                to="/dashboard/create"
+                class="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-accent-red
+                       hover:bg-accent-red-hover text-white font-bold text-base
+                       transition-all duration-200 active:scale-95 shadow-lg shadow-accent-red/20"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4v16m8-8H4" />
+                </svg>
+                Create New Event
+              </RouterLink>
+              <RouterLink
+                to="/dashboard"
+                class="inline-flex items-center gap-2 px-6 py-4 rounded-lg border border-white/20
+                       hover:border-white/40 text-white text-base font-medium
+                       transition-all duration-200 hover:bg-white/5"
+              >
+                My Dashboard
+              </RouterLink>
+            </template>
+            <template v-else>
+              <RouterLink
+                to="/try"
+                class="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-accent-red
+                       hover:bg-accent-red-hover text-white font-bold text-base
+                       transition-all duration-200 active:scale-95 shadow-lg shadow-accent-red/20"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.677v6.646a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Start a Free Test Stream
+              </RouterLink>
+              <a
+                v-if="liveEvents.length"
+                href="#live"
+                class="inline-flex items-center gap-2 px-6 py-4 rounded-lg border border-white/20
+                       hover:border-white/40 text-white text-base font-medium
+                       transition-all duration-200 hover:bg-white/5"
+              >
+                Browse Live Events
+              </a>
+            </template>
           </div>
 
-          <!-- Simple trust line — no fake numbers -->
-          <p class="text-text-muted text-sm pt-2">
+          <!-- Trust line -->
+          <p v-if="!auth.isAuthenticated" class="text-text-muted text-sm pt-2">
             5 minutes free &nbsp;·&nbsp; M-Pesa payouts &nbsp;·&nbsp; Works with OBS or browser
           </p>
         </div>
@@ -129,12 +153,25 @@
 
         <div class="mt-10">
           <RouterLink
+            v-if="!auth.isAuthenticated"
             to="/try"
             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-accent-red
                    hover:bg-accent-red-hover text-white font-semibold text-sm
                    transition-all duration-200 active:scale-95"
           >
             Try it now — no account needed
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </RouterLink>
+          <RouterLink
+            v-else
+            to="/dashboard/create"
+            class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-accent-red
+                   hover:bg-accent-red-hover text-white font-semibold text-sm
+                   transition-all duration-200 active:scale-95"
+          >
+            Create your first event
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -164,35 +201,62 @@
     ============================================================ -->
     <section class="py-20 animate-fade-in">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          class="rounded-xl border border-white/10 p-12 md:p-16 bg-bg-elevated"
-        >
-          <h2 class="font-display text-5xl md:text-6xl uppercase tracking-wide text-white leading-none mb-4">
-            Ready to Charge<br />Your Audience?
-          </h2>
-          <p class="text-text-muted text-base max-w-lg leading-relaxed mb-8">
-            Once you've tested the platform and seen it works, create an account.
-            Set a ticket price. We handle payment collection via M-Pesa and
-            pay you 70% after every session.
-          </p>
-          <div class="flex items-center flex-wrap gap-4">
-            <RouterLink
-              to="/register"
-              class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-accent-red
-                     hover:bg-accent-red-hover text-white font-semibold text-sm
-                     transition-all duration-200 active:scale-95"
-            >
-              Create Free Account
-            </RouterLink>
-            <RouterLink
-              to="/try"
-              class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg border border-white/20
-                     hover:border-white/40 text-white text-sm font-medium
-                     transition-all duration-200 hover:bg-white/5"
-            >
-              Test the stream first
-            </RouterLink>
-          </div>
+        <div class="rounded-xl border border-white/10 p-12 md:p-16 bg-bg-elevated">
+          <template v-if="auth.isAuthenticated">
+            <h2 class="font-display text-5xl md:text-6xl uppercase tracking-wide text-white leading-none mb-4">
+              Ready to Go Live?
+            </h2>
+            <p class="text-text-muted text-base max-w-lg leading-relaxed mb-8">
+              Create your next event, set a ticket price, and start collecting
+              M-Pesa payments. 70% of every ticket goes straight to you.
+            </p>
+            <div class="flex items-center flex-wrap gap-4">
+              <RouterLink
+                to="/dashboard/create"
+                class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-accent-red
+                       hover:bg-accent-red-hover text-white font-semibold text-sm
+                       transition-all duration-200 active:scale-95"
+              >
+                Create New Event
+              </RouterLink>
+              <RouterLink
+                to="/dashboard"
+                class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg border border-white/20
+                       hover:border-white/40 text-white text-sm font-medium
+                       transition-all duration-200 hover:bg-white/5"
+              >
+                View Dashboard
+              </RouterLink>
+            </div>
+          </template>
+          <template v-else>
+            <h2 class="font-display text-5xl md:text-6xl uppercase tracking-wide text-white leading-none mb-4">
+              Ready to Charge<br />Your Audience?
+            </h2>
+            <p class="text-text-muted text-base max-w-lg leading-relaxed mb-8">
+              Once you've tested the platform and seen it works, create an account.
+              Set a ticket price. We handle payment collection via M-Pesa and
+              pay you 70% after every session.
+            </p>
+            <div class="flex items-center flex-wrap gap-4">
+              <RouterLink
+                to="/register"
+                class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-accent-red
+                       hover:bg-accent-red-hover text-white font-semibold text-sm
+                       transition-all duration-200 active:scale-95"
+              >
+                Create Free Account
+              </RouterLink>
+              <RouterLink
+                to="/try"
+                class="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg border border-white/20
+                       hover:border-white/40 text-white text-sm font-medium
+                       transition-all duration-200 hover:bg-white/5"
+              >
+                Test the stream first
+              </RouterLink>
+            </div>
+          </template>
         </div>
       </div>
     </section>

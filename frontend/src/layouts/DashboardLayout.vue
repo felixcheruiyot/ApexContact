@@ -27,14 +27,8 @@
     >
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2 px-5 py-5 border-b border-white/5 shrink-0">
-        <svg width="22" height="22" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="14" cy="14" r="14" fill="#E8002D"/>
-          <polygon points="11,8 22,14 11,20" fill="white"/>
-          <rect x="5" y="11" width="2.5" height="6" rx="1" fill="white"/>
-          <rect x="8.5" y="9" width="2.5" height="10" rx="1" fill="white"/>
-        </svg>
-        <span class="font-display text-lg text-accent-red tracking-wider">LIVE</span>
-        <span class="font-display text-lg text-white tracking-wider">STREAMIFY</span>
+        <img src="@/assets/logo.svg" alt="Live Streamify" class="w-6 h-6 shrink-0" />
+        <span class="font-display text-lg tracking-wider text-white">LIVE <span class="text-accent-red">STREAMIFY</span></span>
       </RouterLink>
 
       <!-- Role section badge -->
@@ -58,10 +52,8 @@
           <NavItem to="/dashboard" :exact="true" icon="grid" label="My Events" />
           <NavItem to="/dashboard/create" icon="plus" label="Create Event" />
           <NavItem to="/dashboard/revenue" icon="bar-chart" label="Revenue" />
-          <div class="pt-2 pb-1 px-2">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted/60">Live Rooms</p>
-          </div>
-          <NavItem to="/commentary/create" icon="mic" label="Start a Live Room" />
+          <NavItem to="/dashboard/streams" icon="play" label="My Streams" />
+          <NavItem to="/dashboard/withdrawal" icon="credit-card" label="Withdrawal" />
         </template>
       </nav>
 
@@ -178,8 +170,9 @@ const pageTitle = computed(() => {
   if (p.startsWith('/dashboard/create')) return 'Create Event'
   if (p.startsWith('/dashboard/edit')) return 'Edit Event'
   if (p.startsWith('/dashboard/analytics')) return 'Event Analytics'
-  if (p.startsWith('/dashboard/revenue')) return 'Revenue & Analytics'
-  if (p.startsWith('/dashboard/commentary')) return 'Start a Live Room'
+  if (p.startsWith('/dashboard/revenue')) return 'Revenue & Earnings'
+  if (p.startsWith('/dashboard/streams')) return 'My Streams'
+  if (p.startsWith('/dashboard/withdrawal')) return 'Withdrawal'
   if (p.startsWith('/profile')) return 'My Profile'
   return sectionLabel.value
 })

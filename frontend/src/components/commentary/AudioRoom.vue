@@ -3,50 +3,81 @@
     <!-- Header -->
     <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-white font-semibold text-sm">Audio Room</span>
+        <span class="text-white font-semibold text-sm">{{ showVideo ? 'Video Room' : 'Audio Room' }}</span>
         <span v-if="connected" class="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
       </div>
       <span class="text-text-muted text-xs">{{ participants.length }} in room</span>
     </div>
 
-    <!-- Participants grid -->
-    <div class="flex-1 overflow-y-auto p-4">
-      <!-- Pre-join: user must click to allow AudioContext + mic -->
-      <div v-if="!joined" class="flex flex-col items-center justify-center h-full gap-4">
-        <Mic class="w-10 h-10 text-text-muted" />
-        <p class="text-white font-medium text-sm">Ready to join the audio room?</p>
-        <p class="text-text-muted text-xs text-center max-w-xs">
-          {{ canPublish ? 'Your microphone will be enabled.' : 'You will join as a listener.' }}
-        </p>
-        <button
-          @click="join"
-          class="px-6 py-2.5 rounded-lg bg-accent-orange text-white text-sm font-semibold hover:bg-orange-500 transition-colors"
+    <!-- Pre-join screen -->
+    <div v-if="!joined" class="flex flex-col items-center justify-center flex-1 gap-4 p-6">
+      <component :is="showVideo ? Video : Mic" class="w-10 h-10 text-text-muted" />
+      <p class="text-white font-medium text-sm">Ready to join?</p>
+      <p class="text-text-muted text-xs text-center max-w-xs">
+        {{ canPublish
+          ? (showVideo ? 'Your microphone and camera will be enabled.' : 'Your microphone will be enabled.')
+          : 'You will join as a listener.' }}
+      </p>
+      <button
+        @click="join"
+        class="px-6 py-2.5 rounded-lg bg-accent-orange text-white text-sm font-semibold hover:bg-orange-500 transition-colors"
+      >
+        Join {{ showVideo ? 'Video' : 'Audio' }}
+      </button>
+    </div>
+
+    <!-- Connecting -->
+    <div v-else-if="!connected && !connectionError" class="flex flex-col items-center justify-center flex-1 gap-4">
+      <div class="w-12 h-12 rounded-full border-2 border-accent-orange border-t-transparent animate-spin" />
+      <p class="text-text-muted text-sm">Connecting…</p>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="connectionError" class="flex flex-col items-center justify-center flex-1 gap-3 p-6">
+      <MicOff class="w-8 h-8 text-text-muted" />
+      <p class="text-white font-medium text-sm">Connection unavailable</p>
+      <p class="text-text-muted text-xs text-center max-w-xs">{{ connectionError }}</p>
+      <button @click="retry"
+        class="mt-2 px-4 py-2 rounded-lg bg-accent-orange text-white text-sm font-medium hover:bg-orange-500 transition-colors">
+        Retry
+      </button>
+    </div>
+
+    <!-- Connected: participants -->
+    <div v-else class="flex-1 overflow-hidden flex flex-col">
+
+      <!-- Video grid (audio_video mode) -->
+      <div v-if="showVideo && videoParticipants.length" class="grid grid-cols-2 gap-2 p-3 flex-1 overflow-auto">
+        <div
+          v-for="vp in videoParticipants"
+          :key="vp.identity"
+          class="relative rounded-lg overflow-hidden bg-black aspect-video"
         >
-          Join Audio
-        </button>
+          <video
+            v-if="vp.videoEl"
+            :ref="el => attachVideo(el as HTMLVideoElement, vp.identity)"
+            autoplay
+            playsinline
+            muted
+            class="w-full h-full object-cover"
+          />
+          <div v-else class="w-full h-full flex items-center justify-center bg-bg-elevated text-2xl font-bold text-white">
+            {{ initials(vp.identity) }}
+          </div>
+          <div class="absolute bottom-1 left-2 text-white text-xs font-semibold drop-shadow">
+            {{ vp.identity }}
+            <span v-if="vp.isSpeaking" class="ml-1 text-accent-orange">▶</span>
+          </div>
+        </div>
       </div>
 
-      <div v-else-if="!connected && !connectionError" class="flex flex-col items-center justify-center h-full gap-4">
-        <div class="w-12 h-12 rounded-full border-2 border-accent-orange border-t-transparent animate-spin" />
-        <p class="text-text-muted text-sm">Connecting to audio room…</p>
-      </div>
-
-      <div v-else-if="connectionError" class="flex flex-col items-center justify-center h-full gap-3">
-        <MicOff class="w-8 h-8 text-text-muted" />
-        <p class="text-white font-medium text-sm">Audio unavailable</p>
-        <p class="text-text-muted text-xs text-center max-w-xs">{{ connectionError }}</p>
-        <button @click="retry" class="mt-2 px-4 py-2 rounded-lg bg-accent-orange text-white text-sm font-medium hover:bg-orange-500 transition-colors">
-          Retry
-        </button>
-      </div>
-
-      <div v-else class="grid grid-cols-3 sm:grid-cols-4 gap-4">
+      <!-- Audio-only: avatar grid -->
+      <div v-else class="grid grid-cols-3 sm:grid-cols-4 gap-4 p-4 overflow-y-auto flex-1">
         <div
           v-for="p in participants"
           :key="p.identity"
           class="flex flex-col items-center gap-2"
         >
-          <!-- Avatar with speaking indicator -->
           <div
             class="relative w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold"
             :class="[
@@ -55,74 +86,79 @@
             ]"
           >
             {{ initials(p.identity) }}
-            <!-- Speaking animation ring -->
             <div v-if="p.isSpeaking" class="absolute inset-0 rounded-full bg-accent-orange/20 animate-pulse" />
           </div>
           <span class="text-white text-xs text-center truncate max-w-[72px]" :title="p.identity">
             {{ p.identity }}
           </span>
-          <!-- Mic status -->
           <span class="text-text-muted">
             <MicOff v-if="p.isMuted" class="w-3 h-3" />
             <Mic v-else class="w-3 h-3" />
           </span>
-          <!-- Host: grant/revoke mic button (not for self) -->
+          <!-- Host: grant/revoke mic -->
           <template v-if="isHost && p.identity !== myUserId">
             <button
               v-if="(speakerIds ?? []).includes(p.identity)"
               @click="$emit('revokeMic', p.identity)"
               class="px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-            >
-              Revoke Mic
-            </button>
+            >Revoke Mic</button>
             <button
               v-else
               @click="$emit('grantMic', p.identity)"
               class="px-2 py-0.5 rounded text-[10px] font-medium bg-success/20 text-success hover:bg-success/30 transition-colors"
-            >
-              Grant Mic
-            </button>
+            >Grant Mic</button>
           </template>
         </div>
       </div>
-    </div>
 
-    <!-- Controls -->
-    <div v-if="connected" class="px-4 py-3 border-t border-white/5 flex items-center justify-center gap-3">
-      <!-- Mute/unmute (speakers & host) -->
-      <button
-        v-if="canPublish"
-        @click="toggleMute"
-        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        :class="muted ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-bg-elevated text-white hover:bg-white/10'"
-      >
-        <MicOff v-if="muted" class="w-4 h-4" /><Mic v-else class="w-4 h-4" />
-        {{ muted ? 'Unmute' : 'Mute' }}
-      </button>
+      <!-- Controls -->
+      <div class="px-4 py-3 border-t border-white/5 flex items-center justify-center gap-3 flex-wrap">
+        <!-- Mute/unmute -->
+        <button
+          v-if="canPublish"
+          @click="toggleMute"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          :class="muted ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-bg-elevated text-white hover:bg-white/10'"
+        >
+          <MicOff v-if="muted" class="w-4 h-4" /><Mic v-else class="w-4 h-4" />
+          {{ muted ? 'Unmute' : 'Mute' }}
+        </button>
 
-      <!-- Raise hand (listeners) -->
-      <button
-        v-if="!canPublish"
-        @click="$emit('raiseHand')"
-        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-bg-elevated text-white text-sm font-medium hover:bg-white/10 transition-colors"
-      >
-        <Hand class="w-4 h-4" /> Raise Hand
-      </button>
+        <!-- Camera toggle (audio_video only) -->
+        <button
+          v-if="canPublish && showVideo"
+          @click="toggleCamera"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          :class="cameraOff ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-bg-elevated text-white hover:bg-white/10'"
+        >
+          <VideoOff v-if="cameraOff" class="w-4 h-4" /><Video v-else class="w-4 h-4" />
+          {{ cameraOff ? 'Start Camera' : 'Stop Camera' }}
+        </button>
 
-      <!-- Leave -->
-      <button
-        @click="$emit('leave')"
-        class="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-colors"
-      >
-        Leave
-      </button>
+        <!-- Raise hand -->
+        <button
+          v-if="!canPublish"
+          @click="$emit('raiseHand')"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg bg-bg-elevated text-white text-sm font-medium hover:bg-white/10 transition-colors"
+        >
+          <Hand class="w-4 h-4" /> Raise Hand
+        </button>
+
+        <!-- Leave -->
+        <button
+          @click="$emit('leave')"
+          class="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-colors"
+        >
+          Leave
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, computed, watch } from 'vue'
-import { Mic, MicOff, Hand } from 'lucide-vue-next'
+import { ref, computed, onUnmounted, watch, nextTick } from 'vue'
+import { Mic, MicOff, Hand, Video, VideoOff } from 'lucide-vue-next'
 import {
   Room,
   RoomEvent,
@@ -134,6 +170,7 @@ interface ParticipantInfo {
   identity: string
   isSpeaking: boolean
   isMuted: boolean
+  videoEl: boolean
 }
 
 const props = defineProps<{
@@ -143,6 +180,7 @@ const props = defineProps<{
   isHost?: boolean
   myUserId?: string
   speakerIds?: string[]
+  showVideo?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -154,23 +192,47 @@ const emit = defineEmits<{
   (e: 'revokeMic', userId: string): void
 }>()
 
-// Room is created lazily inside connect() so no AudioContext is created
-// until the user explicitly clicks "Join Audio".
 let room: Room | null = null
-
-// Keep track of audio elements we inject so we can remove them on disconnect.
 const audioElements: HTMLAudioElement[] = []
+const videoElements = new Map<string, HTMLVideoElement>()
 
 const joined = ref(false)
 const connected = ref(false)
 const connectionError = ref('')
 const participants = ref<ParticipantInfo[]>([])
 const muted = ref(false)
+const cameraOff = ref(false)
 
 const canPublish = computed(() => props.myRole === 'host' || props.myRole === 'speaker')
+const videoParticipants = computed(() => participants.value.filter(p => p.videoEl))
 
 function initials(identity: string) {
   return identity.slice(0, 2).toUpperCase()
+}
+
+// Attach a video track's stream to a <video> element
+function attachVideo(el: HTMLVideoElement | null, identity: string) {
+  if (!el) return
+  if (!room) return
+  const isLocal = room.localParticipant.identity === identity
+  if (isLocal) {
+    const pub = [...room.localParticipant.videoTrackPublications.values()].find(p => p.track)
+    if (pub?.track) {
+      const stream = new MediaStream([pub.track.mediaStreamTrack])
+      el.srcObject = stream
+    }
+  } else {
+    room.remoteParticipants.forEach((p) => {
+      if (p.identity === identity) {
+        p.videoTrackPublications.forEach(pub => {
+          if (pub.track) {
+            const stream = new MediaStream([pub.track.mediaStreamTrack])
+            el.srcObject = stream
+          }
+        })
+      }
+    })
+  }
 }
 
 function buildParticipantList() {
@@ -178,34 +240,34 @@ function buildParticipantList() {
   const list: ParticipantInfo[] = []
 
   const local = room.localParticipant
+  const localHasVideo = local.videoTrackPublications.size > 0
   list.push({
     identity: local.identity,
     isSpeaking: local.isSpeaking,
-    isMuted: local.isMicrophoneEnabled === false,
+    isMuted: !local.isMicrophoneEnabled,
+    videoEl: localHasVideo,
   })
 
   room.remoteParticipants.forEach((p: RemoteParticipant) => {
+    const hasVideo = p.videoTrackPublications.size > 0
     list.push({
       identity: p.identity,
       isSpeaking: p.isSpeaking,
       isMuted: !p.audioTrackPublications.size,
+      videoEl: hasVideo,
     })
   })
 
   participants.value = list
 }
 
-// Called on explicit user click — satisfies browser autoplay + getUserMedia policies.
 async function join() {
   joined.value = true
   await connect()
 }
 
 function cleanupAudio() {
-  audioElements.forEach(el => {
-    el.srcObject = null
-    el.remove()
-  })
+  audioElements.forEach(el => { el.srcObject = null; el.remove() })
   audioElements.length = 0
 }
 
@@ -214,23 +276,20 @@ async function connect() {
   try {
     room = new Room()
     await room.connect(props.livekitUrl, props.token)
-
-    // Unlock browser audio context — must be called while inside a user-gesture
-    // call stack (join() is triggered by a button click, so this is safe).
     await room.startAudio()
 
-    // Read publish permission from the token itself — more reliable than
-    // props.myRole which may not yet reflect a just-granted speaker role.
     if (room.localParticipant.permissions?.canPublish) {
       await room.localParticipant.setMicrophoneEnabled(true)
+      if (props.showVideo) {
+        await room.localParticipant.setCameraEnabled(true)
+        cameraOff.value = false
+      }
     }
 
     connected.value = true
     buildParticipantList()
     emit('connected')
 
-    // Attach each incoming remote audio track to a DOM <audio> element so
-    // the browser actually plays the sound.
     room.on(RoomEvent.TrackSubscribed, (track) => {
       if (track.kind === Track.Kind.Audio) {
         const el = track.attach() as HTMLAudioElement
@@ -239,6 +298,9 @@ async function connect() {
         audioElements.push(el)
       }
       buildParticipantList()
+      if (track.kind === Track.Kind.Video) {
+        nextTick(() => buildParticipantList())
+      }
     })
 
     room.on(RoomEvent.TrackUnsubscribed, (track) => {
@@ -251,8 +313,10 @@ async function connect() {
     room.on(RoomEvent.ActiveSpeakersChanged, buildParticipantList)
     room.on(RoomEvent.TrackPublished, buildParticipantList)
     room.on(RoomEvent.TrackUnpublished, buildParticipantList)
+    room.on(RoomEvent.LocalTrackPublished, buildParticipantList)
+    room.on(RoomEvent.LocalTrackUnpublished, buildParticipantList)
   } catch (err: any) {
-    connectionError.value = err?.message ?? 'Could not connect to the audio room.'
+    connectionError.value = err?.message ?? 'Could not connect to the room.'
     emit('error', connectionError.value)
   }
 }
@@ -264,14 +328,19 @@ async function toggleMute() {
   buildParticipantList()
 }
 
+async function toggleCamera() {
+  if (!room) return
+  cameraOff.value = !cameraOff.value
+  await room.localParticipant.setCameraEnabled(!cameraOff.value)
+  buildParticipantList()
+}
+
 function retry() {
   cleanupAudio()
   room?.disconnect()
   connect()
 }
 
-// When the token changes (e.g. role upgraded from listener → speaker),
-// reconnect to LiveKit so the new permissions take effect immediately.
 watch(() => props.token, async (newToken, oldToken) => {
   if (newToken && oldToken && newToken !== oldToken && connected.value) {
     cleanupAudio()
