@@ -48,6 +48,13 @@ const router = createRouter({
       component: () => import('@/pages/TryStream.vue'),
     },
 
+    // ── Public: Guest stream viewer (shareable link) ───────────────────────────
+    {
+      path: '/guest/:guestId',
+      name: 'guest-view',
+      component: () => import('@/pages/GuestView.vue'),
+    },
+
     // ── Protected: Watch ──────────────────────────────────────────────────────
     {
       path: '/watch/:eventId',
