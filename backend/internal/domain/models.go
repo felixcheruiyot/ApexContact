@@ -206,6 +206,41 @@ type FraudFlag struct {
 	ResolvedAt     *time.Time `json:"resolved_at,omitempty" db:"resolved_at"`
 }
 
+// ─── Withdrawal ───────────────────────────────────────────────────────────────
+
+type WithdrawalStatus string
+
+const (
+	WithdrawalPendingOTP WithdrawalStatus = "pending_otp"
+	WithdrawalProcessing WithdrawalStatus = "processing"
+	WithdrawalCompleted  WithdrawalStatus = "completed"
+	WithdrawalFailed     WithdrawalStatus = "failed"
+	WithdrawalCancelled  WithdrawalStatus = "cancelled"
+)
+
+type PayoutAccount struct {
+	ID            uuid.UUID `json:"id" db:"id"`
+	UserID        uuid.UUID `json:"user_id" db:"user_id"`
+	AccountType   string    `json:"account_type" db:"account_type"`
+	AccountNumber string    `json:"account_number" db:"account_number"`
+	AccountName   string    `json:"account_name" db:"account_name"`
+	BankName      string    `json:"bank_name" db:"bank_name"`
+	CreatedAt     time.Time `json:"created_at" db:"created_at"`
+}
+
+type Withdrawal struct {
+	ID              uuid.UUID        `json:"id" db:"id"`
+	UserID          uuid.UUID        `json:"user_id" db:"user_id"`
+	PayoutAccountID uuid.UUID        `json:"payout_account_id" db:"payout_account_id"`
+	Amount          float64          `json:"amount" db:"amount"`
+	Currency        string           `json:"currency" db:"currency"`
+	Status          WithdrawalStatus `json:"status" db:"status"`
+	IntaSendRef     string           `json:"intasend_ref" db:"intasend_ref"`
+	FailureReason   string           `json:"failure_reason,omitempty" db:"failure_reason"`
+	CreatedAt       time.Time        `json:"created_at" db:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at" db:"updated_at"`
+}
+
 // ─── API Response envelopes ───────────────────────────────────────────────────
 
 type Response struct {
