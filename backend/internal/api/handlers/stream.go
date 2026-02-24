@@ -146,6 +146,60 @@ func (h *StreamHandler) GetToken(c *fiber.Ctx) error {
 	})
 }
 
+// GuestStream creates a time-limited anonymous stream session requiring no authentication.
+// Returns RTMP credentials for the broadcaster and a shareable viewer URL.
+func (h *StreamHandler) GuestStream(c *fiber.Ctx) error {
+	var req struct {
+		Title string `json:"title"`
+	}
+	_ = c.BodyParser(&req)
+
+	const timeLimitSeconds = 300 // 5 minutes
+
+	guestID := uuid.NewString()
+	streamKey := fmt.Sprintf("guest-%s", uuid.New().String()[:8])
+	expiresAt := time.Now().Add(time.Duration(timeLimitSeconds) * time.Second)
+
+	// Store guestID → streamKey in Redis. Keep for slightly longer than the limit
+	// so a viewer URL remains resolvable after the timer expires on the broadcaster side.
+	h.rdb.Set(context.Background(),
+		fmt.Sprintf("guest:%s", guestID),
+		streamKey,
+		time.Duration(timeLimitSeconds+120)*time.Second,
+	)
+
+	viewerURL := fmt.Sprintf("%s/guest/%s", h.cfg.FrontendURL, guestID)
+
+	return c.Status(fiber.StatusCreated).JSON(domain.Response{
+		Data: fiber.Map{
+			"guest_id":           guestID,
+			"stream_key":         streamKey,
+			"rtmp_url":           h.cfg.RTMPIngestURL,
+			"viewer_url":         viewerURL,
+			"expires_at":         expiresAt.Format(time.RFC3339),
+			"time_limit_seconds": timeLimitSeconds,
+		},
+	})
+}
+
+// GuestWatch resolves a guest stream ID to its HLS URL. Called by the viewer page.
+func (h *StreamHandler) GuestWatch(c *fiber.Ctx) error {
+	guestID := c.Params("guestId")
+	if guestID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "guest ID is required")
+	}
+
+	streamKey, err := h.rdb.Get(context.Background(), fmt.Sprintf("guest:%s", guestID)).Result()
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, "guest stream not found or has expired")
+	}
+
+	hlsURL := fmt.Sprintf("%s/hls/%s.m3u8", h.cfg.FrontendURL, streamKey)
+	return c.JSON(domain.Response{
+		Data: fiber.Map{"hls_url": hlsURL, "stream_key": streamKey},
+	})
+}
+
 // IngestCallback is called by the Nginx-RTMP media server on stream start/stop.
 // Nginx-RTMP sends application/x-www-form-urlencoded with fields: call, name, app, addr
 func (h *StreamHandler) IngestCallback(c *fiber.Ctx) error {
