@@ -30,17 +30,11 @@
         <!-- Thumbnail -->
         <div class="relative aspect-video bg-bg-elevated overflow-hidden">
           <img
-            v-if="sub.thumbnail_url"
-            :src="sub.thumbnail_url"
+            :src="eventImage(sub.thumbnail_url)"
             :alt="sub.title"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            @error="onImageError"
           />
-          <div v-else class="w-full h-full flex items-center justify-center">
-            <svg class="w-10 h-10 text-text-muted/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M15 10l4.553-2.276A1 1 0 0121 8.677v6.646a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          </div>
           <!-- Status badge -->
           <div class="absolute top-2 left-2">
             <span :class="statusBadge(sub.status)" class="text-xs font-bold px-2 py-0.5 rounded-full capitalize">
@@ -77,6 +71,7 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { format } from 'date-fns'
 import client from '@/api/client'
+import { eventImage, onImageError } from '@/utils/eventImage'
 
 interface StreamSubscription {
   subscription_id: string

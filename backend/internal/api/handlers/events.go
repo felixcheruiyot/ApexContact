@@ -8,18 +8,20 @@ import (
 
 	"github.com/livestreamify/backend/internal/config"
 	"github.com/livestreamify/backend/internal/domain"
+	"github.com/livestreamify/backend/internal/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type EventHandler struct {
-	cfg *config.Config
-	db  *pgxpool.Pool
+	cfg      *config.Config
+	db       *pgxpool.Pool
+	notifSvc *service.NotificationService
 }
 
-func NewEventHandler(cfg *config.Config, db *pgxpool.Pool) *EventHandler {
-	return &EventHandler{cfg: cfg, db: db}
+func NewEventHandler(cfg *config.Config, db *pgxpool.Pool, notifSvc *service.NotificationService) *EventHandler {
+	return &EventHandler{cfg: cfg, db: db, notifSvc: notifSvc}
 }
 
 type createEventRequest struct {
@@ -165,6 +167,9 @@ func (h *EventHandler) Update(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "event not found, not editable, or access denied")
 	}
 
+	// Asynchronously notify subscribers about the update
+	go h.notifyEventUpdated(id)
+
 	return c.JSON(domain.Response{Data: "event updated"})
 }
 
@@ -216,6 +221,38 @@ func (h *EventHandler) Discover(c *fiber.Ctx) error {
 		events = []domain.Event{}
 	}
 	return c.JSON(domain.Response{Data: events})
+}
+
+// notifyEventUpdated queries all ticket holders for the event and emails each one.
+func (h *EventHandler) notifyEventUpdated(eventID string) {
+	ctx := context.Background()
+
+	var evt domain.Event
+	err := h.db.QueryRow(ctx,
+		`SELECT id, title, scheduled_at FROM events WHERE id = $1`, eventID,
+	).Scan(&evt.ID, &evt.Title, &evt.ScheduledAt)
+	if err != nil {
+		return
+	}
+
+	rows, err := h.db.Query(ctx,
+		`SELECT u.id, u.email, u.full_name
+		 FROM subscriptions s
+		 JOIN users u ON u.id = s.user_id
+		 WHERE s.event_id = $1`, eventID,
+	)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user domain.User
+		if err := rows.Scan(&user.ID, &user.Email, &user.FullName); err != nil {
+			continue
+		}
+		_ = h.notifSvc.SendEventUpdated(ctx, &user, &evt)
+	}
 }
 
 func itoa(n int) string {

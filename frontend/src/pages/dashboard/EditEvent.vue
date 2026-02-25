@@ -9,8 +9,8 @@
       <div class="h-24 bg-white/5 rounded-lg" />
     </div>
 
-    <!-- Locked state: event is not draft -->
-    <div v-else-if="event && event.status !== 'draft'"
+    <!-- Locked state: event has started or is in a non-editable state -->
+    <div v-else-if="event && !canEdit"
       class="card p-8 text-center space-y-3">
       <svg class="w-12 h-12 text-text-muted mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -18,7 +18,8 @@
       </svg>
       <p class="text-white font-semibold">This event cannot be edited</p>
       <p class="text-text-muted text-sm">
-        Only events in <span class="text-white font-medium">Draft</span> status can be edited.
+        Events can only be edited while in <span class="text-white font-medium">Draft</span> status
+        or while <span class="text-white font-medium">Scheduled</span> and not yet started.
         This event is currently <span class="font-medium capitalize" :class="statusTextClass">{{ event.status.replace('_', ' ') }}</span>.
       </p>
       <RouterLink to="/dashboard" class="btn-ghost inline-block mt-2 text-sm py-2 px-4">
@@ -28,6 +29,17 @@
 
     <!-- Edit form -->
     <form v-else-if="event" @submit.prevent="handleSubmit" class="space-y-6">
+      <!-- Subscriber notification notice for scheduled events -->
+      <div v-if="event.status === 'scheduled'"
+        class="flex items-start gap-3 px-4 py-3 rounded-lg bg-accent-orange/10 border border-accent-orange/20">
+        <svg class="w-5 h-5 text-accent-orange shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-accent-orange text-sm">
+          Saving changes will send an email notification to all ticket holders informing them of the update.
+        </p>
+      </div>
       <div>
         <label class="block text-text-muted text-sm mb-2">Event Title</label>
         <input v-model="form.title" type="text" placeholder="e.g. Sales Masterclass: Closing High-Ticket Deals 2026" class="input" required />
@@ -127,6 +139,13 @@ import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { eventsApi } from '@/api/events'
 import type { Event, SportType } from '@/types'
 
+// An event is editable if it is still a draft, or if it is scheduled and hasn't started yet
+function isEditable(e: Event): boolean {
+  if (e.status === 'draft') return true
+  if (e.status === 'scheduled' && new Date(e.scheduled_at) > new Date()) return true
+  return false
+}
+
 const router = useRouter()
 const route = useRoute()
 const eventId = route.params.eventId as string
@@ -156,6 +175,8 @@ const form = ref<{
   is_public: false,
 })
 
+const canEdit = computed(() => event.value ? isEditable(event.value) : false)
+
 const statusTextClass = computed(() => {
   switch (event.value?.status) {
     case 'pending_review': return 'text-blue-400'
@@ -177,7 +198,7 @@ onMounted(async () => {
   try {
     const res = await eventsApi.get(eventId)
     event.value = res.data.data ?? null
-    if (event.value && event.value.status === 'draft') {
+    if (event.value && isEditable(event.value)) {
       form.value = {
         title: event.value.title,
         description: event.value.description,

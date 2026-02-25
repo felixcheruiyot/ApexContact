@@ -3,9 +3,10 @@
     <!-- Thumbnail -->
     <div class="relative aspect-video overflow-hidden bg-bg-elevated">
       <img
-        :src="lobby.thumbnail_url || '/placeholder-event.jpg'"
+        :src="eventImage(lobby.thumbnail_url)"
         :alt="lobby.title"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        @error="onImageError"
       />
       <!-- Status badge -->
       <div class="absolute top-3 left-3 flex items-center gap-2">
@@ -70,6 +71,7 @@ import { RouterLink } from 'vue-router'
 import { Mic } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import type { Event } from '@/types'
+import { eventImage, onImageError } from '@/utils/eventImage'
 
 const props = defineProps<{ lobby: Event }>()
 

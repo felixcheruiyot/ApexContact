@@ -67,7 +67,7 @@ func registerMiddleware(app *fiber.App, cfg *config.Config) {
 
 func registerRoutes(app *fiber.App, cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client, notifSvc *service.NotificationService) {
 	authHandler := handlers.NewAuthHandler(cfg, db, rdb, notifSvc)
-	eventHandler := handlers.NewEventHandler(cfg, db)
+	eventHandler := handlers.NewEventHandler(cfg, db, notifSvc)
 	streamHandler := handlers.NewStreamHandler(cfg, db, rdb)
 	paymentHandler := handlers.NewPaymentHandler(cfg, db, rdb)
 	adminHandler := handlers.NewAdminHandler(cfg, db, rdb)

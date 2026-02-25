@@ -15,9 +15,10 @@
       <!-- Thumbnail -->
       <div class="relative rounded-xl overflow-hidden aspect-video mb-8">
         <img
-          :src="event.thumbnail_url || '/placeholder-event.jpg'"
+          :src="eventImage(event.thumbnail_url)"
           :alt="event.title"
           class="w-full h-full object-cover"
+          @error="onImageError"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
         <div class="absolute bottom-6 left-6 right-6">
@@ -188,6 +189,7 @@ import { useCommentaryStore } from '@/stores/commentary'
 import { useAuthStore } from '@/stores/auth'
 import NicknameModal from '@/components/commentary/NicknameModal.vue'
 import MpesaModal from '@/components/payment/MpesaModal.vue'
+import { eventImage, onImageError } from '@/utils/eventImage'
 
 const route = useRoute()
 const router = useRouter()

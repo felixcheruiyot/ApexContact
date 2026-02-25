@@ -141,6 +141,54 @@ func (s *NotificationService) SendWithdrawalOTP(ctx context.Context, user *domai
 	return s.mailer.Send(user.Email, "Your Withdrawal OTP — Live Streamify", body)
 }
 
+// SendEventUpdated emails a ticket holder informing them that event details have changed.
+func (s *NotificationService) SendEventUpdated(ctx context.Context, user *domain.User, event *domain.Event) error {
+	body := fmt.Sprintf(`<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background-color:#0A0A0F;font-family:Arial,sans-serif;">
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background-color:#0A0A0F;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+             style="max-width:600px;background-color:#141418;border-radius:12px;overflow:hidden;">
+        <tr><td style="background-color:#E8002D;padding:20px 40px;">
+          <p style="margin:0;font-size:22px;font-weight:700;letter-spacing:3px;color:#FFFFFF;text-transform:uppercase;">LIVE STREAMIFY</p>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#FFFFFF;">Event Updated</h1>
+          <p style="margin:0 0 8px;font-size:15px;color:#A0A0B0;line-height:1.6;">Hi %s,</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#A0A0B0;line-height:1.6;">
+            The event you have a ticket for has been updated by the organiser. Please review the latest details below.
+          </p>
+          <div style="background-color:#1E1E26;border-radius:8px;padding:20px;margin:0 0 24px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#FFFFFF;">%s</p>
+            <p style="margin:0;font-size:14px;color:#A0A0B0;">%s</p>
+          </div>
+          <a href="%s" style="display:inline-block;background-color:#E8002D;color:#FFFFFF;font-weight:700;
+             font-size:15px;padding:14px 28px;border-radius:8px;text-decoration:none;">
+            View Event Details
+          </a>
+          <p style="margin:24px 0 0;font-size:13px;color:#606070;line-height:1.6;">
+            Your ticket remains valid. If you have questions, please contact the event organiser.
+          </p>
+        </td></tr>
+        <tr><td style="padding:24px 40px;border-top:1px solid #1E1E26;">
+          <p style="margin:0;font-size:12px;color:#606070;text-align:center;">&copy; 2026 Live Streamify</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+		user.FullName,
+		event.Title,
+		event.ScheduledAt.Format("January 2, 2006 at 3:04 PM MST"),
+		s.appURL+"/events/"+event.ID.String(),
+	)
+
+	return s.mailer.Send(user.Email, "Event Updated — "+event.Title, body)
+}
+
 // SendRaw sends a pre-rendered HTML email.
 func (s *NotificationService) SendRaw(email, subject, body string) error {
 	return s.mailer.Send(email, subject, body)

@@ -106,10 +106,10 @@
               <h3 class="text-white font-semibold text-sm line-clamp-2">{{ event.title }}</h3>
             </div>
             <img
-              v-if="event.thumbnail_url"
-              :src="event.thumbnail_url"
+              :src="eventImage(event.thumbnail_url)"
               class="w-16 h-12 object-cover rounded-lg shrink-0"
               :alt="event.title"
+              @error="onImageError"
             />
           </div>
           <div class="flex items-center justify-between">
@@ -215,6 +215,7 @@ import { Users, Film, DollarSign, Shield, Radio } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { adminApi, type PlatformStats } from '@/api/admin'
 import type { FraudFlag, Event } from '@/types'
+import { eventImage, onImageError } from '@/utils/eventImage'
 
 const stats = ref<PlatformStats | null>(null)
 const liveEvents = ref<Event[]>([])
