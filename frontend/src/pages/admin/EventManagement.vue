@@ -79,10 +79,12 @@
     <!-- Table -->
     <div v-else-if="filtered.length" class="card overflow-hidden">
       <div class="overflow-x-auto">
-      <table class="w-full min-w-[640px]">
+      <table class="w-full min-w-[900px]">
         <thead>
           <tr class="border-b border-white/5">
             <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Event</th>
+            <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Owner</th>
+            <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Type</th>
             <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Sport</th>
             <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Scheduled</th>
             <th class="text-left text-text-muted text-xs uppercase tracking-wider px-6 py-3">Price</th>
@@ -98,6 +100,17 @@
               <p v-if="event.review_note" class="text-text-muted text-xs mt-1 italic line-clamp-1">
                 Note: {{ event.review_note }}
               </p>
+            </td>
+            <td class="px-6 py-4 min-w-[160px]">
+              <RouterLink
+                :to="{ name: 'users', query: { search: event.promoter_email } }"
+                class="text-accent-orange text-xs hover:underline block truncate max-w-[150px]"
+                :title="event.promoter_email"
+              >{{ event.promoter_email || event.promoter_id }}</RouterLink>
+              <p v-if="event.promoter_name" class="text-text-muted text-xs mt-0.5 truncate max-w-[150px]">{{ event.promoter_name }}</p>
+            </td>
+            <td class="px-6 py-4">
+              <span class="text-text-muted text-xs capitalize">{{ eventTypeLabel(event.event_type) }}</span>
             </td>
             <td class="px-6 py-4">
               <span class="text-text-muted text-sm capitalize">{{ event.sport_type }}</span>
@@ -304,12 +317,18 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { format } from 'date-fns'
 import { Film } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import type { Event, EventStatus, SportType } from '@/types'
+import type { Event, EventStatus, SportType, EventType } from '@/types'
 
-const events = ref<Event[]>([])
+interface AdminEvent extends Event {
+  promoter_email: string
+  promoter_name: string
+}
+
+const events = ref<AdminEvent[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const actioning = ref<string | null>(null)
@@ -333,7 +352,7 @@ const pendingCount = computed(() =>
   events.value.filter(e => e.status === 'pending_review').length,
 )
 
-const editing = ref<Event | null>(null)
+const editing = ref<AdminEvent | null>(null)
 const saving = ref(false)
 const saveError = ref<string | null>(null)
 
@@ -360,9 +379,19 @@ const form = ref<EditForm>({
 })
 
 // Reason modal
-const reasonModal = ref<{ event: Event; action: 'request_edits' | 'decline' } | null>(null)
+const reasonModal = ref<{ event: AdminEvent; action: 'request_edits' | 'decline' } | null>(null)
 const reasonText = ref('')
 const reasonError = ref<string | null>(null)
+
+function eventTypeLabel(type: EventType | string): string {
+  switch (type) {
+    case 'video': return 'Video (OBS)'
+    case 'audio_video': return 'Audio + Video'
+    case 'audio': return 'Audio Only'
+    case 'commentary': return 'Audio + Video'
+    default: return type || '—'
+  }
+}
 
 const filtered = computed(() => {
   return events.value.filter(e => {
@@ -402,7 +431,7 @@ async function loadEvents() {
   error.value = null
   try {
     const res = await adminApi.listAllEvents()
-    events.value = res.data.data ?? []
+    events.value = (res.data.data ?? []) as AdminEvent[]
   } catch (e: any) {
     error.value = e.response?.data?.error ?? 'Failed to load events'
   } finally {
@@ -410,7 +439,7 @@ async function loadEvents() {
   }
 }
 
-async function approve(event: Event) {
+async function approve(event: AdminEvent) {
   actioning.value = event.id
   try {
     await adminApi.approveEvent(event.id)
@@ -423,7 +452,7 @@ async function approve(event: Event) {
   }
 }
 
-function openReasonModal(event: Event, action: 'request_edits' | 'decline') {
+function openReasonModal(event: AdminEvent, action: 'request_edits' | 'decline') {
   reasonModal.value = { event, action }
   reasonText.value = ''
   reasonError.value = null
@@ -462,7 +491,7 @@ async function submitReason() {
   }
 }
 
-function openEdit(event: Event) {
+function openEdit(event: AdminEvent) {
   editing.value = event
   saveError.value = null
   form.value = {

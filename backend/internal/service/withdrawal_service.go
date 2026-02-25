@@ -54,8 +54,8 @@ func NewWithdrawalService(
 	return &WithdrawalService{db: db, rdb: rdb, intasend: is, notifSvc: notifSvc}
 }
 
-// AvailableBalance returns 70% of total successful ticket sales for events
-// owned by userID, minus the sum of all completed withdrawals.
+// AvailableBalance returns 70% of successful ticket sales for events owned by
+// userID that completed more than 12 hours ago, minus all completed withdrawals.
 func (s *WithdrawalService) AvailableBalance(ctx context.Context, userID string) (float64, error) {
 	const query = `
 		SELECT
@@ -64,7 +64,10 @@ func (s *WithdrawalService) AvailableBalance(ctx context.Context, userID string)
 		    FROM events e
 		    JOIN subscriptions sub ON sub.event_id = e.id
 		    JOIN payments p ON sub.payment_id = p.id
-		    WHERE e.promoter_id = $1 AND p.status = 'success'
+		    WHERE e.promoter_id = $1
+		      AND p.status = 'success'
+		      AND e.status = 'completed'
+		      AND e.updated_at <= NOW() - INTERVAL '12 hours'
 		  ), 0) * $2
 		  - COALESCE((
 		    SELECT SUM(amount)
@@ -76,6 +79,31 @@ func (s *WithdrawalService) AvailableBalance(ctx context.Context, userID string)
 	err := s.db.QueryRow(ctx, query, userID, PromoterCut).Scan(&balance)
 	if err != nil {
 		return 0, fmt.Errorf("AvailableBalance: %w", err)
+	}
+	return balance, nil
+}
+
+// UpcomingBalance returns 70% of successful ticket sales for events that
+// completed within the last 12 hours (clearing soon) or are still live/scheduled.
+func (s *WithdrawalService) UpcomingBalance(ctx context.Context, userID string) (float64, error) {
+	const query = `
+		SELECT COALESCE((
+		    SELECT SUM(p.amount)
+		    FROM events e
+		    JOIN subscriptions sub ON sub.event_id = e.id
+		    JOIN payments p ON sub.payment_id = p.id
+		    WHERE e.promoter_id = $1
+		      AND p.status = 'success'
+		      AND (
+		        (e.status = 'completed' AND e.updated_at > NOW() - INTERVAL '12 hours')
+		        OR e.status IN ('live', 'scheduled')
+		      )
+		  ), 0) * $2
+	`
+	var balance float64
+	err := s.db.QueryRow(ctx, query, userID, PromoterCut).Scan(&balance)
+	if err != nil {
+		return 0, fmt.Errorf("UpcomingBalance: %w", err)
 	}
 	return balance, nil
 }

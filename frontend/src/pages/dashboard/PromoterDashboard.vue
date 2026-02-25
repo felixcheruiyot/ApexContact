@@ -97,6 +97,10 @@
                   <div class="flex items-center gap-3 justify-end">
                     <!-- Draft actions -->
                     <template v-if="event.status === 'draft'">
+                      <RouterLink :to="`/events/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        View
+                      </RouterLink>
                       <RouterLink :to="`/dashboard/edit/${event.id}`"
                         class="text-text-muted text-sm hover:text-white transition-colors">
                         Edit
@@ -110,16 +114,43 @@
 
                     <!-- Pending review: no actions -->
                     <template v-else-if="event.status === 'pending_review'">
+                      <RouterLink :to="`/events/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        View
+                      </RouterLink>
                       <span class="text-text-muted text-xs italic">Under Review</span>
                     </template>
 
                     <!-- Declined: no actions -->
                     <template v-else-if="event.status === 'declined'">
-                      <!-- no actions -->
+                      <RouterLink :to="`/events/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        View
+                      </RouterLink>
                     </template>
 
-                    <!-- Active events -->
+                    <!-- Scheduled (not yet started) — allow editing -->
+                    <template v-else-if="event.status === 'scheduled' && new Date(event.scheduled_at) > new Date()">
+                      <RouterLink :to="`/events/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        View
+                      </RouterLink>
+                      <RouterLink :to="`/dashboard/edit/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        Edit
+                      </RouterLink>
+                      <button @click="showStreamKey(event.id)"
+                        class="text-accent-orange text-sm hover:underline">
+                        Stream Key
+                      </button>
+                    </template>
+
+                    <!-- Active events (live, scheduled past start, completed) -->
                     <template v-else>
+                      <RouterLink :to="`/events/${event.id}`"
+                        class="text-text-muted text-sm hover:text-white transition-colors">
+                        View
+                      </RouterLink>
                       <button @click="showStreamKey(event.id)"
                         class="text-accent-orange text-sm hover:underline">
                         Stream Key

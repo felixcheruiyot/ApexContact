@@ -127,18 +127,28 @@ type adminUpdateEventRequest struct {
 	Status       domain.EventStatus `json:"status"`
 }
 
+type adminEventItem struct {
+	domain.Event
+	PromoterEmail string `json:"promoter_email"`
+	PromoterName  string `json:"promoter_name"`
+}
+
 func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
 	statusFilter := c.Query("status")
 
-	query := `SELECT id, promoter_id, title, description, sport_type, scheduled_at,
-		        status, price, currency, thumbnail_url, review_note, created_at, updated_at
-		 FROM events`
+	query := `SELECT e.id, e.promoter_id, e.title, e.description, e.sport_type, e.scheduled_at,
+		        e.status, e.price, e.currency, e.thumbnail_url, e.event_type, e.review_note,
+		        e.created_at, e.updated_at,
+		        COALESCE(u.email, '') AS promoter_email,
+		        COALESCE(u.full_name, '') AS promoter_name
+		 FROM events e
+		 LEFT JOIN users u ON u.id = e.promoter_id`
 	var args []interface{}
 	if statusFilter != "" {
-		query += " WHERE status=$1"
+		query += " WHERE e.status=$1"
 		args = append(args, statusFilter)
 	}
-	query += " ORDER BY created_at DESC"
+	query += " ORDER BY e.created_at DESC"
 
 	rows, err := h.db.Query(context.Background(), query, args...)
 	if err != nil {
@@ -146,15 +156,18 @@ func (h *AdminHandler) ListEvents(c *fiber.Ctx) error {
 	}
 	defer rows.Close()
 
-	var events []domain.Event
+	var events []adminEventItem
 	for rows.Next() {
-		var e domain.Event
-		if err := rows.Scan(&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType,
-			&e.ScheduledAt, &e.Status, &e.Price, &e.Currency, &e.ThumbnailURL,
-			&e.ReviewNote, &e.CreatedAt, &e.UpdatedAt); err != nil {
+		var item adminEventItem
+		if err := rows.Scan(
+			&item.ID, &item.PromoterID, &item.Title, &item.Description, &item.SportType,
+			&item.ScheduledAt, &item.Status, &item.Price, &item.Currency, &item.ThumbnailURL,
+			&item.EventType, &item.ReviewNote, &item.CreatedAt, &item.UpdatedAt,
+			&item.PromoterEmail, &item.PromoterName,
+		); err != nil {
 			continue
 		}
-		events = append(events, e)
+		events = append(events, item)
 	}
 
 	return c.JSON(domain.Response{Data: events})

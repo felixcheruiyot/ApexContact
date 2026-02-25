@@ -1,22 +1,7 @@
 <template>
-  <div class="min-h-screen bg-bg flex flex-col">
-
-    <!-- Minimal header -->
-    <header class="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-      <RouterLink to="/" class="font-display text-xl tracking-widest text-white/80 hover:text-white transition-colors">
-        LIVE <span class="text-accent-red">·</span> STREAMIFY
-      </RouterLink>
-      <RouterLink
-        to="/register"
-        class="px-4 py-2 rounded-lg bg-accent-red hover:bg-accent-red-hover
-               text-white text-sm font-semibold transition-all"
-      >
-        Start your own
-      </RouterLink>
-    </header>
-
+  <div class="min-h-[60vh]">
     <!-- Loading -->
-    <div v-if="loading" class="flex-1 flex items-center justify-center">
+    <div v-if="loading" class="flex items-center justify-center min-h-[60vh]">
       <div class="flex flex-col items-center gap-3">
         <div class="w-10 h-10 border-4 border-accent-orange border-t-transparent rounded-full animate-spin" />
         <p class="text-text-muted text-sm">Joining room…</p>
@@ -24,7 +9,7 @@
     </div>
 
     <!-- Error -->
-    <div v-else-if="error" class="flex-1 flex items-center justify-center px-4">
+    <div v-else-if="error" class="flex items-center justify-center min-h-[60vh] px-4">
       <div class="text-center max-w-sm space-y-4">
         <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto">
           <Mic class="w-8 h-8 text-text-muted" />
@@ -43,55 +28,97 @@
       </div>
     </div>
 
-    <!-- Room ready — show in commentary/AudioRoom component -->
-    <div v-else-if="roomData" class="flex-1 flex flex-col items-center justify-center px-4 py-10">
-      <div class="w-full max-w-xl space-y-6">
-        <div class="flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-accent-orange animate-pulse" />
-          <span class="text-white font-semibold text-sm uppercase tracking-wider">
-            Guest {{ roomData.event_type === 'audio' ? 'Audio Room' : 'Audio + Video Room' }}
-          </span>
-        </div>
+    <!-- Room — same layout as Watch.vue for audio/video events -->
+    <template v-else-if="roomData">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <div class="bg-bg-elevated border border-white/10 rounded-xl p-8 text-center space-y-4">
-          <div class="w-14 h-14 rounded-full bg-accent-orange/15 flex items-center justify-center mx-auto">
-            <component :is="roomData.event_type === 'audio' ? Mic : Video" class="w-7 h-7 text-accent-orange" />
-          </div>
-          <div>
-            <p class="text-white font-bold text-lg mb-1">You're joining a live session</p>
-            <p class="text-text-muted text-sm leading-relaxed">
-              You'll join as a listener.
-              {{ roomData.event_type === 'audio_video' ? 'You can see and hear the host.' : 'You can hear the host.' }}
-            </p>
+        <!-- Live room embed -->
+        <div class="mb-6 bg-bg-elevated border border-white/10 rounded-xl overflow-hidden">
+          <!-- Pre-join state -->
+          <div v-if="!joined" class="p-10 flex flex-col items-center gap-5 text-center">
+            <div class="w-16 h-16 rounded-full bg-accent-orange/15 flex items-center justify-center">
+              <component :is="roomData.event_type === 'audio' ? Mic : Video" class="w-8 h-8 text-accent-orange" />
+            </div>
+            <div>
+              <p class="text-white font-bold text-xl mb-1">You're joining a live session</p>
+              <p class="text-text-muted text-sm">
+                You'll join as a listener.
+                {{ roomData.event_type === 'audio_video' ? 'You can see and hear the host.' : 'You can hear the host.' }}
+              </p>
+            </div>
+            <button
+              @click="joined = true"
+              class="px-8 py-3 rounded-lg bg-accent-orange hover:bg-orange-500
+                     text-white font-bold text-sm transition-all active:scale-95"
+            >
+              <component :is="roomData.event_type === 'audio' ? Mic : Video" class="w-4 h-4 inline-block mr-2" />
+              Join as listener
+            </button>
           </div>
 
-          <!-- The AudioRoom component handles the actual LiveKit connection -->
+          <!-- AudioRoom handles the LiveKit connection -->
           <AudioRoom
-            v-if="joined"
+            v-else
             :token="roomData.token"
             :livekit-url="roomData.livekit_url"
             my-role="listener"
             :is-host="false"
           />
-
-          <button
-            v-else
-            @click="joined = true"
-            class="w-full px-6 py-3.5 rounded-lg bg-accent-orange hover:bg-orange-500
-                   text-white font-bold text-sm transition-all active:scale-95"
-          >
-            <component :is="roomData.event_type === 'audio' ? Mic : Video" class="w-4 h-4 inline-block mr-2" />
-            Join as listener
-          </button>
         </div>
 
-        <p class="text-center text-text-muted text-xs">
-          This is a guest session — it expires automatically.
-          <RouterLink to="/try" class="text-white underline hover:no-underline ml-1">Start your own</RouterLink>
-        </p>
-      </div>
-    </div>
+        <!-- Info section below room -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="lg:col-span-2">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-2 h-2 rounded-full bg-accent-orange animate-pulse" />
+              <span class="text-white font-semibold text-sm uppercase tracking-wider">
+                Live {{ roomData.event_type === 'audio' ? 'Audio Room' : 'Audio + Video Room' }}
+              </span>
+            </div>
+            <h1 class="text-white font-bold text-2xl mb-3">Guest Session</h1>
+            <p class="text-text-muted leading-relaxed">
+              This is a guest test session. Sign up to host unlimited sessions with ticket sales and M-Pesa payments.
+            </p>
+          </div>
 
+          <!-- Sidebar -->
+          <div class="card p-5 h-fit">
+            <h3 class="text-white font-semibold mb-4">Session Info</h3>
+            <dl class="space-y-3">
+              <div>
+                <dt class="text-text-muted text-xs uppercase tracking-wider mb-1">Status</dt>
+                <dd>
+                  <span class="inline-flex items-center gap-1.5 badge-live">
+                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                    Live
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-text-muted text-xs uppercase tracking-wider mb-1">Format</dt>
+                <dd class="text-white text-sm capitalize">
+                  {{ roomData.event_type === 'audio' ? 'Audio Only' : 'Audio + Video' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-text-muted text-xs uppercase tracking-wider mb-1">Host</dt>
+                <dd class="text-white text-sm">Anonymous</dd>
+              </div>
+            </dl>
+            <div class="mt-4 pt-4 border-t border-white/5 space-y-3">
+              <p class="text-text-muted text-xs">Want to host your own session?</p>
+              <RouterLink to="/try" class="btn-primary w-full text-center text-sm block py-2">
+                Start a free stream
+              </RouterLink>
+              <RouterLink to="/register" class="btn-ghost w-full text-center text-sm block py-2">
+                Create account
+              </RouterLink>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </template>
   </div>
 </template>
 

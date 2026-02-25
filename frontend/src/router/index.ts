@@ -17,6 +17,9 @@ const router = createRouter({
         { path: 'promoters', name: 'for-promoters', component: () => import('@/pages/ForPromoters.vue') },
         { path: 'use-cases', name: 'use-cases', component: () => import('@/pages/UseCases.vue') },
         { path: 'privacy', name: 'privacy', component: () => import('@/pages/PrivacyPolicy.vue') },
+        { path: 'try', name: 'try-stream', component: () => import('@/pages/TryStream.vue') },
+        { path: 'guest/room/:guestId', name: 'guest-room-view', component: () => import('@/pages/GuestRoomView.vue') },
+        { path: 'guest/:guestId', name: 'guest-view', component: () => import('@/pages/GuestView.vue') },
         {
           path: 'profile',
           name: 'profile',
@@ -41,29 +44,6 @@ const router = createRouter({
       path: '/auth/callback',
       name: 'auth-callback',
       component: () => import('@/pages/auth/OAuthCallback.vue'),
-    },
-
-    // ── Public: Try stream (no auth required) ─────────────────────────────────
-    {
-      path: '/try',
-      name: 'try-stream',
-      component: () => import('@/pages/TryStream.vue'),
-    },
-
-    // ── Public: Guest LiveKit room viewer (audio / audio+video) ──────────────
-    // Must be defined BEFORE /guest/:guestId to avoid the dynamic segment
-    // swallowing the static 'room' segment in some router edge cases.
-    {
-      path: '/guest/room/:guestId',
-      name: 'guest-room-view',
-      component: () => import('@/pages/GuestRoomView.vue'),
-    },
-
-    // ── Public: Guest stream viewer (shareable link) ───────────────────────────
-    {
-      path: '/guest/:guestId',
-      name: 'guest-view',
-      component: () => import('@/pages/GuestView.vue'),
     },
 
     // ── Protected: Watch ──────────────────────────────────────────────────────

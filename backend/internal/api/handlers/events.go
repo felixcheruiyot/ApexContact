@@ -152,7 +152,8 @@ func (h *EventHandler) Update(c *fiber.Ctx) error {
 	tag, err := h.db.Exec(context.Background(),
 		`UPDATE events SET title=$1, description=$2, sport_type=$3, scheduled_at=$4,
 		  price=$5, currency=$6, thumbnail_url=$7, teaser_hook=$8, is_public=$9, updated_at=$10
-		 WHERE id=$11 AND promoter_id=$12 AND status='draft'`,
+		 WHERE id=$11 AND promoter_id=$12
+		   AND (status='draft' OR (status='scheduled' AND scheduled_at > NOW()))`,
 		req.Title, req.Description, req.SportType, req.ScheduledAt,
 		req.Price, req.Currency, req.ThumbnailURL, req.TeaserHook, req.IsPublic,
 		time.Now(), id, promoterID,
@@ -161,7 +162,7 @@ func (h *EventHandler) Update(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to update event")
 	}
 	if tag.RowsAffected() == 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "event not found, not in draft status, or access denied")
+		return fiber.NewError(fiber.StatusBadRequest, "event not found, not editable, or access denied")
 	}
 
 	return c.JSON(domain.Response{Data: "event updated"})

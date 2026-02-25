@@ -5,19 +5,34 @@
       <p class="text-text-muted text-sm mt-1">Withdraw your earnings to your M-Pesa or bank account.</p>
     </div>
 
-    <!-- Balance card -->
-    <div class="card p-6 flex items-center justify-between">
-      <div>
-        <p class="text-text-muted text-xs uppercase tracking-wider mb-1">Available Balance</p>
-        <p class="text-white font-bold text-3xl">
-          KES {{ balance !== null ? balance.toLocaleString('en-KE', { minimumFractionDigits: 2 }) : '—' }}
-        </p>
-        <p class="text-text-muted text-xs mt-1">70% of your completed ticket sales, minus past withdrawals</p>
+    <!-- Balance cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="card p-6 flex items-center justify-between">
+        <div>
+          <p class="text-text-muted text-xs uppercase tracking-wider mb-1">Available to Withdraw</p>
+          <p class="text-white font-bold text-3xl">
+            KES {{ balance !== null ? balance.toLocaleString('en-KE', { minimumFractionDigits: 2 }) : '—' }}
+          </p>
+          <p class="text-text-muted text-xs mt-1">From events that ended 12+ hours ago</p>
+        </div>
+        <svg class="w-10 h-10 text-accent-orange opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
       </div>
-      <svg class="w-10 h-10 text-accent-orange opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-      </svg>
+      <div class="card p-6 flex items-center justify-between">
+        <div>
+          <p class="text-text-muted text-xs uppercase tracking-wider mb-1">Upcoming Funds</p>
+          <p class="text-white font-bold text-3xl">
+            KES {{ upcomingBalance !== null ? upcomingBalance.toLocaleString('en-KE', { minimumFractionDigits: 2 }) : '—' }}
+          </p>
+          <p class="text-text-muted text-xs mt-1">Clears 12 hours after each event ends</p>
+        </div>
+        <svg class="w-10 h-10 text-status-success opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
     </div>
 
     <!-- Payout account setup -->
@@ -186,6 +201,7 @@ interface WithdrawalRecord {
 }
 
 const balance = ref<number | null>(null)
+const upcomingBalance = ref<number | null>(null)
 const payoutAccount = ref<PayoutAccount | null>(null)
 const history = ref<WithdrawalRecord[]>([])
 
@@ -211,7 +227,8 @@ async function loadBalance() {
   try {
     const res = await client.get('/profile/balance')
     balance.value = res.data.data?.balance ?? 0
-  } catch { balance.value = 0 }
+    upcomingBalance.value = res.data.data?.upcoming_balance ?? 0
+  } catch { balance.value = 0; upcomingBalance.value = 0 }
 }
 
 async function loadPayoutAccount() {

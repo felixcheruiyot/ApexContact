@@ -30,7 +30,15 @@ func (h *WithdrawalHandler) Balance(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch balance")
 	}
-	return c.JSON(domain.Response{Data: fiber.Map{"balance": balance, "currency": "KES"}})
+	upcoming, err := h.svc.UpcomingBalance(c.Context(), userID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to fetch balance")
+	}
+	return c.JSON(domain.Response{Data: fiber.Map{
+		"balance":          balance,
+		"upcoming_balance": upcoming,
+		"currency":         "KES",
+	}})
 }
 
 // GET /api/v1/profile/payout-account

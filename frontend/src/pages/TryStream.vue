@@ -1,34 +1,5 @@
 <template>
-  <div class="min-h-screen bg-bg flex flex-col">
-
-    <!-- Minimal header -->
-    <header class="border-b border-white/5 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
-      <RouterLink to="/" class="flex items-center gap-2 shrink-0 group min-w-0">
-        <img src="@/assets/logo.svg" alt="Live Streamify" class="w-7 h-7 shrink-0" />
-        <span class="font-display text-lg sm:text-xl tracking-widest text-white group-hover:text-white transition-colors truncate">
-          LIVE <span class="text-accent-red">STREAMIFY</span>
-        </span>
-      </RouterLink>
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <RouterLink
-          to="/login"
-          class="text-text-muted hover:text-white text-sm transition-colors whitespace-nowrap"
-        >
-          Sign in
-        </RouterLink>
-        <RouterLink
-          to="/register"
-          class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-white/20 hover:border-white/40
-                 text-white text-xs sm:text-sm font-medium transition-all hover:bg-white/5 whitespace-nowrap"
-        >
-          <span class="sm:hidden">Sign up</span>
-          <span class="hidden sm:inline">Create account</span>
-        </RouterLink>
-      </div>
-    </header>
-
-    <!-- Main content -->
-    <main class="flex-1 flex items-start justify-center px-4 pt-8 sm:pt-12 pb-20">
+  <div class="flex-1 flex items-start justify-center px-4 pt-8 sm:pt-12 pb-20">
       <div class="w-full max-w-2xl">
 
         <!-- ── PHASE: pick ──────────────────────────────────────────── -->
@@ -396,7 +367,6 @@
         </div>
 
       </div>
-    </main>
   </div>
 </template>
 

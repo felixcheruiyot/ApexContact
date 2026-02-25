@@ -101,8 +101,8 @@ const existingToken = computed(() =>
 
 const ctaLabel = computed(() => {
   if (auth.isAdmin) return event.value?.status === 'live' ? 'Watch Free (Admin)' : 'Event Details (Admin)'
-  if (existingToken.value) return 'Watch Now'
-  return event.value?.status === 'live' ? 'Watch Live' : 'Buy Ticket'
+  if (existingToken.value) return event.value?.status === 'live' ? 'Watch Now (Live)' : 'Watch Now'
+  return event.value?.status === 'live' ? 'Buy Ticket — Event is Live Now' : 'Buy Ticket'
 })
 
 onMounted(() => eventsStore.fetchEvent(route.params.id as string))
