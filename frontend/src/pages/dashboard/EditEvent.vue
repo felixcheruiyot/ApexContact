@@ -72,7 +72,8 @@
         </div>
         <div>
           <label class="block text-text-muted text-sm mb-2">Date & Time</label>
-          <input v-model="form.scheduled_at" type="datetime-local" class="input" required />
+          <input v-model="form.scheduled_at" type="datetime-local" :min="minScheduledAt()" class="input" required />
+          <p v-if="dateError" class="text-status-error text-xs mt-1">{{ dateError }}</p>
         </div>
       </div>
 
@@ -139,6 +140,12 @@ import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { eventsApi } from '@/api/events'
 import type { Event, SportType } from '@/types'
 
+function minScheduledAt(): string {
+  const d = new Date(Date.now() + 15 * 60 * 1000)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 // An event is editable if it is still a draft, or if it is scheduled and hasn't started yet
 function isEditable(e: Event): boolean {
   if (e.status === 'draft') return true
@@ -153,6 +160,7 @@ const eventId = route.params.eventId as string
 const event = ref<Event | null>(null)
 const loadingEvent = ref(true)
 const errorMsg = ref('')
+const dateError = ref('')
 const loading = ref(false)
 
 const form = ref<{
@@ -220,6 +228,18 @@ onMounted(async () => {
 async function handleSubmit() {
   if (!form.value.sport_type) return
   errorMsg.value = ''
+  dateError.value = ''
+
+  const scheduledDate = new Date(form.value.scheduled_at)
+  if (!form.value.scheduled_at || isNaN(scheduledDate.getTime())) {
+    dateError.value = 'Please select a valid date and time.'
+    return
+  }
+  if (scheduledDate.getTime() < Date.now() + 15 * 60 * 1000) {
+    dateError.value = 'Event must be scheduled at least 15 minutes in the future.'
+    return
+  }
+
   loading.value = true
   try {
     await eventsApi.update(eventId, {

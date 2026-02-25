@@ -203,7 +203,8 @@
           </div>
           <div>
             <label class="form-label">Date & Time *</label>
-            <input v-model="form.scheduled_at" type="datetime-local" class="input" required />
+            <input v-model="form.scheduled_at" type="datetime-local" :min="minScheduledAt()" class="input" required />
+            <p v-if="dateError" class="text-status-error text-xs mt-1">{{ dateError }}</p>
           </div>
         </div>
 
@@ -280,6 +281,13 @@ import { eventsApi } from '@/api/events'
 import { commentaryApi } from '@/api/commentary'
 import type { SportType } from '@/types'
 
+// Minimum allowed datetime: 15 minutes from now
+function minScheduledAt(): string {
+  const d = new Date(Date.now() + 15 * 60 * 1000)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 type BroadcastType = 'audio' | 'audio_video' | 'commercial'
 
 const router = useRouter()
@@ -287,6 +295,7 @@ const step = ref(0)
 const selectedType = ref<BroadcastType | null>(null)
 const loading = ref(false)
 const errorMsg = ref('')
+const dateError = ref('')
 
 const broadcastModes = [
   {
@@ -353,6 +362,18 @@ const form = ref({
 async function handleSubmit() {
   if (!form.value.sport_type || !selectedType.value) return
   errorMsg.value = ''
+  dateError.value = ''
+
+  const scheduledDate = new Date(form.value.scheduled_at)
+  if (!form.value.scheduled_at || isNaN(scheduledDate.getTime())) {
+    dateError.value = 'Please select a valid date and time.'
+    return
+  }
+  if (scheduledDate.getTime() < Date.now() + 15 * 60 * 1000) {
+    dateError.value = 'Event must be scheduled at least 15 minutes in the future.'
+    return
+  }
+
   loading.value = true
 
   try {

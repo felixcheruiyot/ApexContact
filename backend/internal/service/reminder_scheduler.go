@@ -9,23 +9,40 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// StartReminderScheduler polls every 5 minutes for events starting in ~45 minutes
-// and dispatches reminder emails to all subscribed, verified users.
-// It blocks until ctx is cancelled.
+// StartReminderScheduler polls every minute for event state transitions and
+// every 5 minutes for reminder emails. It blocks until ctx is cancelled.
 func StartReminderScheduler(ctx context.Context, db *pgxpool.Pool, notifSvc *NotificationService) {
-	ticker := time.NewTicker(5 * time.Minute)
-	defer ticker.Stop()
+	reminderTicker := time.NewTicker(5 * time.Minute)
+	transitionTicker := time.NewTicker(1 * time.Minute)
+	defer reminderTicker.Stop()
+	defer transitionTicker.Stop()
 
 	// Fire once immediately so restarts don't miss a window.
+	autoTransitionEvents(ctx, db)
 	dispatchReminders(ctx, db, notifSvc)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-ticker.C:
+		case <-transitionTicker.C:
+			autoTransitionEvents(ctx, db)
+		case <-reminderTicker.C:
 			dispatchReminders(ctx, db, notifSvc)
 		}
+	}
+}
+
+// autoTransitionEvents moves scheduled events to live once their scheduled time has arrived.
+func autoTransitionEvents(ctx context.Context, db *pgxpool.Pool) {
+	_, err := db.Exec(ctx, `
+		UPDATE events
+		SET status = 'live', updated_at = NOW()
+		WHERE status = 'scheduled'
+		  AND scheduled_at <= NOW()
+	`)
+	if err != nil {
+		log.Error().Err(err).Msg("auto_transition: failed to transition events to live")
 	}
 }
 

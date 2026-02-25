@@ -80,15 +80,16 @@ func (h *EventHandler) Get(c *fiber.Ctx) error {
 	err := h.db.QueryRow(context.Background(),
 		`SELECT id, promoter_id, title, description, sport_type, scheduled_at,
 		        status, price, currency, thumbnail_url, event_type, teaser_hook,
-		        is_public, created_at, updated_at
+		        is_public, hls_path, created_at, updated_at
 		 FROM events WHERE id = $1`, id,
 	).Scan(&e.ID, &e.PromoterID, &e.Title, &e.Description, &e.SportType,
 		&e.ScheduledAt, &e.Status, &e.Price, &e.Currency, &e.ThumbnailURL,
-		&e.EventType, &e.TeaserHook, &e.IsPublic, &e.CreatedAt, &e.UpdatedAt)
+		&e.EventType, &e.TeaserHook, &e.IsPublic, &e.HLSPath, &e.CreatedAt, &e.UpdatedAt)
 
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "event not found")
 	}
+	e.StreamActive = e.HLSPath != ""
 
 	return c.JSON(domain.Response{Data: e})
 }
@@ -99,6 +100,10 @@ func (h *EventHandler) Create(c *fiber.Ctx) error {
 	var req createEventRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+
+	if req.ScheduledAt.Before(time.Now().Add(15 * time.Minute)) {
+		return fiber.NewError(fiber.StatusBadRequest, "scheduled date must be at least 15 minutes in the future")
 	}
 
 	currency := req.Currency
@@ -149,6 +154,10 @@ func (h *EventHandler) Update(c *fiber.Ctx) error {
 	var req createEventRequest
 	if err := c.BodyParser(&req); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+
+	if req.ScheduledAt.Before(time.Now().Add(15 * time.Minute)) {
+		return fiber.NewError(fiber.StatusBadRequest, "scheduled date must be at least 15 minutes in the future")
 	}
 
 	tag, err := h.db.Exec(context.Background(),

@@ -127,6 +127,7 @@ type Event struct {
 	ThumbnailURL string      `json:"thumbnail_url" db:"thumbnail_url"`
 	StreamKey    string      `json:"-" db:"stream_key"`  // never expose to viewers
 	HLSPath      string      `json:"-" db:"hls_path"`
+	StreamActive bool        `json:"stream_active" db:"-"` // computed: hls_path != ""
 	ReviewNote   string      `json:"review_note" db:"review_note"`
 	EventType    EventType   `json:"event_type" db:"event_type"`
 	LiveKitRoom  string      `json:"-" db:"livekit_room"`

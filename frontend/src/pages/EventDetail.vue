@@ -5,6 +5,19 @@
     </div>
 
     <template v-else-if="event">
+      <!-- Waiting for host banner: event time has passed but broadcaster hasn't gone live yet -->
+      <div
+        v-if="event.status === 'live' && event.event_type === 'video' && !event.stream_active"
+        class="bg-accent-orange/10 border-b border-accent-orange/20 px-4 py-3"
+      >
+        <div class="max-w-7xl mx-auto flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-accent-orange animate-pulse shrink-0" />
+          <p class="text-accent-orange text-sm font-medium">
+            The event has started — waiting for the host to begin the stream. Please stay on this page and refresh shortly.
+          </p>
+        </div>
+      </div>
+
       <EventHero :event="event" @buy-ticket="handleCta" />
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -99,8 +112,15 @@ const existingToken = computed(() =>
   event.value ? payment.getStoredToken(event.value.id) : null
 )
 
+const waitingForHost = computed(() =>
+  event.value?.status === 'live' &&
+  event.value?.event_type === 'video' &&
+  !event.value?.stream_active
+)
+
 const ctaLabel = computed(() => {
   if (auth.isAdmin) return event.value?.status === 'live' ? 'Watch Free (Admin)' : 'Event Details (Admin)'
+  if (waitingForHost.value) return existingToken.value ? 'Stream Starting Soon' : 'Reserve Your Spot'
   if (existingToken.value) return event.value?.status === 'live' ? 'Watch Now (Live)' : 'Watch Now'
   return event.value?.status === 'live' ? 'Buy Ticket — Event is Live Now' : 'Buy Ticket'
 })

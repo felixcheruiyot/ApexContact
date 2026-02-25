@@ -45,6 +45,7 @@ export interface Event {
   event_type: EventType
   teaser_hook: string
   is_public: boolean
+  stream_active: boolean
   created_at: string
 }
 
