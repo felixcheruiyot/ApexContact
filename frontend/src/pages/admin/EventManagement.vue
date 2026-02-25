@@ -127,31 +127,33 @@
               </span>
             </td>
             <td class="px-6 py-4 text-right">
-              <!-- Pending review actions -->
-              <div v-if="event.status === 'pending_review'" class="flex items-center gap-2 justify-end">
-                <button @click="approve(event)"
-                  :disabled="actioning === event.id"
-                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success
-                         hover:bg-status-success/20 transition-colors disabled:opacity-50">
-                  Approve
-                </button>
-                <button @click="openReasonModal(event, 'request_edits')"
-                  :disabled="actioning === event.id"
-                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-accent-orange/10 text-accent-orange
-                         hover:bg-accent-orange/20 transition-colors disabled:opacity-50">
-                  Request Edits
-                </button>
-                <button @click="openReasonModal(event, 'decline')"
-                  :disabled="actioning === event.id"
-                  class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-error/10 text-status-error
-                         hover:bg-status-error/20 transition-colors disabled:opacity-50">
-                  Decline
+              <div class="flex items-center gap-2 justify-end flex-wrap">
+                <!-- Pending review workflow buttons -->
+                <template v-if="event.status === 'pending_review'">
+                  <button @click="approve(event)"
+                    :disabled="actioning === event.id"
+                    class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-success/10 text-status-success
+                           hover:bg-status-success/20 transition-colors disabled:opacity-50">
+                    Approve
+                  </button>
+                  <button @click="openReasonModal(event, 'request_edits')"
+                    :disabled="actioning === event.id"
+                    class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-accent-orange/10 text-accent-orange
+                           hover:bg-accent-orange/20 transition-colors disabled:opacity-50">
+                    Request Edits
+                  </button>
+                  <button @click="openReasonModal(event, 'decline')"
+                    :disabled="actioning === event.id"
+                    class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-status-error/10 text-status-error
+                           hover:bg-status-error/20 transition-colors disabled:opacity-50">
+                    Decline
+                  </button>
+                </template>
+                <!-- Edit available for all events -->
+                <button @click="openEdit(event)" class="btn-ghost text-xs py-1.5 px-3">
+                  Edit
                 </button>
               </div>
-              <!-- Other events: edit -->
-              <button v-else @click="openEdit(event)" class="btn-ghost text-xs py-1.5 px-3">
-                Edit
-              </button>
             </td>
           </tr>
         </tbody>
